@@ -33,11 +33,15 @@ def upload_file():
             filename = secure_filename(file.filename)
             filename_abs_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filename_abs_path)
-            marge_output_dir = do_process.init_marge()
-            do_process.config_marge(marge_output_dir)
-            #return redirect(url_for('uploaded_file',
-            #                        filename=filename))
-            return "File uploaded success! Wait for results!"
+
+            marge_res = do_process.init_marge()
+            if marge_res[0]:
+                # do marge process
+                do_process.config_marge(marge_res[1][0], marge_res[1][1])
+                do_process.exe_marge(marge_res[1][0])
+                return "File uploaded succeed! Marge init succeed!"
+            else:
+                return "File uploaded succeed! Marge init failed!"
 
     return render_template('upload.html')
 

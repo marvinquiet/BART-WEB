@@ -1,5 +1,7 @@
 BART/
 MARGE/
+MARGE_*/
+uploads/
 
 *.pyc
 __pycache__/
