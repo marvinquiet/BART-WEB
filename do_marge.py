@@ -103,11 +103,14 @@ def is_marge_done(user_path):
     snakemake_path = os.path.join(marge_output_dir, '.snakemake')
     snakemake_log_dir = os.path.join(snakemake_path, 'log')
 
-    for file in os.listdir(snakemake_log_dir):
-        if file.endswith(".log"):
-            if '(100%) done' in file:
-                return True
-
+    for log_file in os.listdir(snakemake_log_dir):
+        if log_file.endswith(".log"):
+            log_file_path = os.path.join(snakemake_log_dir, log_file)
+            with open(log_file_path, 'rb') as file:
+                for line in file:
+                    if '(100%) done' in line:
+                        return True
+    return False
 
 
 

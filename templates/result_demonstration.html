@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <!-- <link rel="icon" href="../../../../favicon.ico"> -->
 
-    <title>MARGE-BART Website</title>
+    <title>MARGE-BART Result</title>
 
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
@@ -18,20 +18,30 @@
   <body class="bg-light">
 
     <div class="container">
-
       <div class="row">
         <div class="col-md-12 order-md-1">
-          <form method=post>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <button class="btn btn-primary btn-lg btn-block" type="submit" name="index_submit" value="predict_data">Predict Your Own Data</button>
-              </div>
-              <div class="col-md-6 mb-3">
-                <button class="btn btn-primary btn-lg btn-block" type="submit" name="index_submit" onclick="pop_up_func()">Retrieve Result</button>
-              </div>
-            </form>
+
+          <div id="resultPending" class="col-md-12 mb-3">
+            <h3 class="mb-3">YOUR PREDICTION IS STILL BEING PROCESSED.</h3>
+          </div>
+
+          <div id="result" class="col-md-12 mb-3">
+            <h3 class="mb-3">RESULTS.</h3>
+          </div>
+
+          <div id="userConfig" class="col-md-12 mb-3">
+            <h3 class="mb-3">YOUR CONFIGS.</h4>
+            
+          </div>
+
+          <div id="procLog" class="col-md-12 mb-3">
+            <h3 class="mb-3">PROCEDURE LOG.</h3>
           </div>
         </div>
+      </div>
+
+      <div class="py-5 text-center">
+        <a href="http://127.0.0.1:5000/">Go back to main page.</a>
       </div>
 
       <footer class="my-5 pt-5 text-muted text-center text-small">
@@ -54,7 +64,6 @@
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script> -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='holder.min.js') }}"></script>
-    
     
     </script>
   </body>

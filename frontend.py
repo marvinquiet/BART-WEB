@@ -87,16 +87,21 @@ def test_getting_config():
     return render_template('get_data_config.html')
 
 
-
 @app.route('/retrieve-result', methods=['GET', 'POST'])
 def test_getting_result():
     user_key = request.args['user_key']
-    print (user_key)
     user_data = do_process.get_user_data(user_key)
-    if do_marge.is_marge_done(user_data['user_path']):
-        print (True)
+    results = do_process.generate_results(user_data)
 
-    return render_template('result_demonstration.html')
+    return render_template('result_demonstration.html', results=results)
+
+    # if do_marge.is_marge_done(user_data['user_path']):
+    #     return render_template('result_demonstration.html', result=result)
+    # else:
+    #     return render_template('result_demonstration.html', result=result)
+        
+
+    
 
 
 def allowed_file(filename):

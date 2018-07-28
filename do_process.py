@@ -4,6 +4,8 @@ import shutil
 import json
 
 import utils
+import do_marge
+import do_bart
 
 PROJECT_DIR = os.path.dirname(__file__)
 
@@ -44,6 +46,12 @@ def get_user_data(user_key):
 def is_user_key_exists(user_key):
     dest_path = os.path.join(PROJECT_DIR, user_key)
     return os.path.exists(dest_path)
+
+def generate_results(user_data):
+    results = {}
+    if do_marge.is_marge_done(user_data['user_path']):
+
+
 
 
 
