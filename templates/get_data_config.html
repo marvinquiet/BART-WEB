@@ -1,0 +1,246 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- <link rel="icon" href="../../../../favicon.ico"> -->
+
+    <title>MARGE-BART Website</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='form-validation.css') }}" rel="stylesheet">
+  </head>
+
+  <body class="bg-light">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 order-md-1">
+          <form class="needs-validation" method=post enctype=multipart/form-data novalidate>
+            
+            <h3 class="mb-3">Predict your own data now</h3>
+            <div class="col-md-12 mb-3">
+              <h4 class="mb-3">Choose Data Type</h4>
+              <select class="custom-select d-block w-100" id="dataType" name=dataType required>
+                <option value="">Choose...</option>
+                <option value="ChIP-seq">ChIP-seq</option>
+                <option value="Geneset">Geneset</option>
+                <option value="Both">Both</option>
+              </select>
+              <div class="invalid-feedback">
+                Please select a valid data type.
+              </div>
+            </div>
+
+            <div class="col-md-12 mb-3">
+              <h4 class="mb-3">Choose Assembly</h4>
+              <select class="custom-select d-block w-100" id="assembly" name="assembly" required>
+                <option value="">Choose...</option>
+                <option value="hg38">hg38</option>
+                <!-- <option value="hg19">hg19</option> -->
+                <option value="mm10">mm10</option>
+                <!-- <option value="mm9">mm9</option> -->
+              </select>
+              <div class="invalid-feedback">
+                Please select a valid assembly.
+              </div>
+            </div>
+
+              
+            <div class="col-md-12 mb-3">
+              <h4 class="mb-3">Choose Prediction Type</h4>
+              <div class="custom-control custom-checkbox">
+                <input id="rp" class="custom-control-input" type="checkbox" name="predictionType" value="rp" disabled>
+                <label class="custom-control-label" for="rp">
+                    Relative RPs
+                </label>
+              </div>
+
+              <div class="custom-control custom-checkbox">
+                <input id="cis" class="custom-control-input" type="checkbox" name="predictionType" value="cis" disabled>
+                <label class="custom-control-label" for="cis">
+                    Cisregulatory Elements
+                </label>
+              </div>
+
+              <div class="custom-control custom-checkbox">
+                <input id="tf" class="custom-control-input" type="checkbox" name="predictionType" value="tf" disabled>
+                <label class="custom-control-label" for="tf">
+                    TF patterns
+                </label>
+              </div>
+
+              <div class="custom-control custom-checkbox">
+                <input id="eh" class="custom-control-input" type="checkbox" name="predictionType" value="eh" disabled>
+                <label class="custom-control-label" for="eh">
+                    Enhancer
+                </label>
+              </div>
+            </div>
+
+              
+
+            <div class="col-md-12 mb-3" id='expType' hidden>
+              <h4 class="mb-3" id='expTypeTitle' hidden>Choose Gene Expression Type</h4>
+              <div class="custom-control custom-radio">
+                <input id="geneOnly" name="expTypeChoice" value="Gene_Only" type="radio" class="custom-control-input" required>
+                <label class="custom-control-label" for="geneOnly">Gene Only</label>
+              </div>
+              <div class="custom-control custom-radio">
+                <input id="geneResp" name="expTypeChoice" value="Gene_Response" type="radio" class="custom-control-input" required>
+                <label class="custom-control-label" for="geneResp">Gene Response</label>
+              </div>
+            </div>
+
+              
+
+            <div class="col-md-12 mb-3" id="geneId" hidden>
+              <h4 class="mb-3" id="geneIdTitle" hidden>Choose Gene ID Type</h4>
+              <div class="custom-control custom-radio">
+                <input id="geneSymb" name="geneIdChoice" value="GeneSymbol" type="radio" class="custom-control-input" required>
+                <label class="custom-control-label" for="geneSymb">Gene Symbol</label>
+              </div>
+              <div class="custom-control custom-radio">
+                <input id="refSeq" name="geneIdChoice" value="RefSeq" type="radio" class="custom-control-input" required>
+                <label class="custom-control-label" for="refSeq">Ref Seq</label>
+              </div>
+            </div>
+
+            
+            <div class="col-md-12 mb-3">
+              <h4 class="mb-3">Upload your file(s).</h4>
+              <p id="fileType" hidden></p>
+              <input id="uploadFiles" name="uploadFiles" type="file" multiple>
+            </div>
+
+            <hr class="mb-4">
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <h3 class="mb-3">Generate unique key</h3>
+                <p>In order to retrieve your prediction result later, you need to input your username to generate your retrieval key.</p>
+                <label for="Username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                <div class="invalid-feedback" style="width: 100%;">
+                  Your username is required.
+                </div>
+              </div>
+            </div>
+
+            <hr class="mb-4">
+            <button class="btn btn-primary btn-lg btn-block" type="submit" name="start_prediction" value="start_prediction">Start your prediction</button>
+          </form>
+        </div>
+      </div>
+
+      <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">&copy; 2017-2018 Chongzhi Zang Lab at the University of Virginia</p>
+        <ul class="list-inline">
+          <li class="list-inline-item"><a href="#">Privacy</a></li>
+          <li class="list-inline-item"><a href="#">Terms</a></li>
+          <li class="list-inline-item"><a href="#">Support</a></li>
+        </ul>
+      </footer>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <!-- <script src="../../assets/js/vendor/popper.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='holder.min.js') }}"></script>
+    
+    
+
+    <script>
+      // Example starter JavaScript for disabling form submissions if there are invalid fields
+      (function() {
+        'use strict';
+
+        window.addEventListener('load', function() {
+          // Fetch all the forms we want to apply custom Bootstrap validation styles to
+          var forms = document.getElementsByClassName('needs-validation');
+
+          // Loop over them and prevent submission
+          var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+              if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+              form.classList.add('was-validated');
+            }, false);
+          });
+        }, false);
+      })();
+    </script>
+
+    <script>
+    $("#dataType").change(function() {
+        if ($(this).val() === "ChIP-seq") {
+            $("#eh").attr("disabled", "disabled");
+            $("#rp").removeAttr("disabled");
+            $("#cis").removeAttr("disabled");
+            $("#tf").removeAttr("disabled");
+
+            $("#expTypeTitle").attr("hidden", true);
+            $("#expType").attr("hidden", true);
+            $("#geneIdTitle").attr("hidden", true);
+            $("#geneId").attr("hidden", true);
+
+            $("#fileType").text("Only ChIP-seq file in .bam will be processed.");
+            $("#fileType").removeAttr("hidden");
+        } else if ($(this).val() === "Geneset") {
+            $("#eh").removeAttr("disabled");
+            $("#tf").removeAttr("disabled");
+            $("#rp").attr("disabled", "disabled");
+            $("#cis").attr("disabled", "disabled");
+
+            $("#expTypeTitle").removeAttr("hidden");
+            $("#expType").removeAttr("hidden");
+            $("#geneIdTitle").removeAttr("hidden");
+            $("#geneId").removeAttr("hidden");
+
+            $("#fileType").text("Only Geneset file in .txt will be processed.");
+            $("#fileType").removeAttr("hidden");
+        } else if ($(this).val() === "Both") {
+            $("#rp").removeAttr("disabled");
+            $("#cis").removeAttr("disabled");
+            $("#eh").removeAttr("disabled");
+            $("#tf").removeAttr("disabled");
+
+            $("#expTypeTitle").removeAttr("hidden");
+            $("#expType").removeAttr("hidden");
+            $("#geneIdTitle").removeAttr("hidden");
+            $("#geneId").removeAttr("hidden");
+
+            $("#fileType").text("ChIP-seq in .bam and Geneset file in .txt will be processed.");
+            $("#fileType").removeAttr("hidden");
+        } else if ($(this).val() === "") {
+            $('input[type=checkbox]').prop('checked',false);
+            $("#eh").attr("disabled", "disabled");
+            $("#rp").attr("disabled", "disabled");
+            $("#cis").attr("disabled", "disabled");
+            $("#tf").attr("disabled", "disabled");
+
+            $("#expTypeTitle").attr("hidden", true);
+            $("#expType").attr("hidden", true);
+            $("#geneIdTitle").attr("hidden", true);
+            $("#geneId").attr("hidden", true);
+
+            $("#fileType").attr("hidden", true);
+        }
+    });
+    </script>
+  </body>
+</html>
