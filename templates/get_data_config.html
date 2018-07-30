@@ -89,7 +89,7 @@
             <div class="col-md-12 mb-3" id='expType' hidden>
               <h4 class="mb-3" id='expTypeTitle' hidden>Choose Gene Expression Type</h4>
               <div class="custom-control custom-radio">
-                <input id="geneOnly" name="expTypeChoice" value="Gene_Only" type="radio" class="custom-control-input" required>
+                <input id="geneOnly" name="expTypeChoice" value="Gene_Only" type="radio" class="custom-control-input" checked required>
                 <label class="custom-control-label" for="geneOnly">Gene Only</label>
               </div>
               <div class="custom-control custom-radio">
@@ -103,7 +103,7 @@
             <div class="col-md-12 mb-3" id="geneId" hidden>
               <h4 class="mb-3" id="geneIdTitle" hidden>Choose Gene ID Type</h4>
               <div class="custom-control custom-radio">
-                <input id="geneSymb" name="geneIdChoice" value="GeneSymbol" type="radio" class="custom-control-input" required>
+                <input id="geneSymb" name="geneIdChoice" value="GeneSymbol" type="radio" class="custom-control-input" checked required>
                 <label class="custom-control-label" for="geneSymb">Gene Symbol</label>
               </div>
               <div class="custom-control custom-radio">
@@ -188,6 +188,7 @@
     <script>
     $("#dataType").change(function() {
         if ($(this).val() === "ChIP-seq") {
+            $('input[type=checkbox]').prop('checked',false);
             $("#eh").attr("disabled", "disabled");
             $("#rp").removeAttr("disabled");
             $("#cis").removeAttr("disabled");
@@ -201,6 +202,7 @@
             $("#fileType").text("Only ChIP-seq file in .bam will be processed.");
             $("#fileType").removeAttr("hidden");
         } else if ($(this).val() === "Geneset") {
+            $('input[type=checkbox]').prop('checked',false);
             $("#eh").removeAttr("disabled");
             $("#tf").removeAttr("disabled");
             $("#rp").attr("disabled", "disabled");
@@ -214,6 +216,7 @@
             $("#fileType").text("Only Geneset file in .txt will be processed.");
             $("#fileType").removeAttr("hidden");
         } else if ($(this).val() === "Both") {
+            $('input[type=checkbox]').prop('checked',false);
             $("#rp").removeAttr("disabled");
             $("#cis").removeAttr("disabled");
             $("#eh").removeAttr("disabled");

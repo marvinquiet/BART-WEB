@@ -16,7 +16,7 @@ def generate_user_key(username):
     return key
 
 def init_project_path(user_key):
-    user_path = os.path.join(PROJECT_DIR, user_key)
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     user_upload_path = os.path.join(user_path, 'upload')
     user_download_path = os.path.join(user_path, 'download')
     user_log_path = os.path.join(user_path, 'log')
@@ -36,7 +36,7 @@ def init_user_config(user_path, user_data):
         fopen.write(json.dumps(user_data))
 
 def get_user_data(user_key):
-    user_path = os.path.join(PROJECT_DIR, user_key)
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     config_file = os.path.join(user_path, 'user.config')
     with open(config_file, 'rb') as fopen:
         user_data = json.load(fopen)
@@ -44,12 +44,71 @@ def get_user_data(user_key):
     return user_data
 
 def is_user_key_exists(user_key):
-    dest_path = os.path.join(PROJECT_DIR, user_key)
+    dest_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     return os.path.exists(dest_path)
 
 def generate_results(user_data):
     results = {}
-    if do_marge.is_marge_done(user_data['user_path']):
+
+    results['done'] = True
+
+    # dataType: ChIP-seq, Geneset, Both
+    # prediction_type: rp, cis, tf, eh
+    # assembly: hg38, mm10
+    # gene_exp_type: Gene_Only, Gene_Response
+    # gene_id_type: GeneSymbol, RefSeq
+
+    # user config
+    results['user_conf'] = {}
+    results['user_conf']['YourKey'] = user_data['user_key']
+    results['user_conf']['Assembly'] = user_data['assembly']
+    results['user_conf']['DataType'] = user_data['dataType']
+    if user_data['gene_exp_type'] != "":
+        results['user_conf']['GeneExpressionType'] = user_data['gene_exp_type']
+    if user_data['gene_id_type'] != "":
+        results['user_conf']['GeneIdType'] = user_data['gene_id_type']
+
+    results['user_conf']['PredictionType'] = []
+    if 'rp' in user_data['prediction_type']:
+        results['user_conf']['PredictionType'].append("Relative Potentials")
+    if 'cis' in user_data['prediction_type']:
+        results['user_conf']['PredictionType'].append("Cisregulatory Elements")
+    if 'tf' in user_data['prediction_type']:
+        results['user_conf']['PredictionType'].append("TF patterns")
+    if 'eh' in user_data['prediction_type']:
+        results['user_conf']['PredictionType'].append("Enhancer")
+
+    results['user_conf']['UploadFiles'] = []
+    for file_path in user_data['files']:
+        results['user_conf']['UploadFiles'].append(str(file_path.split('/')[-1]))
+
+    # use marge to process
+    if 'eh' in user_data['prediction_type'] or 'rp' in user_data['prediction_type'] or 'cis' in user_data['prediction_type']:
+
+        if do_marge.is_marge_done(user_data['user_path']):
+            # marge procedure log file path
+            results['proc_log'] = []
+            snakemake_log_dir = os.path.join(user_data['user_path'], 'marge_data/.snakemake/log')
+
+            for log_file in os.listdir(snakemake_log_dir):
+                if log_file.endswith(".log"):
+                    src_log = os.path.join(snakemake_log_dir, log_file)
+                    dest_log = os.path.join(user_data['user_path'], 'download/%s' % (log_file))
+                    shutil.copyfile(src_log, dest_log)
+                    log_file_url = '/download/%s___%s' % (user_data['user_key'], log_file)
+                    results['proc_log'].append((log_file, log_file_url))
+        else:
+            results['done'] = False
+
+
+    # use bart to process
+    if 'tf' in user_data['prediction_type']:
+        pass  
+
+
+
+    return results  
+
 
 
 

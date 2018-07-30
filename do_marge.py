@@ -8,18 +8,13 @@ import utils
 PROJECT_DIR = os.path.dirname(__file__)
 MARGE_DIR = os.path.join(PROJECT_DIR, "MARGE")
 
+MARGE_CORE = 1
+
 # init marge env
 def init_marge(user_path):
     user_upload_path = os.path.join(user_path, 'upload')
     marge_output_dir = os.path.join(user_path, 'marge_data')
     marge_input_dir = user_upload_path
-
-    # copy uploaded files into marge_output directory
-    # src_files = os.listdir(marge_input_dir)
-    # for file_name in src_files:
-    #     full_file_name = os.path.join(marge_input_dir, file_name)
-    #     if (os.path.isfile(full_file_name)):
-    #         shutil.copy(full_file_name, marge_input_dir)
 
     # subprocess.call(["cd", MARGE_DIR])
     marge_res = subprocess.check_call(["marge", "init", marge_output_dir])
@@ -92,16 +87,11 @@ def exe_marge(user_path):
 
     res = subprocess.Popen(["snakemake", "-n"], stdout=subprocess.PIPE, cwd=marge_output_dir).communicate()
 
-    # with open(os.path.join(user_log_path, 'snakemake_res.txt'), 'wb') as f_snake_res:
-    #     f_snake_res.write(res[0])
-    subprocess.Popen(["snakemake", "--cores", "1"], cwd=marge_output_dir)
-    # print (res[0])
+    subprocess.Popen(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir)
 
 
 def is_marge_done(user_path):
-    marge_output_dir = os.path.join(user_path, 'marge_data')
-    snakemake_path = os.path.join(marge_output_dir, '.snakemake')
-    snakemake_log_dir = os.path.join(snakemake_path, 'log')
+    snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
 
     for log_file in os.listdir(snakemake_log_dir):
         if log_file.endswith(".log"):

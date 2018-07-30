@@ -1,4 +1,5 @@
 import os
+import json
 from flask import (Flask, flash, request, redirect, url_for, render_template)
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
@@ -10,7 +11,8 @@ PROJECT_DIR = os.path.dirname(__file__)
 ALLOWED_EXTENSIONS = set(['txt', 'bam'])
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+app.secret_key = os.urandom(24)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -19,11 +21,13 @@ def index():
             return redirect(url_for('test_getting_config'))
         else:
             user_key = request.form['index_submit']
-            if do_process.is_user_key_exists(user_key):
-                return redirect(url_for('test_getting_result', user_key=user_key))
-            else:
-                msg = "User key does not exist, make sure you entered the right user_key"
-                return render_template("error.html", msg=msg)
+
+            if user_key != "":
+                if do_process.is_user_key_exists(user_key):
+                    return redirect(url_for('test_getting_result', user_key=user_key))
+                else:
+                    msg = "User key does not exist, make sure you entered the right user_key"
+                    return render_template("error.html", msg=msg)
     return render_template('index.html')
 
 
@@ -37,12 +41,17 @@ def test_getting_config():
 
             # record user data
             user_data = {}
+            user_data['user_key'] = user_key
             user_data['user_path'] = user_path
             user_data['dataType'] = request.form['dataType']
             user_data['assembly'] = request.form['assembly']
             user_data['prediction_type'] = request.form.getlist('predictionType')
-            user_data['gene_exp_type'] = request.form['expTypeChoice']
-            user_data['gene_id_type'] = request.form['geneIdChoice']
+            if user_data['dataType'] != "ChIP-seq":
+                user_data['gene_exp_type'] = request.form['expTypeChoice']
+                user_data['gene_id_type'] = request.form['geneIdChoice']
+            else:
+                user_data['gene_exp_type'] = ""
+                user_data['gene_id_type'] = ""
             user_data['files'] = []
 
             # process what user has uploaded
@@ -93,15 +102,16 @@ def test_getting_result():
     user_data = do_process.get_user_data(user_key)
     results = do_process.generate_results(user_data)
 
+
     return render_template('result_demonstration.html', results=results)
 
-    # if do_marge.is_marge_done(user_data['user_path']):
-    #     return render_template('result_demonstration.html', result=result)
-    # else:
-    #     return render_template('result_demonstration.html', result=result)
-        
 
-    
+@app.route('/download/<userkey_filename>')
+def download_file(userkey_filename):
+    user_key, filename = userkey_filename.split('___')
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
+    download_path = os.path.join(user_path, 'download')
+    return send_from_directory(download_path, filename)
 
 
 def allowed_file(filename):
