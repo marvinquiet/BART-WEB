@@ -24,7 +24,8 @@ def init_marge(user_path):
         return False
 
 # edit config.json
-def config_marge(user_path, user_data):
+def config_marge(user_data):
+    user_path = user_data['user_path']
     user_upload_path = os.path.join(user_path, 'upload')
     marge_output_dir = os.path.join(user_path, 'marge_data')
     marge_input_dir = user_upload_path
@@ -87,20 +88,21 @@ def exe_marge(user_path):
 
     res = subprocess.Popen(["snakemake", "-n"], stdout=subprocess.PIPE, cwd=marge_output_dir).communicate()
 
-    subprocess.Popen(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir)
+    subprocess.Popen(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir, stdout=subprocess.PIPE)
 
 
 def is_marge_done(user_path):
     snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
-
-    for log_file in os.listdir(snakemake_log_dir):
-        if log_file.endswith(".log"):
-            log_file_path = os.path.join(snakemake_log_dir, log_file)
-            with open(log_file_path, 'rb') as file:
-                for line in file:
-                    if '(100%) done' in line:
-                        return True
+    if os.path.exists(snakemake_log_dir):
+        for log_file in os.listdir(snakemake_log_dir):
+            if log_file.endswith(".log"):
+                log_file_path = os.path.join(snakemake_log_dir, log_file)
+                with open(log_file_path, 'r') as file:
+                    for line in file:
+                        if '(100%) done' in line:
+                            return True
     return False
+
 
 
 

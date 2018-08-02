@@ -32,13 +32,14 @@ def init_project_path(user_key):
 def init_user_config(user_path, user_data):
     # init username.config and save config data
     config_file = os.path.join(user_path, 'user.config')
-    with open(config_file, 'wb') as fopen:
-        fopen.write(json.dumps(user_data))
+    with open(config_file, 'w') as fopen:
+        json.dump(user_data, fopen)
+
 
 def get_user_data(user_key):
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     config_file = os.path.join(user_path, 'user.config')
-    with open(config_file, 'rb') as fopen:
+    with open(config_file, 'r') as fopen:
         user_data = json.load(fopen)
 
     return user_data
@@ -82,38 +83,59 @@ def generate_results(user_data):
     for file_path in user_data['files']:
         results['user_conf']['UploadFiles'].append(str(file_path.split('/')[-1]))
 
-    # use marge to process
-    if 'eh' in user_data['prediction_type'] or 'rp' in user_data['prediction_type'] or 'cis' in user_data['prediction_type']:
 
+    # only use bart to process
+    if 'tf' in user_data['prediction_type'] and user_data['dataType'] == "ChIP-seq":
+        
+        pass
+    else:
+        # use marge to process
         if do_marge.is_marge_done(user_data['user_path']):
             # marge procedure log file path
             results['proc_log'] = []
             snakemake_log_dir = os.path.join(user_data['user_path'], 'marge_data/.snakemake/log')
-
+            
             for log_file in os.listdir(snakemake_log_dir):
                 if log_file.endswith(".log"):
                     src_log = os.path.join(snakemake_log_dir, log_file)
-                    dest_log = os.path.join(user_data['user_path'], 'download/%s' % (log_file))
+                    dest_log = os.path.join(user_data['user_path'], 'download/' + log_file)
                     shutil.copyfile(src_log, dest_log)
+                    
                     log_file_url = '/download/%s___%s' % (user_data['user_key'], log_file)
                     results['proc_log'].append((log_file, log_file_url))
+
+            # marge output file path
+            marge_output_path = os.path.join(user_data['user_path'], 'marge_data/margeoutput')
+            results['result_files'] = []
+            suffix_type = ['_enhancer_prediction.txt', '_all_relativeRP.txt', '_Strength.txt', '_all_RP.txt', '_target_regressionInfo.txt']
+            for root, dirs, files in os.walk(marge_output_path):
+                for file in files:
+                    for file_type in suffix_type:
+                        if file_type in str(file):
+                            src_file = os.path.join(root, file)
+                            dest_file = os.path.join(user_data['user_path'], 'download/' + file)
+                            shutil.copyfile(src_file, dest_file)
+
+                            dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
+                            results['result_files'].append((file, dest_file_url))
         else:
             results['done'] = False
 
+            results['processing_log'] = ""
+            snakemake_log_dir = os.path.join(user_data['user_path'], 'marge_data/.snakemake/log')
+            
+            for log_file in os.listdir(snakemake_log_dir):
+                if log_file.endswith(".log"):
+                    log_file_path = os.path.join(snakemake_log_dir, log_file)
+                    template_path = os.path.join(PROJECT_DIR, 'template')
+                    results['processing_log'] = os.path.relpath(log_file_path, template_path)
 
-    # use bart to process
-    if 'tf' in user_data['prediction_type']:
-        pass  
+
+
 
 
 
     return results  
-
-
-
-
-
-
 
 
 

@@ -21,24 +21,34 @@
       <div class="row">
         <div class="col-md-12 order-md-1">
 
-          <div class="col-md-12 mb-3">
+          <div id="resultOutputDiv" class="col-md-12 mb-3">
             <h4 id="resultOutput" class="mb-3"></h4>
           </div>
 
 
           <div id="userConfig" class="col-md-12 mb-3">
             <h4 class="mb-3">YOUR CONFIGS</h4>
-            {% for key, value in results['user_conf'].iteritems() %}
+            {% for key, value in results['user_conf'].items() %}
               <p> {{ key }}: {{ value }} </p>
             {% endfor %}
             
           </div>
 
           <div id="procLog" class="col-md-12 mb-3">
-            <h4 class="mb-3">PROCEDURE LOG</h4>
+            <h4 class="mb-3">LOG</h4>
             {% for log in results['proc_log'] %}
-              <a href="{{ log[1] }}" download> {{ log[0] }}</a>
+              <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
             {% endfor %}
+            <div id="procLogTextDiv" class="card-deck mb-3" hidden>
+              <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                  <h4 class="my-0 font-weight-normal">Processing...</h4>
+                </div>
+                <div id="procLogText" class="card-body">
+
+                </div>
+              </div>
+            </div>
           </div>
 
           <hr class="mb-4">
@@ -78,10 +88,42 @@
             document.getElementById("resultOutput").innerHTML = "RESULTS";
             document.getElementById("stopPrediction").style.display = 'none';
 
-
+            var resultFiles = myResult.result_files;
+            for (var i = 0; i < resultFiles.length; i++) {
+                if (resultFiles[i] != null) {
+                    var resultFile = resultFiles[i][0];
+                    var resultFileUrl = resultFiles[i][1];
+                    var aTag = document.createElement("a");
+                    var aText = document.createTextNode(resultFile);
+                    aTag.appendChild(aText);
+                    var aHref = document.createAttribute("href");
+                    aHref.value = resultFileUrl;
+                    aTag.setAttributeNode(aHref);
+                    aTag.setAttributeNode(document.createAttribute("download"));
+                    document.getElementById("resultOutputDiv").appendChild(aTag);
+                    var brTag = document.createElement("br");
+                    document.getElementById("resultOutputDiv").appendChild(brTag);
+                }
+            }
         } else {
-            document.getElementById("resultOutput").innerHTML = "Your prediction is still being processed!";
+            document.getElementById("resultOutput").innerHTML = "YOUR PREDICTION IS STILL BEING PROCESSED!!!";
             document.getElementById("stopPrediction").style.display = '';
+            var brTag = document.createElement("br");
+            document.getElementById("resultOutputDiv").appendChild(brTag);
+
+            var logTextDiv = document.getElementById("procLogTextDiv");
+            logTextDiv.removeAttribute("hidden");
+
+            // var processingLog = myResult.processing_log;
+            var processingLog = "../do_bart.py"
+            var pTag = document.createElement("iframe");
+            var pSrc = document.createAttribute("src");
+            pSrc.value = processingLog;
+            pTag.setAttributeNode(pSrc);
+            document.getElementById("procLogText").appendChild(pTag);
+
+
+
         }
 
     </script>

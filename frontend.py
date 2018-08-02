@@ -6,6 +6,7 @@ from flask import send_from_directory
 
 import do_process
 import do_marge
+import do_bart
 
 PROJECT_DIR = os.path.dirname(__file__)
 ALLOWED_EXTENSIONS = set(['txt', 'bam'])
@@ -77,20 +78,35 @@ def test_getting_config():
 
             do_process.init_user_config(user_path, user_data)
 
-
-            # what marge should do
-            if u'rp' in user_data['prediction_type'] or u'cis' in user_data['prediction_type'] or u'eh' in user_data['prediction_type']:
+            if u'tf' in user_data['prediction_type'] and \
+                len(user_data['prediction_type']) == 1 and  \
+                user_data['dataType'] == 'ChIP-seq':
+                # only do bart profile with .bam file
+                do_bart.exe_bart_profile(user_data)
+                return render_template('key_demonstration.html', key=user_key)
+            elif u'tf' not in user_data['prediction_type']:
                 # init marge process
                 if do_marge.init_marge(user_path):
-                    do_marge.config_marge(user_path, user_data)
+                    do_marge.config_marge(user_data)
                     do_marge.exe_marge(user_path)
                 else:
                     msg = "Init marge error! Please try again later!"
                     return render_template("error.html", msg=msg)
+                return render_template('key_demonstration.html', key=user_key)
+            else:
+                # do marge first to get enhancer prediction, and do bart geneset later
+                # init marge process
+                if do_marge.init_marge(user_path):
+                    do_marge.config_marge(user_data)
+                    do_bart.exe_marge_and_bart(user_data)
 
-            # what bart should do
-            if u'tf' in user_data['prediction_type']:
-                pass
+
+                    # marge_proc = do_marge.exe_marge(user_path)
+                    # do_bart.exe_bart_geneset(user_data, marge_proc)
+                else:
+                    msg = "Init marge error! Please try again later!"
+                    return render_template("error.html", msg=msg)
+                return render_template('key_demonstration.html', key=user_key)
 
             return render_template('key_demonstration.html', key=user_key)
     return render_template('get_data_config.html')
@@ -107,7 +123,7 @@ def test_getting_result():
 
 
 @app.route('/download/<userkey_filename>')
-def download_file(userkey_filename):
+def download_log_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     download_path = os.path.join(user_path, 'download')
