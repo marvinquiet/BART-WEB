@@ -1,8 +1,7 @@
 import os
 import json
-from flask import (Flask, flash, request, redirect, url_for, render_template)
+from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory)
 from werkzeug.utils import secure_filename
-from flask import send_from_directory
 
 import do_process
 import do_marge
@@ -11,31 +10,38 @@ import do_bart
 PROJECT_DIR = os.path.dirname(__file__)
 ALLOWED_EXTENSIONS = set(['txt', 'bam'])
 
+# related to flask app
 app = Flask(__name__)
-
 app.secret_key = os.urandom(24)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        # predict data button
         if request.form['index_submit'] == 'predict_data':
-            return redirect(url_for('test_getting_config'))
+            return redirect(url_for('get_config'))
+        # retrieve result button
         else:
             user_key = request.form['index_submit']
 
-            if user_key != "":
-                if do_process.is_user_key_exists(user_key):
-                    return redirect(url_for('test_getting_result', user_key=user_key))
-                else:
-                    msg = "User key does not exist, make sure you entered the right user_key"
-                    return render_template("error.html", msg=msg)
+            # when key is null, refresh the website
+            if user_key == "":
+                return render_template('index.html')
+
+            if do_process.is_user_key_exists(user_key):
+                return redirect(url_for('get_result', user_key=user_key))
+            else:
+                msg = "User key does not exist, make sure you entered the right key"
+                return render_template("error.html", msg=msg)
     return render_template('index.html')
 
 
 @app.route('/config-data', methods=['GET', 'POST'])
-def test_getting_config():
+def get_config():
     if request.method == 'POST':
+        # when "Predict your own data" button is clicked
         if request.form['start_prediction'] == 'start_prediction':
+            # fetch user name and generate unique project path
             username = request.form['username']
             user_key = do_process.generate_user_key(username)
             user_path = do_process.init_project_path(user_key)
@@ -68,6 +74,7 @@ def test_getting_config():
                     flash('One of the files does not have a legal file name.')
                     return redirect(request.url)
 
+                # make sure the suffix of filename in [.txt, .bam] 
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     upload_path = os.path.join(user_path, 'upload')
@@ -76,6 +83,7 @@ def test_getting_config():
 
                     user_data['files'].append(filename_abs_path)
 
+            # 
             do_process.init_user_config(user_path, user_data)
 
             if u'tf' in user_data['prediction_type'] and \
@@ -113,7 +121,7 @@ def test_getting_config():
 
 
 @app.route('/retrieve-result', methods=['GET', 'POST'])
-def test_getting_result():
+def get_result():
     user_key = request.args['user_key']
     user_data = do_process.get_user_data(user_key)
     results = do_process.generate_results(user_data)
