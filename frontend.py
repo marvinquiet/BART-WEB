@@ -1,11 +1,10 @@
 import os
 import json
-from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory)
+from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory, session)
 from werkzeug.utils import secure_filename
 
 import do_process
-import do_marge
-import do_bart
+import marge_bart
 
 PROJECT_DIR = os.path.dirname(__file__)
 ALLOWED_EXTENSIONS = set(['txt', 'bam'])
@@ -31,8 +30,9 @@ def index():
             if do_process.is_user_key_exists(user_key):
                 return redirect(url_for('get_result', user_key=user_key))
             else:
-                msg = "User key does not exist, make sure you entered the right key"
-                return render_template("error.html", msg=msg)
+                err_msg = "User key does not exist, make sure you entered the right key"
+                session['err_msg'] = err_msg
+                return redirect(url_for('error_page'))
     return render_template('index.html')
 
 
@@ -83,40 +83,21 @@ def get_config():
 
                     user_data['files'].append(filename_abs_path)
 
-            # 
             do_process.init_user_config(user_path, user_data)
 
             if u'tf' in user_data['prediction_type'] and \
                 len(user_data['prediction_type']) == 1 and  \
                 user_data['dataType'] == 'ChIP-seq':
                 # only do bart profile with .bam file
-                do_bart.exe_bart_profile(user_data)
-                return render_template('key_demonstration.html', key=user_key)
+                marge_bart.exe_bart_profile(user_data)
             elif u'tf' not in user_data['prediction_type']:
-                # init marge process
-                if do_marge.init_marge(user_path):
-                    do_marge.config_marge(user_data)
-                    do_marge.exe_marge(user_path)
-                else:
-                    msg = "Init marge error! Please try again later!"
-                    return render_template("error.html", msg=msg)
-                return render_template('key_demonstration.html', key=user_key)
+                # do marge process, repeat 3 times
+                marge_bart.do_marge_bart(user_key, False)
             else:
                 # do marge first to get enhancer prediction, and do bart geneset later
-                # init marge process
-                if do_marge.init_marge(user_path):
-                    do_marge.config_marge(user_data)
-                    do_bart.exe_marge_and_bart(user_data)
-
-
-                    # marge_proc = do_marge.exe_marge(user_path)
-                    # do_bart.exe_bart_geneset(user_data, marge_proc)
-                else:
-                    msg = "Init marge error! Please try again later!"
-                    return render_template("error.html", msg=msg)
-                return render_template('key_demonstration.html', key=user_key)
-
-            return render_template('key_demonstration.html', key=user_key)
+                marge_bart.do_marge_bart(user_key, True)
+            session['user_key'] = user_key
+            return redirect(url_for('show_key'))
     return render_template('get_data_config.html')
 
 
@@ -130,6 +111,17 @@ def get_result():
     return render_template('result_demonstration.html', results=results)
 
 
+@app.route('/key', methods=['GET', 'POST'])
+def show_key():
+    user_key = session.get('user_key', None)
+    return render_template('key_demonstration.html', key=user_key)
+
+@app.route('/error', methods=['GET', 'POST'])
+def error_page():
+    err_msg = session.get('err_msg', None)
+    return render_template('error.html', msg=err_msg)
+
+
 @app.route('/download/<userkey_filename>')
 def download_log_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
@@ -141,5 +133,3 @@ def download_log_file(userkey_filename):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
