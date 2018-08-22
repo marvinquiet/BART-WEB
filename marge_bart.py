@@ -5,13 +5,15 @@ import shutil
 
 import utils
 
+sys.setrecursionlimit(20000)
+
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 MARGE_DIR = os.path.join(PROJECT_DIR, "MARGE")
 BART_DIR = os.path.join(PROJECT_DIR, "BART")
 
 BART_CORE = 1
 MARGE_CORE = 4
-REPEAT_TIMES = 2
+REPEAT_TIMES = 1
 
 # =============MARGE===============
 
