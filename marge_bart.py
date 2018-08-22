@@ -116,7 +116,6 @@ def exe_bart_profile(user_data):
         if input_file.endswith(".bam"):
             subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-t", target_file_path, "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
 
-
 def exe_bart_geneset(user_data):
     '''
     Usage:
@@ -132,7 +131,6 @@ def exe_bart_geneset(user_data):
     eh_files = get_enhancer_prediction(user_data['user_path'])
     for eh_file in eh_files:
         subprocess.Popen(["bart", "geneset", "-i", eh_file, "-s", user_data["assembly"], "-t", target_file_path, "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
-
 
 def get_enhancer_prediction(user_path):
     # marge output file path

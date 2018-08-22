@@ -6,8 +6,6 @@ from werkzeug.utils import secure_filename
 import do_process
 import marge_bart
 
-MARGE_REPEAT_TIMES = 3
-
 PROJECT_DIR = os.path.dirname(__file__)
 ALLOWED_EXTENSIONS = set(['txt', 'bam'])
 

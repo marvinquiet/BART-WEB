@@ -89,7 +89,7 @@ def generate_results(user_data):
         return results
 
     # use only marge to process
-    if do_marge.is_marge_done(user_data['user_path']):
+    if marge_bart.is_marge_done(user_data['user_path']):
         # marge procedure log file path
         results['proc_log'] = []
         snakemake_log_dir = os.path.join(user_data['user_path'], 'marge_data/.snakemake/log')
