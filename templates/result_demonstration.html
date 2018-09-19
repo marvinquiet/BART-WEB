@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -6,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <!-- <link rel="icon" href="../../../../favicon.ico"> -->
 
     <title>MARGE-BART Result</title>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+
+    <!-- tabulator -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/js/tabulator.min.js"></script>
+    
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -25,6 +31,8 @@
             <h4 id="resultOutput" class="mb-3"></h4>
           </div>
 
+          <!-- test bart result table by tabulor-->
+          <div id="bart-result"></div>
 
           <div id="userConfig" class="col-md-12 mb-3">
             <h4 class="mb-3">YOUR CONFIGS</h4>
@@ -73,60 +81,80 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-    <!-- <script src="../../assets/js/vendor/popper.min.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script> -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='holder.min.js') }}"></script>
+   
 
     <script type="text/javascript">
-        var myResult = {{ results|tojson }}
+      // var myResult = {{ results|tojson }}
 
-        if (myResult.done) {
-            document.getElementById("resultOutput").innerHTML = "RESULTS";
-            document.getElementById("stopPrediction").style.display = 'none';
+        // if (myResult.done) {
+        //     document.getElementById("resultOutput").innerHTML = "RESULTS";
+        //     document.getElementById("stopPrediction").style.display = 'none';
 
-            var resultFiles = myResult.result_files;
-            for (var i = 0; i < resultFiles.length; i++) {
-                if (resultFiles[i] != null) {
-                    var resultFile = resultFiles[i][0];
-                    var resultFileUrl = resultFiles[i][1];
-                    var aTag = document.createElement("a");
-                    var aText = document.createTextNode(resultFile);
-                    aTag.appendChild(aText);
-                    var aHref = document.createAttribute("href");
-                    aHref.value = resultFileUrl;
-                    aTag.setAttributeNode(aHref);
-                    aTag.setAttributeNode(document.createAttribute("download"));
-                    document.getElementById("resultOutputDiv").appendChild(aTag);
-                    var brTag = document.createElement("br");
-                    document.getElementById("resultOutputDiv").appendChild(brTag);
-                }
-            }
-        } else {
-            document.getElementById("resultOutput").innerHTML = "YOUR PREDICTION IS STILL BEING PROCESSED!!!";
-            document.getElementById("stopPrediction").style.display = '';
-            var brTag = document.createElement("br");
-            document.getElementById("resultOutputDiv").appendChild(brTag);
+        //     var resultFiles = myResult.result_files;
+        //     for (var i = 0; i < resultFiles.length; i++) {
+        //         if (resultFiles[i] != null) {
+        //             var resultFile = resultFiles[i][0];
+        //             var resultFileUrl = resultFiles[i][1];
+        //             var aTag = document.createElement("a");
+        //             var aText = document.createTextNode(resultFile);
+        //             aTag.appendChild(aText);
+        //             var aHref = document.createAttribute("href");
+        //             aHref.value = resultFileUrl;
+        //             aTag.setAttributeNode(aHref);
+        //             aTag.setAttributeNode(document.createAttribute("download"));
+        //             document.getElementById("resultOutputDiv").appendChild(aTag);
+        //             var brTag = document.createElement("br");
+        //             document.getElementById("resultOutputDiv").appendChild(brTag);
+        //         }
+        //     }
+        // } else {
+        //     document.getElementById("resultOutput").innerHTML = "YOUR PREDICTION IS STILL BEING PROCESSED!!!";
+        //     document.getElementById("stopPrediction").style.display = '';
+        //     var brTag = document.createElement("br");
+        //     document.getElementById("resultOutputDiv").appendChild(brTag);
 
-            var logTextDiv = document.getElementById("procLogTextDiv");
-            logTextDiv.removeAttribute("hidden");
+        //     var logTextDiv = document.getElementById("procLogTextDiv");
+        //     logTextDiv.removeAttribute("hidden");
 
-            // var processingLog = myResult.processing_log;
-            var processingLog = "../do_bart.py"
-            var pTag = document.createElement("iframe");
-            var pSrc = document.createAttribute("src");
-            pSrc.value = processingLog;
-            pTag.setAttributeNode(pSrc);
-            document.getElementById("procLogText").appendChild(pTag);
+        //     // var processingLog = myResult.processing_log;
+        //     var processingLog = "../do_bart.py"
+        //     var pTag = document.createElement("iframe");
+        //     var pSrc = document.createAttribute("src");
+        //     pSrc.value = processingLog;
+        //     pTag.setAttributeNode(pSrc);
+        //     document.getElementById("procLogText").appendChild(pTag);
+        // }
+
+      
+      
+      $('#bart-result').tabulator({
+        height: 608,
+        layout: "fitColumns",
+        columns:[
+          {title: "TF", field: "tf_name", align:"center", width: 120},
+          {title: "TF-Score", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
+          {title: "P-Value", field: "p_value", align:"center", sorter: "number"},
+          {title: "Z-Score", field: "z_score", align:"center", sorter: "number"},
+          {title: "AUC", field: "max_auc", align:"center", sorter: "number"},
+          {title: "R-Rank", field: "r_rank", align:"center", sorter: "number"},
+        ],
+
+        rowClick:function(e, row){ //trigger an alert message when the row is clicked
+          alert("Row " + row.getData().id + " Clicked!!!!");
+        },
+      });
+
+      var myResult = {{ results|tojson }}
+      $("#bart-result").tabulator("setData", myResult.bartResult);
 
 
 
-        }
 
-    </script>
+    </script> 
 
   </body>
 </html>

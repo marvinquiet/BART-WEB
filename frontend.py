@@ -101,13 +101,11 @@ def get_config():
     return render_template('get_data_config.html')
 
 
-@app.route('/retrieve-result', methods=['GET', 'POST'])
+@app.route('/result', methods=['GET', 'POST'])
 def get_result():
     user_key = request.args['user_key']
     user_data = do_process.get_user_data(user_key)
     results = do_process.generate_results(user_data)
-
-
     return render_template('result_demonstration.html', results=results)
 
 

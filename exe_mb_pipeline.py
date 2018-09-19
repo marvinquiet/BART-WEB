@@ -1,0 +1,103 @@
+import os, sys
+import subprocess
+import json
+import shutil
+
+import utils
+from marge_bart import *
+
+sys.setrecursionlimit(20000)
+
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
+MARGE_DIR = os.path.join(PROJECT_DIR, "MARGE")
+BART_DIR = os.path.join(PROJECT_DIR, "BART")
+
+BART_CORE = 1
+MARGE_CORE = 4
+REPEAT_TIMES = 1
+
+
+def main():
+    # example: python exe_mb_pipline.py 3 marge_output_dir
+    # print (sys.argv)
+
+    # get argv
+    script_name = sys.argv[0]
+    repeat_times = int(sys.argv[1])
+    user_key = sys.argv[2]
+    bart_flag = bool(sys.argv[3])
+
+    import do_process
+    user_data = do_process.get_user_data(user_key)
+    user_path = user_data['user_path']
+    files = user_data['files']
+
+    err_msg = ""
+    for i in range(repeat_times):
+        marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
+        if init_marge(marge_output_dir):
+            config_marge(user_data, marge_output_dir)
+            subprocess.call(["snakemake", "-n"], stdout=subprocess.PIPE, cwd=marge_output_dir)
+        else:
+            err_msg += "Error in init marge NO.%d \n" % (i+1) 
+
+    import multiprocessing
+    pool = multiprocessing.Pool(processes=MARGE_CORE)
+    for i in range(repeat_times):
+        marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
+        pool.apply_async(exe_marge, args=(marge_output_dir, ))
+
+    pool.close()
+    pool.join() 
+
+    # get marge output
+    auc_scores = []
+    auc_files = []
+    import re
+    pattern = r"\d+\.?\d*" # integer or float
+
+    # find AUC score
+    for i in range(repeat_times):
+        marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
+        for upload_file in files:
+            filename = os.path.basename(upload_file)
+            filename, file_ext = os.path.splitext(filename)
+            regression_score_file = os.path.join(marge_output_dir, 'margeoutput/regression/{}_target_regressionInfo.txt'.format(filename))
+
+            if not os.path.exists(regression_score_file):
+                err_msg += "File not exists: %s" % (regression_score_file)
+                continue
+            
+            with open(regression_score_file, 'r') as fopen:
+                for line in fopen:
+                    if 'AUC = ' in line:
+                        score = re.findall(pattern, line)[0]
+                        auc_scores.append(float(score))
+                        auc_files.append(marge_output_dir)
+
+    # find max AUC score
+    max_auc = max(auc_scores)
+    max_index = -1
+    for i in range(len(auc_scores)):
+        if auc_scores[i] == max_auc:
+            max_index = i
+            break
+
+    # find max AUC folder & change it to folder /marge_data
+    if max_index == -1:
+        err_msg += "Severe error in marge process!!\n"
+    else:
+        auc_file = auc_files[i]
+        os.rename(auc_file, os.path.join(user_path, 'marge_data'))
+
+    # if bart
+    print (user_data)
+    if bart_flag:
+        exe_bart_geneset(user_data)
+
+    print (err_msg)
+
+
+if __name__ == '__main__':
+    main()
+    

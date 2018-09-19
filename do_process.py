@@ -47,17 +47,8 @@ def is_user_key_exists(user_key):
     dest_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     return os.path.exists(dest_path)
 
-def generate_results(user_data):
-    results = {}
 
-    results['done'] = True
-
-    # dataType: ChIP-seq, Geneset, Both
-    # prediction_type: rp, cis, tf, eh
-    # assembly: hg38, mm10
-    # gene_exp_type: Gene_Only, Gene_Response
-    # gene_id_type: GeneSymbol, RefSeq
-
+def config_results(results, user_data):
     # user config
     results['user_conf'] = {}
     results['user_conf']['YourKey'] = user_data['user_key']
@@ -82,6 +73,19 @@ def generate_results(user_data):
     for file_path in user_data['files']:
         results['user_conf']['UploadFiles'].append(str(file_path.split('/')[-1]))
 
+
+def generate_results(user_data):
+    results = {}
+    config_results(results, user_data)
+    results['done'] = True
+
+    # dataType: ChIP-seq, Geneset, Both
+    # prediction_type: rp, cis, tf, eh
+    # assembly: hg38, mm10
+    # gene_exp_type: Gene_Only, Gene_Response
+    # gene_id_type: GeneSymbol, RefSeq
+
+    
 
     # only use bart to process
     if 'tf' in user_data['prediction_type'] and user_data['dataType'] == "ChIP-seq":
@@ -117,6 +121,12 @@ def generate_results(user_data):
 
                         dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
                         results['result_files'].append((file, dest_file_url))
+
+
+
+
+        results['bartResult'] = parse_bart_results('/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962/download/genelist1_bart_results.txt')
+
         return results
 
     # marge does not finish
@@ -135,10 +145,17 @@ def generate_results(user_data):
 
 
 
+def parse_bart_results(bart_result_file):
+    # tf_name, tf_score, p_value, z_score, max_auc, r_rank -> definition in result_demonstration.html
+    bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank'] 
+    bart_result = []
+    with open(bart_result_file, 'r') as fopen:
+        next(fopen) # skip first line
+        for line in fopen:
+            line = line.strip()
+            bart_result.append(dict(zip(bart_title, line.split('\t'))))
+    return bart_result
+            
 
-
-
-
-
-
-
+if __name__ == '__main__':
+    parse_bart_results('/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962/download/genelist1_bart_results.txt')
