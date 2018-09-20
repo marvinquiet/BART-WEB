@@ -2,7 +2,7 @@
 # @author: Wenjing Ma
 # 1. change the path to BART & MARGE
 # 2. change the path to tools related to MARGE
-# 3. make sure the installation of MARGE/BART
+# 3. make sure the installation of MARGE/BART, and related dependencies!!! Important!!!
 # 4. make sure the installation of package dependencies: yaml
 #--------------------------------------------------------#
 

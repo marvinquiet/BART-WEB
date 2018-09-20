@@ -29,10 +29,11 @@
 
           <div id="resultOutputDiv" class="col-md-12 mb-3">
             <h4 id="resultOutput" class="mb-3"></h4>
+            <!-- bart result table by tabulor -->
+            <div id="bart-result"></div>
           </div>
 
-          <!-- test bart result table by tabulor-->
-          <div id="bart-result"></div>
+          
 
           <div id="userConfig" class="col-md-12 mb-3">
             <h4 class="mb-3">YOUR CONFIGS</h4>
@@ -60,7 +61,7 @@
           </div>
 
           <hr class="mb-4">
-          <button id="stopPrediction" class="btn btn-primary btn-lg btn-block" type="submit" name="stop_prediction" value="stop_prediction">Stop your prediction</button>
+          <!-- <button id="stopPrediction" class="btn btn-primary btn-lg btn-block" type="submit" name="stop_prediction" value="stop_prediction">Stop your prediction</button> -->
         </div>
       </div>
 
@@ -129,9 +130,11 @@
         //     document.getElementById("procLogText").appendChild(pTag);
         // }
 
+      var myResult = {{ results|tojson }}
       
-      
-      $('#bart-result').tabulator({
+      // if bart ran and finished, show the results in the table
+      if (myResult.bartResult.length >= 0) {
+        $('#bart-result').tabulator({
         height: 608,
         layout: "fitColumns",
         columns:[
@@ -147,9 +150,8 @@
           alert("Row " + row.getData().id + " Clicked!!!!");
         },
       });
-
-      var myResult = {{ results|tojson }}
-      $("#bart-result").tabulator("setData", myResult.bartResult);
+        $("#bart-result").tabulator("setData", myResult.bartResult);
+      }
 
 
 

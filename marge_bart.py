@@ -47,9 +47,8 @@ def init_marge(marge_output_dir):
     else:
         return False
 
-# edit config.json
+# edit marge config.json
 def config_marge(user_data, marge_output_dir):
-
     user_path = user_data['user_path']
     marge_input_dir = os.path.join(user_path, 'upload')
 
@@ -112,11 +111,20 @@ def is_marge_done(user_path):
     for log_file in os.listdir(snakemake_log_dir):
         if log_file.endswith(".log"):
             log_file_path = os.path.join(snakemake_log_dir, log_file)
-            with open(log_file_path, 'r') as file:
-                for line in file:
-                    if '(100%) done' in line:
-                        return True
-    return False
+            with open(log_file_path, 'r') as flog:
+                if ('(100%) done') not in flog.read():
+                    return False
+    return True
+
+def get_enhancer_prediction(user_path):
+    # marge output file path
+    eh_files = []
+    eh_files_path = os.path.join(user_path, 'marge_data/margeoutput/cisRegions')
+    for eh_file in os.listdir(eh_files_path):
+        if '_enhancer_prediction.txt' in str(eh_file):
+            eh_files.append(os.path.join(eh_files_path, eh_file))
+
+    return eh_files
 
 # ============ BART ==============
 
@@ -152,22 +160,12 @@ def exe_bart_geneset(user_data):
     for eh_file in eh_files:
         subprocess.call(["bart", "geneset", "-i", eh_file, "-s", user_data["assembly"], "-t", target_file_path, "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
 
-def get_enhancer_prediction(user_path):
-    # marge output file path
-    eh_files = []
-    eh_files_path = os.path.join(user_path, 'marge_data/margeoutput/cisRegions')
-    for eh_file in os.listdir(eh_files_path):
-        if '_enhancer_prediction.txt' in str(eh_file):
-            eh_files.append(os.path.join(eh_files_path, eh_file))
-
-    return eh_files
-
 def is_bart_done(user_path):
     user_key = os.path.basename(user_path)
     import do_process
     user_data = do_process.get_user_data(user_key)
     for user_file in user_data['files']:
-        uploaded_file, = os.path.basename(user_file).split('.') # path/to/user/upload/filename.bam(txt)
+        uploaded_file = os.path.basename(user_file).split('.')[0] # path/to/user/upload/filename.bam(txt)
         res_file_path = os.path.join(user_path, 'download/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
         if not os.path.exists(res_file_path):
             return False
@@ -177,8 +175,14 @@ def is_bart_done(user_path):
 # ========= MARGE BART PIPELINE =========
 # call file in background to execute pipeline, otherwise, it will block the web server
 def do_marge_bart(user_key, bart_flag):
-    subprocess.Popen(["python", "exe_mb_pipeline.py", str(MARGE_REPEAT_TIMES), user_key, str(bart_flag)], cwd=PROJECT_DIR)
+    pipeline_path = os.path.join(PROJECT_DIR, "exe_mb_pipeline.py")
+    subprocess.Popen(["python", pipeline_path, str(MARGE_REPEAT_TIMES), user_key, str(bart_flag)], cwd=PROJECT_DIR)
 
+
+# ============== UNIT TEST ===============
+def test_is_marge_done():
+    test_path = '/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962'
+    assert is_marge_done(test_path) == True
 
 if __name__ == '__main__':
-    pass
+    test_is_marge_done()
