@@ -1,21 +1,42 @@
 import os, sys
 import subprocess
 import json
+import yaml
 import shutil
 
 import utils
 
 sys.setrecursionlimit(20000)
 
+# ======== load conf.yaml ========
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
-MARGE_DIR = os.path.join(PROJECT_DIR, "MARGE")
-BART_DIR = os.path.join(PROJECT_DIR, "BART")
+MARGE_DIR = ''
+BART_DIR = ''
+# default
+BART_CORE = 4 
+MARGE_CORE = 4 
+MARGE_REPEAT_TIMES = 3
+with open('conf.yaml', 'r') as fyaml:
+    try: 
+        conf_data = yaml.load(fyaml)
+        BART_DIR = conf_data['BART']['project_path']
+        MARGE_DIR = conf_data['MARGE']['project_path']
+        MARGE_LIB_DIR = conf_data['MARGE']['lib_path']
 
-BART_CORE = 1
-MARGE_CORE = 4
-REPEAT_TIMES = 1
+        BART_CORE = conf_data['BART']['core']
+        MARGE_CORE = conf_data['MARGE']['core']
+        MARGE_REPEAT_TIMES = conf_data['MARGE']['repeat_times']
 
-# =============MARGE===============
+        MACS2_path = conf_data['UCSC_tools']['MACS2']
+        bedClip_path = conf_data['UCSC_tools']['bedClip']
+        bedGraphToBigWig_path = conf_data['UCSC_tools']['bedGraphToBigWig']
+        bigWigAverageOverBed_path = conf_data['UCSC_tools']['bigWigAverageOverBed']
+        bigWigSummary_path = conf_data['UCSC_tools']['bigWigSummary'] 
+    except yaml.YAMLError as e: 
+        print (e)
+
+
+# ============ MARGE ==============
 
 # init marge env
 def init_marge(marge_output_dir):
@@ -40,19 +61,16 @@ def config_marge(user_data, marge_output_dir):
     with open(config_file) as data_file:
         data = json.load(data_file)
 
-    # TODO: deal with the data into new config.json which will be used
-    data["tools"]["MACS2"] = "/usr/local/Cellar/pyenv/1.2.1/versions/venv2.7/bin/macs2"
-
-    marge_tools_dir = os.path.join(MARGE_DIR, "marge_ucsc_tools")
-    data["tools"]["bedClip"] = os.path.join(marge_tools_dir, "bedClip")
-    data["tools"]["bedGraphToBigWig"] = os.path.join(marge_tools_dir, "bedGraphToBigWig")
-    data["tools"]["bigWigAverageOverBed"] = os.path.join(marge_tools_dir, "bigWigAverageOverBed")
-    data["tools"]["bigWigSummary"] = os.path.join(marge_tools_dir, "bigWigSummary")
+    # tools path in MARGE/config.json
+    data["tools"]["MACS2"] = MACS2_path
+    data["tools"]["bedClip"] = bedClip_path
+    data["tools"]["bedGraphToBigWig"] = bedGraphToBigWig_path
+    data["tools"]["bigWigAverageOverBed"] = bigWigAverageOverBed_path
+    data["tools"]["bigWigSummary"] = bigWigSummary_path
 
     data["ASSEMBLY"] = user_data["assembly"]
     data["MARGEdir"] = os.path.join(MARGE_DIR, "marge")
-    marge_ref_dir = os.path.join(MARGE_DIR, "marge_ref")
-    data["REFdir"] = os.path.join(marge_ref_dir, data["ASSEMBLY"] + "_all_reference")
+    data["REFdir"] = os.path.join(MARGE_LIB_DIR, data["ASSEMBLY"] + "_all_reference")
 
     if user_data['dataType'] == "ChIP-seq":
         data["EXPSDIR"] = ""
@@ -100,7 +118,7 @@ def is_marge_done(user_path):
                         return True
     return False
 
-# =============BART===============
+# ============ BART ==============
 
 def exe_bart_profile(user_data):
     '''
@@ -144,10 +162,22 @@ def get_enhancer_prediction(user_path):
 
     return eh_files
 
-# ==========MARGE+BART==========
+def is_bart_done(user_path):
+    user_key = os.path.basename(user_path)
+    import do_process
+    user_data = do_process.get_user_data(user_key)
+    for user_file in user_data['files']:
+        uploaded_file, = os.path.basename(user_file).split('.') # path/to/user/upload/filename.bam(txt)
+        res_file_path = os.path.join(user_path, 'download/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
+        if not os.path.exists(res_file_path):
+            return False
+    
+    return True
 
+# ========= MARGE BART PIPELINE =========
+# call file in background to execute pipeline, otherwise, it will block the web server
 def do_marge_bart(user_key, bart_flag):
-    subprocess.Popen(["python", "exe_mb_pipeline.py", str(REPEAT_TIMES), user_key, str(bart_flag)], cwd=PROJECT_DIR)
+    subprocess.Popen(["python", "exe_mb_pipeline.py", str(MARGE_REPEAT_TIMES), user_key, str(bart_flag)], cwd=PROJECT_DIR)
 
 
 if __name__ == '__main__':

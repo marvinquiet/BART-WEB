@@ -43,6 +43,7 @@ def get_user_data(user_key):
 
     return user_data
 
+
 def is_user_key_exists(user_key):
     dest_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     return os.path.exists(dest_path)
@@ -89,6 +90,7 @@ def generate_results(user_data):
 
     # only use bart to process
     if 'tf' in user_data['prediction_type'] and user_data['dataType'] == "ChIP-seq":
+
         
         return results
 
@@ -110,10 +112,10 @@ def generate_results(user_data):
         # marge output file path
         marge_output_path = os.path.join(user_data['user_path'], 'marge_data/margeoutput')
         results['result_files'] = []
-        suffix_type = ['_enhancer_prediction.txt', '_all_relativeRP.txt', '_Strength.txt', '_all_RP.txt', '_target_regressionInfo.txt']
+        marge_suffix_type = ['_enhancer_prediction.txt', '_all_relativeRP.txt', '_Strength.txt', '_all_RP.txt', '_target_regressionInfo.txt']
         for root, dirs, files in os.walk(marge_output_path):
             for file in files:
-                for file_type in suffix_type:
+                for file_type in marge_suffix_type:
                     if file_type in str(file):
                         src_file = os.path.join(root, file)
                         dest_file = os.path.join(user_data['user_path'], 'download/' + file)
@@ -121,12 +123,20 @@ def generate_results(user_data):
 
                         dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
                         results['result_files'].append((file, dest_file_url))
-
-
-
-
-        results['bartResult'] = parse_bart_results('/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962/download/genelist1_bart_results.txt')
-
+    
+        # bart results file
+        for root, dirs, files in os.walk(os.path.join(user_data['user_path'], 'download')):
+            for file in files:
+                if '_bart_results.txt' in str(file):
+                    src_file = os.path.join(root, file)
+                    dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
+                    results['result_files'].append((file, dest_file_url))
+                    results['bartResult'] = parse_bart_results(src_file)
+                
+                if '_auc.txt' in str(file):
+                    src_file = os.path.join(root, file)
+                    dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
+                    results['result_files'].append((file, dest_file_url))
         return results
 
     # marge does not finish

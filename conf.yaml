@@ -1,0 +1,23 @@
+#--------------FOR  BACKEND PART  MIGRATION--------------#
+# @author: Wenjing Ma
+# 1. change the path to BART & MARGE
+# 2. change the path to tools related to MARGE
+# 3. make sure the installation of MARGE/BART
+# 4. make sure the installation of package dependencies: yaml
+#--------------------------------------------------------#
+
+BART:   
+    project_path: /Users/marvin/Projects/flask_playground/BART
+    core: 4          # cores to run BART
+MARGE:  
+    project_path: /Users/marvin/Projects/flask_playground/MARGE
+    lib_path: /Users/marvin/Projects/flask_playground/MARGE/marge_ref
+    core: 4           # cores to run MARGE
+    repeat_times: 3   # after certain repetition, execute bart
+
+UCSC_tools:
+    MACS2: /usr/local/Cellar/pyenv/1.2.1/versions/venv2.7/bin/macs2
+    bedClip: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bedClip
+    bedGraphToBigWig: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bedGraphToBigWig
+    bigWigAverageOverBed: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bigWigAverageOverBed
+    bigWigSummary: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bigWigSummary
