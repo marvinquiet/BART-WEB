@@ -33,18 +33,15 @@
             <div id="bart-result"></div>
           </div>
 
-          
-
           <div id="userConfig" class="col-md-12 mb-3">
             <h4 class="mb-3">YOUR CONFIGS</h4>
             {% for key, value in results['user_conf'].items() %}
               <p> {{ key }}: {{ value }} </p>
             {% endfor %}
-            
           </div>
 
           <div id="procLog" class="col-md-12 mb-3">
-            <h4 class="mb-3">LOG</h4>
+            <h4 class="mb-3">PROCEDURE LOG</h4>
             {% for log in results['proc_log'] %}
               <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
             {% endfor %}
@@ -79,6 +76,72 @@
       </footer>
     </div>
 
+    <script type="text/javascript">
+      var myResult = {{ results|tojson }}
+
+      // if the procedure ran and finished, show RESULTS part
+      // Otherwise, show "Your result is still being processed"
+      if (myResult.done) {
+          document.getElementById("resultOutput").innerHTML = "RESULTS";
+          // document.getElementById("stopPrediction").style.display = 'none';
+
+          var resultFiles = myResult.result_files;
+          for (var i = 0; i < resultFiles.length; i++) {
+              if (resultFiles[i] != null) {
+                  var resultFile = resultFiles[i][0];
+                  var resultFileUrl = resultFiles[i][1];
+                  var aTag = document.createElement("a");
+                  var aText = document.createTextNode(resultFile);
+                  aTag.appendChild(aText);
+                  var aHref = document.createAttribute("href");
+                  aHref.value = resultFileUrl;
+                  aTag.setAttributeNode(aHref);
+                  aTag.setAttributeNode(document.createAttribute("download"));
+                  document.getElementById("resultOutputDiv").appendChild(aTag);
+                  var brTag = document.createElement("br");
+                  document.getElementById("resultOutputDiv").appendChild(brTag);
+              }
+          }
+      } else {
+          document.getElementById("resultOutput").innerHTML = "YOUR PREDICTION IS STILL BEING PROCESSED!!!";
+          document.getElementById("stopPrediction").style.display = '';
+          var brTag = document.createElement("br");
+          document.getElementById("resultOutputDiv").appendChild(brTag);
+
+          var logTextDiv = document.getElementById("procLogTextDiv");
+          logTextDiv.removeAttribute("hidden");
+
+          // var processingLog = myResult.processing_log;
+          var processingLog = "../do_bart.py"
+          var pTag = document.createElement("iframe");
+          var pSrc = document.createAttribute("src");
+          pSrc.value = processingLog;
+          pTag.setAttributeNode(pSrc);
+          document.getElementById("procLogText").appendChild(pTag);
+      }
+
+      // if bart ran and finished, show the results in the table
+      if (myResult.bartResult.length >= 0) {
+          $('#bart-result').tabulator({
+          height: 608,
+          layout: "fitColumns",
+          columns:[
+            {title: "TF", field: "tf_name", align:"center", width: 120},
+            {title: "TF-Score", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
+            {title: "P-Value", field: "p_value", align:"center", sorter: "number"},
+            {title: "Z-Score", field: "z_score", align:"center", sorter: "number"},
+            {title: "AUC", field: "max_auc", align:"center", sorter: "number"},
+            {title: "R-Rank", field: "r_rank", align:"center", sorter: "number"},
+          ],
+
+          // rowClick:function(e, row){ //trigger an alert message when the row is clicked
+          //   alert("Row " + row.getData().id + " Clicked!!!!");
+          // },
+          });
+          $("#bart-result").tabulator("setData", myResult.bartResult);
+      }
+    </script> 
+    
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -86,77 +149,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='holder.min.js') }}"></script>
-   
-
-    <script type="text/javascript">
-      // var myResult = {{ results|tojson }}
-
-        // if (myResult.done) {
-        //     document.getElementById("resultOutput").innerHTML = "RESULTS";
-        //     document.getElementById("stopPrediction").style.display = 'none';
-
-        //     var resultFiles = myResult.result_files;
-        //     for (var i = 0; i < resultFiles.length; i++) {
-        //         if (resultFiles[i] != null) {
-        //             var resultFile = resultFiles[i][0];
-        //             var resultFileUrl = resultFiles[i][1];
-        //             var aTag = document.createElement("a");
-        //             var aText = document.createTextNode(resultFile);
-        //             aTag.appendChild(aText);
-        //             var aHref = document.createAttribute("href");
-        //             aHref.value = resultFileUrl;
-        //             aTag.setAttributeNode(aHref);
-        //             aTag.setAttributeNode(document.createAttribute("download"));
-        //             document.getElementById("resultOutputDiv").appendChild(aTag);
-        //             var brTag = document.createElement("br");
-        //             document.getElementById("resultOutputDiv").appendChild(brTag);
-        //         }
-        //     }
-        // } else {
-        //     document.getElementById("resultOutput").innerHTML = "YOUR PREDICTION IS STILL BEING PROCESSED!!!";
-        //     document.getElementById("stopPrediction").style.display = '';
-        //     var brTag = document.createElement("br");
-        //     document.getElementById("resultOutputDiv").appendChild(brTag);
-
-        //     var logTextDiv = document.getElementById("procLogTextDiv");
-        //     logTextDiv.removeAttribute("hidden");
-
-        //     // var processingLog = myResult.processing_log;
-        //     var processingLog = "../do_bart.py"
-        //     var pTag = document.createElement("iframe");
-        //     var pSrc = document.createAttribute("src");
-        //     pSrc.value = processingLog;
-        //     pTag.setAttributeNode(pSrc);
-        //     document.getElementById("procLogText").appendChild(pTag);
-        // }
-
-      var myResult = {{ results|tojson }}
-      
-      // if bart ran and finished, show the results in the table
-      if (myResult.bartResult.length >= 0) {
-        $('#bart-result').tabulator({
-        height: 608,
-        layout: "fitColumns",
-        columns:[
-          {title: "TF", field: "tf_name", align:"center", width: 120},
-          {title: "TF-Score", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
-          {title: "P-Value", field: "p_value", align:"center", sorter: "number"},
-          {title: "Z-Score", field: "z_score", align:"center", sorter: "number"},
-          {title: "AUC", field: "max_auc", align:"center", sorter: "number"},
-          {title: "R-Rank", field: "r_rank", align:"center", sorter: "number"},
-        ],
-
-        rowClick:function(e, row){ //trigger an alert message when the row is clicked
-          alert("Row " + row.getData().id + " Clicked!!!!");
-        },
-      });
-        $("#bart-result").tabulator("setData", myResult.bartResult);
-      }
-
-
-
-
-    </script> 
-
   </body>
 </html>

@@ -1,2 +1,2 @@
-export FLASK_APP=frontend.py
+export FLASK_APP=app.py
 flask run
