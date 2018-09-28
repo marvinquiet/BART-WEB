@@ -172,6 +172,27 @@ def is_bart_done(user_path):
     
     return True
 
+# ============= WRITE SLURM =============
+# TODO: decide to trigger it after moving the file or ?
+def write_slurm(user_data):
+    user_path = user_data['user_path']
+    user_key = user_data['user_key']
+    slurm_file = os.path.join(user_path, 'exe.slurm')
+    with open(slurm_file, 'w') as fopen:
+        fopen.write('''#!/bin/bash
+#SBATCH -n 1
+#SBATCH --mem=100000
+#SBATCH -t 48:00:00
+#SBATCH -p standard
+#SBATCH -A zanglab
+source ~/.bashrc
+module load anaconda3
+#Run program\n''')
+        script_file = os.path.join(PROJECT_DIR, 'exe_mb_pipeline.py')
+        exe_log_path = os.path.join(user_path, 'log/mb_pipe.log')
+        fopen.write('python ' + script_file + ' 3 ' + user_key + ' True > ' + exe_log_path + ' 2>&1\n')
+
+
 # ========= MARGE BART PIPELINE =========
 # call file in background to execute pipeline, otherwise, it will block the web server
 def do_marge_bart(user_key, bart_flag):
@@ -184,5 +205,13 @@ def test_is_marge_done():
     test_path = '/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962'
     assert is_marge_done(test_path) == True
 
+def test_write_slurm():
+    user_key = 'a_1534972940.637962'  
+    import do_process
+    user_data = do_process.get_user_data(user_key)
+    write_slurm(user_data)
+
+
 if __name__ == '__main__':
     test_is_marge_done()
+    test_write_slurm()
