@@ -136,7 +136,7 @@ def exe_bart_profile(user_data):
 
     bart profile -i ChIP.bed -f bed -s hg38 -t target.txt -p 4 --outdir bart_output
     '''
-    bart_output_path = os.path.join(user_data['user_path'], 'download')
+    bart_output_path = os.path.join(user_data['user_path'], 'download/bart_output')
     target_file_path = os.path.join(BART_DIR, 'BART/{assembly_type}_library/{assembly_type}_test_data/target.txt'.format(assembly_type=user_data["assembly"]))
 
     for input_file in user_data['files']:
@@ -152,7 +152,8 @@ def exe_bart_geneset(user_data):
 
     bart geneset -i name_enhancer_prediction.txt -s hg38 -t target.txt -p 4 --outdir bart_output
     '''
-    bart_output_path = os.path.join(user_data['user_path'], 'download')
+    bart_output_path = os.path.join(user_data['user_path'], 'download/bart_output')
+    # TODO: need to be changed!!! Target file can be the same as geneset 
     target_file_path = os.path.join(BART_DIR, 'BART/{assembly_type}_library/{assembly_type}_test_data/target.txt'.format(assembly_type=user_data["assembly"]))
     
     eh_files = get_enhancer_prediction(user_data['user_path'])
@@ -165,7 +166,7 @@ def is_bart_done(user_path):
     user_data = do_process.get_user_data(user_key)
     for user_file in user_data['files']:
         uploaded_file = os.path.basename(user_file).split('.')[0] # path/to/user/upload/filename.bam(txt)
-        res_file_path = os.path.join(user_path, 'download/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
+        res_file_path = os.path.join(user_path, 'download/bart_output/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
         if not os.path.exists(res_file_path):
             return False
     

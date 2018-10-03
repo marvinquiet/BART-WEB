@@ -98,7 +98,6 @@ def generate_results(user_data):
     marge_file_dict = generate_marge_file_results(user_data)
     results.update(marge_file_dict)
 
-
     if user_data['bart'] and not marge_bart.is_bart_done(user_data['user_path']):
         results['done'] = False
         return results
@@ -181,18 +180,18 @@ def generate_bart_file_results(user_data):
         return bart_file_results, bart_chart_results, bart_table_results
 
     # bart output file path
-    for root, dirs, files in os.walk(os.path.join(user_data['user_path'], 'download')):
+    for root, dirs, files in os.walk(os.path.join(user_data['user_path'], 'download/bart_output')):
         for file in files:
             if '_bart_results.txt' in str(file):
                 src_file = os.path.join(root, file)
-                dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
+                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], file)
                 bart_file_results['bart_result_files'].append((file, dest_file_url))
                 # bart table results for demonstration
                 bart_table_results['bartResult'] = parse_bart_results(src_file)
             
             if '_auc.txt' in str(file):
                 src_file = os.path.join(root, file)
-                dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
+                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], file)
                 bart_file_results['bart_result_files'].append((file, dest_file_url))
 
     return bart_file_results, bart_chart_results, bart_table_results
