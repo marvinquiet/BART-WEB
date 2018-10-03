@@ -2,6 +2,7 @@ import os
 import subprocess
 import shutil
 import json
+import yaml
 
 import utils
 import marge_bart
@@ -32,14 +33,14 @@ def init_user_config(user_path, user_data):
     # init username.config and save config data
     config_file = os.path.join(user_path, 'user.config')
     with open(config_file, 'w') as fopen:
-        json.dump(user_data, fopen)
+        yaml.dump(user_data, fopen)
 
 
 def get_user_data(user_key):
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     config_file = os.path.join(user_path, 'user.config')
     with open(config_file, 'r') as fopen:
-        user_data = json.load(fopen)
+        user_data = yaml.load(fopen)
 
     return user_data
 
@@ -99,7 +100,6 @@ def generate_results(user_data):
         results.update(marge_file_dict)
 
 
-    
     if marge_bart.is_bart_done(user_data['user_path']):
         bart_file_results, bart_chart_results, bart_table_results = generate_bart_file_results(user_data)
         results.update(bart_file_results)

@@ -82,20 +82,31 @@ def get_config():
                     file.save(filename_abs_path)
 
                     user_data['files'].append(filename_abs_path)
-
-            do_process.init_user_config(user_path, user_data)
+            
 
             if u'tf' in user_data['prediction_type'] and \
                 len(user_data['prediction_type']) == 1 and  \
                 user_data['dataType'] == 'ChIP-seq':
                 # only do bart profile with .bam file
-                marge_bart.exe_bart_profile(user_data)
+                user_data['marge'] = False
+                user_data['bart'] = True
+
+                # marge_bart.exe_bart_profile(user_data)
             elif u'tf' not in user_data['prediction_type']:
                 # do marge process, repeat 3 times
-                marge_bart.do_marge_bart(user_key, False)
+                user_data['marge'] = True
+                user_data['bart'] = False
+                # marge_bart.do_marge_bart(user_key, False)
             else:
                 # do marge first to get enhancer prediction, and do bart geneset later
-                marge_bart.do_marge_bart(user_key, True)
+                user_data['marge'] = True
+                user_data['bart'] = True
+
+                # marge_bart.do_marge_bart(user_key, True)
+            do_process.init_user_config(user_path, user_data)
+
+            marge_bart.do_marge_bart(user_data)
+            
             session['user_key'] = user_key
             return redirect(url_for('show_key'))
     return render_template('get_data_config.html')

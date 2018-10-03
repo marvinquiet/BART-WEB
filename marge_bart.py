@@ -35,7 +35,6 @@ with open('conf.yaml', 'r') as fyaml:
     except yaml.YAMLError as e: 
         print (e)
 
-
 # ============ MARGE ==============
 
 # init marge env
@@ -172,9 +171,11 @@ def is_bart_done(user_path):
     
     return True
 
-# ============= WRITE SLURM =============
-# TODO: decide to trigger it after moving the file or ?
-def write_slurm(user_data):
+
+# ========= MARGE BART PIPELINE =========
+# call file in background to execute pipeline, otherwise, it will block the web server
+def do_marge_bart(user_data):
+    # write slurm
     user_path = user_data['user_path']
     user_key = user_data['user_key']
     slurm_file = os.path.join(user_path, 'exe.slurm')
@@ -190,14 +191,26 @@ module load anaconda3
 #Run program\n''')
         script_file = os.path.join(PROJECT_DIR, 'exe_mb_pipeline.py')
         exe_log_path = os.path.join(user_path, 'log/mb_pipe.log')
-        fopen.write('python ' + script_file + ' 3 ' + user_key + ' True > ' + exe_log_path + ' 2>&1\n')
+        if user_data['bart'] and user_data['marge']:
+            fopen.write('python ' + script_file + ' 3 ' + user_key + ' True > ' + exe_log_path + ' 2>&1\n')
+            return
+        
+        if not user_data['bart'] and user_data['marge']:
+            fopen.write('python ' + script_file + ' 3 ' + user_key + ' False > ' + exe_log_path + ' 2>&1\n')
+            return
 
+        if user_data['bart'] and not user_data['marge']:
+            bart_output_path = os.path.join(user_data['user_path'], 'download')
+            target_file_path = os.path.join(BART_DIR, 'BART/{assembly_type}_library/{assembly_type}_test_data/target.txt'.format(assembly_type=user_data["assembly"]))
 
-# ========= MARGE BART PIPELINE =========
-# call file in background to execute pipeline, otherwise, it will block the web server
-def do_marge_bart(user_key, bart_flag):
-    pipeline_path = os.path.join(PROJECT_DIR, "exe_mb_pipeline.py")
-    subprocess.Popen(["python", pipeline_path, str(MARGE_REPEAT_TIMES), user_key, str(bart_flag)], cwd=PROJECT_DIR)
+            for input_file in user_data['files']:
+                if input_file.endswith(".bam"):
+                    fopen.write('bart profile -i ' + input_file + ' -f bam -s ' + user_data["assembly"] + ' -t ' + target_file_path + " -p " + str(BART_CORE) + ' --outdir ' + bart_output_path + ' > ' + exe_log_path + ' 2>&1\n')
+                    #subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-t", target_file_path, "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+
+        # pipeline_path = os.path.join(PROJECT_DIR, "exe_mb_pipeline.py")
+        # subprocess.Popen(["python", pipeline_path, str(MARGE_REPEAT_TIMES), user_key, str(True)], cwd=PROJECT_DIR)
+        
 
 
 # ============== UNIT TEST ===============
@@ -205,13 +218,6 @@ def test_is_marge_done():
     test_path = '/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962'
     assert is_marge_done(test_path) == True
 
-def test_write_slurm():
-    user_key = 'a_1534972940.637962'  
-    import do_process
-    user_data = do_process.get_user_data(user_key)
-    write_slurm(user_data)
-
 
 if __name__ == '__main__':
     test_is_marge_done()
-    test_write_slurm()
