@@ -84,8 +84,9 @@
       if (myResult.done) {
           document.getElementById("resultOutput").innerHTML = "RESULTS";
           // document.getElementById("stopPrediction").style.display = 'none';
-
-          var resultFiles = myResult.result_files;
+          var margeResultFiles = myResult.marge_result_files;
+          var bartResultFiles = myResult.bart_result_files;
+          var resultFiles = margeResultFiles.concat(bartResultFiles)
           for (var i = 0; i < resultFiles.length; i++) {
               if (resultFiles[i] != null) {
                   var resultFile = resultFiles[i][0];

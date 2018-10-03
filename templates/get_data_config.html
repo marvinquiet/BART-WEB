@@ -66,8 +66,8 @@
               <h4 class="mb-3">Choose Data Type</h4>
               <select class="custom-select d-block w-100" id="dataType" name=dataType required>
                 <option value="">Choose...</option>
-                <option value="ChIP-seq">ChIP-seq</option>
-                <option value="Geneset">Geneset</option>
+                <option value="ChIP-seq">Read Alignment Bam File</option>
+                <option value="Geneset">Official Gene Symbols list</option>
                 <option value="Both">Both</option>
               </select>
               <div class="invalid-feedback">
@@ -91,32 +91,32 @@
 
               
             <div class="col-md-12 mb-3">
-              <h4 class="mb-3">Choose Prediction Type</h4>
+              <h4 class="mb-3">Choose What to Predict</h4>
               <div class="custom-control custom-checkbox">
                 <input id="rp" class="custom-control-input" type="checkbox" name="predictionType" value="rp" disabled>
                 <label class="custom-control-label" for="rp">
-                    Relative RPs
+                    Relative Regulatory Potentials
                 </label>
               </div>
 
               <div class="custom-control custom-checkbox">
                 <input id="cis" class="custom-control-input" type="checkbox" name="predictionType" value="cis" disabled>
                 <label class="custom-control-label" for="cis">
-                    Cisregulatory Elements
+                    Cis-regulatory Elements
                 </label>
               </div>
 
               <div class="custom-control custom-checkbox">
                 <input id="tf" class="custom-control-input" type="checkbox" name="predictionType" value="tf" disabled>
                 <label class="custom-control-label" for="tf">
-                    TF patterns
+                    Potential TF patterns
                 </label>
               </div>
 
               <div class="custom-control custom-checkbox">
                 <input id="eh" class="custom-control-input" type="checkbox" name="predictionType" value="eh" disabled>
                 <label class="custom-control-label" for="eh">
-                    Enhancer
+                    Potential Enhancers
                 </label>
               </div>
             </div>
@@ -215,12 +215,21 @@
                 event.preventDefault();
                 event.stopPropagation();
               }
+              // whether at least one checkbox is checked
+              var chkbox = document.getElementById("rp").checked || document.getElementById("cis").checked || document.getElementById("tf").checked || document.getElementById("eh").checked
+              if (chkbox == true) {}
+              else{
+                event.preventDefault();
+                event.stopPropagation();
+              }
               form.classList.add('was-validated');
             }, false);
           });
         }, false);
       })();
     </script>
+
+    
 
     <script>
     $("#dataType").change(function() {
