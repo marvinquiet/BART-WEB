@@ -1,3 +1,4 @@
+import os, sys
 # plot bart
 import pandas as pd
 import numpy as np
@@ -5,6 +6,7 @@ from scipy import stats
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 
 # TODO: should be packaged as python bart_plot.py -> and write into slurm
 
@@ -25,6 +27,7 @@ def stat_plot(stat, tfs, ID, bart_output_dir):
     plt.ylabel('Rank Score',fontsize = 12)
     # plotdir = bart_output_dir + os.sep + '{}_plot'.format(args.ofilename)
     plotdir = bart_output_dir + '/plot'
+
     #os.makedirs(plotdir,exist_ok=True)
     try:
         os.makedirs(plotdir,exist_ok=True)
@@ -62,9 +65,7 @@ def stat_plot(stat, tfs, ID, bart_output_dir):
     plt.close()
 
 
-# TODO: draw plot after the result
 def plot_top_tf(bart_table_df, bart_output_dir, AUCs):
-    chart_files = []
     # top 20 for each column, get intersection
     top_cnt = round(len(bart_table_df.index)/5)
 
@@ -91,7 +92,6 @@ def plot_top_tf(bart_table_df, bart_output_dir, AUCs):
     for ID in tf_intersection:
         stat_plot(bart_table_df, tfs, ID, bart_output_dir)
 
-    return chart_files
 
 
 def get_AUCs(auc_file):
@@ -103,10 +103,53 @@ def get_AUCs(auc_file):
             AUCs[tf_key] = auc
     return AUCs
 
+def main():
+    # example: python bart_plot.py user_key
+    # print (sys.argv)
 
-def get_bart_results():
+    # get argv
+    script_name = sys.argv[0]  
+    user_key = sys.argv[1] # user_key is needed
     
+    import do_process
+    user_data = do_process.get_user_data(user_key)
+    user_path = user_data['user_path']
 
-    # make sure get the AUCs first
-    AUCs = get_AUCs(src_file)
-    bart_df = pd.read_csv(bart_result_file, sep='\t', names=bart_title[1:], index_col=0, skiprows=1)
+    bart_result_file = ''
+    bart_auc_file = ''
+    auc_result_dict = {}
+
+    bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank'] 
+    bart_output_dir = os.path.join(user_path, 'download/bart_output')
+
+    bart_auc_ext = '_auc.txt'
+    for root, dirs, files in os.walk(bart_output_dir):
+        for bart_file in files:
+            if bart_auc_ext in bart_file:
+                bart_auc_file = os.path.join(root, bart_file)
+                user_file_name = bart_file.strip(bart_auc_ext)
+                auc_result_dict[user_file_name] = {}
+                auc_result_dict[user_file_name]['auc'] = bart_auc_file
+
+    bart_res_ext = '_bart_results.txt'     
+    for root, dirs, files in os.walk(bart_output_dir):
+        for bart_file in files:
+            if bart_res_ext in bart_file:
+                bart_result_file = os.path.join(root, bart_file)
+                user_file_name = bart_file.strip(bart_res_ext)
+                if user_file_name not in auc_result_dict:
+                    auc_result_dict[user_file_name] = {}
+                    # something definitely went wrong if no _auc.txt files!
+                    # the plot can not be plotted!!
+                    # only the statistics will be shown!
+                auc_result_dict[user_file_name]['res'] = bart_result_file
+
+    for user_file_name, bart_files in auc_result_dict.items():
+        bart_auc_file = bart_files['auc']
+        bart_result_file = bart_files['res']
+        AUCs = get_AUCs(bart_auc_file)
+        bart_df = pd.read_csv(bart_result_file, sep='\t', names=bart_title[1:], index_col=0, skiprows=1)
+        plot_top_tf(bart_df, bart_output_dir, AUCs)
+
+if __name__ == '__main__':
+    main()

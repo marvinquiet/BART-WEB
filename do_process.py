@@ -175,6 +175,7 @@ def generate_bart_file_results(user_data):
 
     bart_file_results['bart_result_files'] = []
     bart_table_results['bartResult'] = []
+    bart_chart_results['bart_chart_files'] = []
 
     if not user_data['bart']:
         return bart_file_results, bart_chart_results, bart_table_results
@@ -186,23 +187,28 @@ def generate_bart_file_results(user_data):
     # bart output file path
     bart_output_dir = os.path.join(user_data['user_path'], 'download/bart_output')
     for root, dirs, files in os.walk(bart_output_dir):
-        for bart_file in files:
-            if '_auc.txt' in bart_file:
-                src_file = os.path.join(root, bart_file)
-                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], bart_file)
-                bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
-                
-            if '_bart_results.txt' in bart_file:
-                src_file = os.path.join(root, bart_file)
-                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], bart_file)
-                bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
-                # bart table results for demonstration
-                bart_table_results['bartResult'] = parse_bart_results(src_file)
+        if 'bart_output/plot' in root:
+            for chart_file in files:
+                src_file = os.path.join(root, chart_file)
+                dest_file_url = '/download/bart_output/plot/%s___%s' % (user_data['user_key'], chart_file)
+                bart_chart_results['bart_chart_files'].append((src_file, dest_file_url))
+        else: 
+            for bart_file in files:
+                if '_auc.txt' in bart_file:
+                    src_file = os.path.join(root, bart_file)
+                    dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], bart_file)
+                    bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
+                    
+                if '_bart_results.txt' in bart_file:
+                    src_file = os.path.join(root, bart_file)
+                    dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], bart_file)
+                    bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
+                    # bart table results for demonstration
+                    bart_table_results['bartResult'] = parse_bart_results(src_file)
 
-                # just finding chart files in bart_output/plot
+                    # just finding chart files in bart_output/plot
 
-                
-                bart_chart_results['bart_chart_files'] = plot_top_tf(bart_df, bart_output_dir, AUCs)
+                    # bart_chart_results['bart_chart_files'] = plot_top_tf(bart_df, bart_output_dir, AUCs)
         
     return bart_file_results, bart_chart_results, bart_table_results
 

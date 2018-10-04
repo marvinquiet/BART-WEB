@@ -132,10 +132,24 @@ def error_page():
 
 
 @app.route('/download/<userkey_filename>')
-def download_log_file(userkey_filename):
+def download_marge_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     download_path = os.path.join(user_path, 'download')
+    return send_from_directory(download_path, filename)
+
+@app.route('/download/bart_output/<userkey_filename>')
+def download_bart_res_file(userkey_filename):
+    user_key, filename = userkey_filename.split('___')
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
+    download_path = os.path.join(user_path, 'download/bart_output')
+    return send_from_directory(download_path, filename)
+
+@app.route('/download/bart_output/plot/<userkey_filename>')
+def download_bart_chat_file(userkey_filename):
+    user_key, filename = userkey_filename.split('___')
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
+    download_path = os.path.join(user_path, 'download/bart_output/plot')
     return send_from_directory(download_path, filename)
 
 
