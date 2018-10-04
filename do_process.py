@@ -1,4 +1,4 @@
-import os
+import os, sys
 import subprocess
 import shutil
 import json
@@ -179,25 +179,35 @@ def generate_bart_file_results(user_data):
     if not user_data['bart']:
         return bart_file_results, bart_chart_results, bart_table_results
 
+    user_files = []
+    for uf in user_data['files']:
+        user_files.append(os.path.basename(uf).split('.')[0])
+
     # bart output file path
-    for root, dirs, files in os.walk(os.path.join(user_data['user_path'], 'download/bart_output')):
-        for file in files:
-            if '_bart_results.txt' in str(file):
-                src_file = os.path.join(root, file)
-                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], file)
-                bart_file_results['bart_result_files'].append((file, dest_file_url))
+    bart_output_dir = os.path.join(user_data['user_path'], 'download/bart_output')
+    for root, dirs, files in os.walk(bart_output_dir):
+        for bart_file in files:
+            if '_auc.txt' in bart_file:
+                src_file = os.path.join(root, bart_file)
+                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], bart_file)
+                bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
+                
+            if '_bart_results.txt' in bart_file:
+                src_file = os.path.join(root, bart_file)
+                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], bart_file)
+                bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
                 # bart table results for demonstration
                 bart_table_results['bartResult'] = parse_bart_results(src_file)
-            
-            if '_auc.txt' in str(file):
-                src_file = os.path.join(root, file)
-                dest_file_url = '/download/bart_output/%s___%s' % (user_data['user_key'], file)
-                bart_file_results['bart_result_files'].append((file, dest_file_url))
 
+                # just finding chart files in bart_output/plot
+
+                
+                bart_chart_results['bart_chart_files'] = plot_top_tf(bart_df, bart_output_dir, AUCs)
+        
     return bart_file_results, bart_chart_results, bart_table_results
 
 
-
+# for showing table
 def parse_bart_results(bart_result_file):
     # tf_name, tf_score, p_value, z_score, max_auc, r_rank -> definition in result_demonstration.html
     bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank'] 
