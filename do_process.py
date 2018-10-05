@@ -20,11 +20,13 @@ def init_project_path(user_key):
     user_upload_path = os.path.join(user_path, 'upload')
     user_download_path = os.path.join(user_path, 'download')
     user_log_path = os.path.join(user_path, 'log')
+    bart_output_path = os.path.join(user_download_path, 'bart_output')
 
     utils.create_dir(user_path)
     utils.create_dir(user_upload_path)
     utils.create_dir(user_download_path)
     utils.create_dir(user_log_path)
+    utils.create_dir(bart_output_path)
 
     return user_path
 

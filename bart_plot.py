@@ -19,8 +19,12 @@ def stat_plot(stat, tfs, ID, bart_output_dir):
     # box-plot
     fig=plt.figure(figsize=(4,4))
     # default --nonorm=FALSE
-    plt.boxplot([stat.loc[i]['tf_score'] for i in stat.index])
-    plt.scatter(1,stat.loc[ID]['tf_score'],c='r',marker='o',s=60)
+    # plt.boxplot([stat.loc[i]['tf_score'] for i in stat.index])
+    # plt.scatter(1,stat.loc[ID]['tf_score'],c='r',marker='o',s=60)
+
+    plt.boxplot([stat.loc[i]['r_rank'] for i in stat.index])
+    plt.scatter(1,stat.loc[ID]['r_rank'],c='r',marker='o',s=60)
+
     plt.gca().invert_yaxis()
     plt.gca().xaxis.set_major_locator(plt.NullLocator())
     plt.title(ID,fontsize = 12)
