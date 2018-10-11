@@ -8,6 +8,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from utils import model_logger as logger
+
 
 # TODO: should be packaged as python bart_plot.py -> and write into slurm
 

@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 
 import do_process
 import marge_bart
+from utils import model_logger as logger
 
 PROJECT_DIR = os.path.dirname(__file__)
 ALLOWED_EXTENSIONS = set(['txt', 'bam'])
@@ -16,6 +17,7 @@ app.secret_key = os.urandom(24)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    logger.info('Start using bart-web!')
     if request.method == 'POST':
         # predict data button
         if request.form['index_submit'] == 'predict_data':

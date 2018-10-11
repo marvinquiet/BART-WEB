@@ -7,6 +7,7 @@ import yaml
 import shutil
 
 import utils
+from utils import model_logger as logger
 
 sys.setrecursionlimit(20000)
 

@@ -7,6 +7,7 @@ import shutil
 
 import utils
 from marge_bart import *
+from utils import model_logger as logger
 
 sys.setrecursionlimit(20000)
 

@@ -8,6 +8,7 @@ import yaml
 
 import utils
 import marge_bart
+from utils import model_logger as logger
 
 PROJECT_DIR = os.path.dirname(__file__)
 
