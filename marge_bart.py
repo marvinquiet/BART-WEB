@@ -21,7 +21,7 @@ MARGE_CORE = 4
 MARGE_REPEAT_TIMES = 3
 with open('conf.yaml', 'r') as fyaml:
     try: 
-        conf_data = yaml.load(fyaml)
+        conf_data = yaml.safe_load(fyaml)
         BART_DIR = conf_data['BART']['project_path']
         MARGE_DIR = conf_data['MARGE']['project_path']
         MARGE_LIB_DIR = conf_data['MARGE']['lib_path']
