@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import json
 from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory, session)
