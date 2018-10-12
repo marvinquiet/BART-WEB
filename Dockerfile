@@ -27,7 +27,7 @@ COPY ./apache-flask.conf /etc/apache2/sites-available/apache-flask.conf
 RUN a2ensite apache-flask
 RUN a2enmod headers
 
-COPY . /var/www/apache-flask/
+COPY  . /var/www/apache-flask/
 
 RUN a2dissite 000-default.conf
 RUN a2ensite apache-flask.conf
@@ -36,6 +36,10 @@ EXPOSE 80
 
 # ENV HOME /app change to apache-flask
 WORKDIR /var/www/apache-flask
+RUN chmod 777 /var/www/apache-flask/usercase
+RUN chmod 777 /var/www/apache-flask/log
+
+
 
 CMD /usr/sbin/apache2ctl -D FOREGROUND
 
