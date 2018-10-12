@@ -11,9 +11,6 @@ from utils import model_logger as logger
 
 sys.setrecursionlimit(20000)
 
-# ======= slurm project dir ======
-SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/CPHG/BART'   # hard-code path 
-
 # ======== load conf.yaml ========
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 MARGE_DIR = ''
@@ -176,11 +173,15 @@ def is_bart_done(user_path):
 
 # ========= MARGE BART PIPELINE =========
 # call file in background to execute pipeline, otherwise, it will block the web server
+
+# slurm project dir
+SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/CPHG/BART'   # hard-code path 
+
 def do_marge_bart(user_data):
     # write slurm
-    # user_path = user_data['user_path']
+    user_path = user_data['user_path']
     user_key = user_data['user_key']
-    user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
+    # user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
     slurm_file = os.path.join(user_path, 'exe.slurm')
     with open(slurm_file, 'w') as fopen:
         fopen.write('''#!/bin/bash
