@@ -110,8 +110,8 @@ def get_config():
 
             marge_bart.do_marge_bart(user_data)
             
-            session['user_key'] = user_key
-            return redirect(url_for('show_key'))
+            # post key 
+            return redirect(url_for('show_key', key=user_key))
     return render_template('get_data_config.html')
 
 
@@ -123,9 +123,9 @@ def get_result():
     return render_template('result_demonstration.html', results=results)
 
 
-@app.route('/key', methods=['GET', 'POST'])
+@app.route('/key')
 def show_key():
-    user_key = session.get('user_key', None)
+    user_key = request.args['key']
     return render_template('key_demonstration.html', key=user_key)
 
 @app.route('/error', methods=['GET', 'POST'])

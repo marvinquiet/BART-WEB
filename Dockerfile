@@ -42,7 +42,6 @@ RUN mkdir log
 RUN chown -R www-data:www-data log
 RUN chmod 755 log
 
-RUN chmod 755 usercase
 
 CMD /usr/sbin/apache2ctl -D FOREGROUND
 
