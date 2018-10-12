@@ -178,8 +178,9 @@ def is_bart_done(user_path):
 # call file in background to execute pipeline, otherwise, it will block the web server
 def do_marge_bart(user_data):
     # write slurm
-    user_path = user_data['user_path']
+    # user_path = user_data['user_path']
     user_key = user_data['user_key']
+    user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
     slurm_file = os.path.join(user_path, 'exe.slurm')
     with open(slurm_file, 'w') as fopen:
         fopen.write('''#!/bin/bash
@@ -207,7 +208,7 @@ module load anaconda3
             return
 
         if user_data['bart'] and not user_data['marge']:
-            bart_output_path = os.path.join(user_data['user_path'], 'download')
+            bart_output_path = os.path.join(user_path, 'download')
             plot_flag = False
             for input_file in user_data['files']:
                 if input_file.endswith(".bam"):
