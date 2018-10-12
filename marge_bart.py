@@ -11,6 +11,9 @@ from utils import model_logger as logger
 
 sys.setrecursionlimit(20000)
 
+# ======= slurm project dir ======
+SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/CPHG/BART'   # hard-code path 
+
 # ======== load conf.yaml ========
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 MARGE_DIR = ''
@@ -189,9 +192,9 @@ source ~/.bashrc
 module load anaconda3
 #Run program\n''')
         # pipeline script
-        script_file = os.path.join(PROJECT_DIR, 'exe_mb_pipeline.py')
+        script_file = os.path.join(SLURM_PROJECT_DIR, 'exe_mb_pipeline.py')
         # bart result plot script
-        bart_plot_file = os.path.join(PROJECT_DIR, 'bart_plot.py')
+        bart_plot_file = os.path.join(SLURM_PROJECT_DIR, 'bart_plot.py')
         exe_log_path = os.path.join(user_path, 'log/mb_pipe.log')
         if user_data['bart'] and user_data['marge']:
             fopen.write('python ' + script_file + ' 3 ' + user_key + ' True > ' + exe_log_path + ' 2>&1\n')
