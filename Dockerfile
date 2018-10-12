@@ -36,10 +36,16 @@ EXPOSE 80
 
 # ENV HOME /app change to apache-flask
 WORKDIR /var/www/apache-flask
+<<<<<<< HEAD
 RUN chmod 777 /var/www/apache-flask/usercase
 RUN chmod 777 /var/www/apache-flask/log
 
 
+=======
+RUN mkdir log
+RUN chown -R www-data:www-data log
+RUN chmod 755 log
+>>>>>>> a4acc0bc6f1bd5546cfe3c2c9b0c8292e4fac728
 
 CMD /usr/sbin/apache2ctl -D FOREGROUND
 
