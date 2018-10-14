@@ -127,7 +127,13 @@
           height: 608,
           layout: "fitColumns",
           columns:[
-            {title: "TF", field: "tf_name", align:"center", width: 120},
+            // click TF name, trigger plot window
+            {title: "TF", field: "tf_name", align:"center", width: 120, cellClick:function(e, cell){
+                //e - the click event object
+                //cell - cell componen;
+                var cellObject = cell.cell;
+                PopupCenter("/plot/" + myResult.user_conf.YourKey + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
+            },},
             {title: "TF-Score", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
             {title: "P-Value", field: "p_value", align:"center", sorter: "number"},
             {title: "Z-Score", field: "z_score", align:"center", sorter: "number"},
@@ -135,13 +141,30 @@
             {title: "R-Rank", field: "r_rank", align:"center", sorter: "number"},
           ],
 
-          // rowClick:function(e, row){ //trigger an alert message when the row is clicked
-          //   alert("Row " + row.getData().id + " Clicked!!!!");
+          // rowClick:function(e, row){ 
           // },
           });
           $("#bart-result").tabulator("setData", myResult.bartResult);
       }
-    </script> 
+
+      function PopupCenter(url, title, w, h) {  
+          // Fixes dual-screen position                         Most browsers      Firefox  
+          var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;  
+          var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;  
+                    
+          width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;  
+          height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;  
+                    
+          var left = ((width / 2) - (w / 2)) + dualScreenLeft;  
+          var top = ((height / 2) - (h / 2)) + dualScreenTop;  
+          var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);  
+        
+          // Puts focus on the newWindow  
+          if (window.focus) {  
+              newWindow.focus();  
+          }  
+      }  
+    </script>
     
     <!-- Bootstrap core JavaScript
     ================================================== -->

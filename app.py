@@ -133,6 +133,20 @@ def error_page():
     err_msg = session.get('err_msg', None)
     return render_template('error.html', msg=err_msg)
 
+@app.route('/plot/<userkey_tfname>')
+def bart_plot_result(userkey_tfname):
+    user_key, tf_name = userkey_tfname.split('___')
+    # where plots locate
+    # plot_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key + '/download/bart_output/plot')
+    distribution_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_avg_z_p_boxplot.png'
+    auc_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_cumulative_distribution.png'
+    plot_results = {}
+    plot_results['user_key'] = user_key
+    plot_results['tf_name'] = tf_name
+    plot_results['auc_plot'] = auc_plot
+    plot_results['dist_plot'] = distribution_plot
+    return render_template('plot_result.html', plotResults=plot_results)
+
 
 @app.route('/download/<userkey_filename>')
 def download_marge_file(userkey_filename):
@@ -149,7 +163,7 @@ def download_bart_res_file(userkey_filename):
     return send_from_directory(download_path, filename)
 
 @app.route('/download/bart_output/plot/<userkey_filename>')
-def download_bart_chat_file(userkey_filename):
+def download_bart_chart_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     download_path = os.path.join(user_path, 'download/bart_output/plot')

@@ -74,7 +74,10 @@ def stat_plot(stat, tfs, ID, bart_output_dir):
 
 def plot_top_tf(bart_table_df, bart_output_dir, AUCs):
     # top 20 for each column, get intersection
-    top_cnt = round(len(bart_table_df.index)/5)
+    # top_cnt = round(len(bart_table_df.index)/5)
+
+    # draw all first
+    top_cnt = round(len(bart_table_df.index))
 
     tf_score_list = set(bart_table_df.sort_values(by=['tf_score'], ascending=False).head(top_cnt).index.values)
     z_score_list = set(bart_table_df.sort_values(by=['z_score'], ascending=False).head(top_cnt).index.values)
