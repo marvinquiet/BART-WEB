@@ -128,12 +128,17 @@
           layout: "fitColumns",
           columns:[
             // click TF name, trigger plot window
-            {title: "TF", field: "tf_name", align:"center", width: 120, cellClick:function(e, cell){
+            {title: "TF", field: "tf_name", align:"center", width: 120, 
+            cellClick:function(e, cell){
                 //e - the click event object
                 //cell - cell componen;
                 var cellObject = cell.cell;
                 PopupCenter("/plot/" + myResult.user_conf.YourKey + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
-            },},
+            },
+            formatter:function(cell, formatterParams){
+                var value = cell.getValue();
+                return "<span style='cursor:pointer; color: blue; text-decoration:underline;' >" + value + "</span>";
+            }},
             {title: "TF-Score", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
             {title: "P-Value", field: "p_value", align:"center", sorter: "number"},
             {title: "Z-Score", field: "z_score", align:"center", sorter: "number"},
