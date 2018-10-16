@@ -246,6 +246,9 @@ def revise_user_config(user_key, user_path):
         new_file_path.append(file_path.replace(DOCKER_DIR, RIVANNA_DIR))
     user_data['files'] = new_file_path
 
+    logger.info (new_user_path)
+    logger.info (user_data)
+
     do_process.init_user_config(user_path, user_data)
     
 # ============== UNIT TEST ===============
