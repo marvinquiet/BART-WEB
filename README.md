@@ -7,7 +7,7 @@ Through this project, you can combine [MARGE](http://cistrome.org/MARGE/index.ht
 
 ### How to use it
 
-When the project is finished, please visit [MARGE-BART/zanglab].
+When the project is finished, please visit [BART-WEB](http://bartweb.uvasomrc.io/).
 
 Or if you want to run in your localhost, download those related projects, MARGE/BART/USCS_TOOLS. Install them, and change the conf.yaml file...
 
