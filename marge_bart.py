@@ -238,7 +238,8 @@ DOCKER_DIR = '/var/www/apache-flask/'
 RIVANNA_DIR = '/sfs/qumulo/qproject/CPHG/BART/'
 def revise_user_config(user_key, user_path):
     user_data = do_process.get_user_data(user_key)
-    user_data['user_path'] = user_data['user_path'].replace(DOCKER_DIR, RIVANNA_DIR)
+    new_user_path = user_data['user_path'].replace(DOCKER_DIR, RIVANNA_DIR)
+    user_data['user_path'] = new_user_path
 
     new_file_path = []
     for file_path in user_data['files']:
@@ -254,4 +255,4 @@ def test_is_marge_done():
 
 
 if __name__ == '__main__':
-    test_is_marge_done()
+    revise_user_config('mawenjing_1539719091.938166', '/Users/marvin/Projects/flask_playground/usercase/mawenjing_1539719091.938166')
