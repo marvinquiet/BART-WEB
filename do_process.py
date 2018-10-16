@@ -66,20 +66,20 @@ def config_results(results, user_data):
     results['user_conf']['YourKey'] = user_data['user_key']
     results['user_conf']['Assembly'] = user_data['assembly']
     results['user_conf']['DataType'] = user_data['dataType']
-    if user_data['gene_exp_type'] != "":
-        results['user_conf']['GeneExpressionType'] = user_data['gene_exp_type']
-    if user_data['gene_id_type'] != "":
-        results['user_conf']['GeneIdType'] = user_data['gene_id_type']
+    # if user_data['gene_exp_type'] != "":
+    #     results['user_conf']['GeneExpressionType'] = user_data['gene_exp_type']
+    # if user_data['gene_id_type'] != "":
+    #     results['user_conf']['GeneIdType'] = user_data['gene_id_type']
 
-    results['user_conf']['PredictionType'] = []
-    if 'rp' in user_data['prediction_type']:
-        results['user_conf']['PredictionType'].append("Relative Potentials")
-    if 'cis' in user_data['prediction_type']:
-        results['user_conf']['PredictionType'].append("Cisregulatory Elements")
-    if 'tf' in user_data['prediction_type']:
-        results['user_conf']['PredictionType'].append("TF patterns")
-    if 'eh' in user_data['prediction_type']:
-        results['user_conf']['PredictionType'].append("Enhancer")
+    # results['user_conf']['PredictionType'] = []
+    # if 'rp' in user_data['prediction_type']:
+    #     results['user_conf']['PredictionType'].append("Relative Potentials")
+    # if 'cis' in user_data['prediction_type']:
+    #     results['user_conf']['PredictionType'].append("Cisregulatory Elements")
+    # if 'tf' in user_data['prediction_type']:
+    #     results['user_conf']['PredictionType'].append("TF patterns")
+    # if 'eh' in user_data['prediction_type']:
+    #     results['user_conf']['PredictionType'].append("Enhancer")
 
     results['user_conf']['UploadFiles'] = []
     for file_path in user_data['files']:

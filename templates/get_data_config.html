@@ -63,12 +63,13 @@
         <div class="col-md-12 order-md-1">
           <form class="needs-validation" method=post enctype=multipart/form-data novalidate>
             <div class="col-md-12 mb-3">
-              <h4 class="mb-3">Choose Data Type</h4>
+              <h4 class="mb-3">What is your data type?</h4>
               <select class="custom-select d-block w-100" id="dataType" name=dataType required>
                 <option value="">Choose...</option>
-                <option value="ChIP-seq">ChIP-seq Bam File</option>
-                <option value="Geneset">Official Gene Symbols list</option>
-                <option value="Both">Both</option>
+                <option value="ChIP-seq-bam">ChIP-seq Bam File</option>
+                <option value="ChIP-seq-bed">ChIP-seq Bed File</option>
+                <option value="Geneset">Gene List</option>
+                <!-- <option value="Both">Both</option> -->
               </select>
               <div class="invalid-feedback">
                 Please select a valid data type.
@@ -76,7 +77,7 @@
             </div>
 
             <div class="col-md-12 mb-3">
-              <h4 class="mb-3">Choose Assembly</h4>
+              <h4 class="mb-3">Human or Mouse?</h4>
               <select class="custom-select d-block w-100" id="assembly" name="assembly" required>
                 <option value="">Choose...</option>
                 <option value="hg38">hg38</option>
@@ -85,12 +86,12 @@
                 <!-- <option value="mm9">mm9</option> -->
               </select>
               <div class="invalid-feedback">
-                Please select a valid assembly.
+                Please select a valid reference.
               </div>
             </div>
 
               
-            <div class="col-md-12 mb-3">
+            <!-- <div class="col-md-12 mb-3">
               <h4 class="mb-3">Choose What to Predict</h4>
               <div class="custom-control custom-checkbox">
                 <input id="rp" class="custom-control-input" type="checkbox" name="predictionType" value="rp" disabled>
@@ -119,11 +120,11 @@
                     Potential Enhancers
                 </label>
               </div>
-            </div>
+            </div> -->
 
               
 
-            <div class="col-md-12 mb-3" id='expType' hidden>
+            <!-- <div class="col-md-12 mb-3" id='expType' hidden>
               <h4 class="mb-3" id='expTypeTitle' hidden>Choose Gene Expression Type</h4>
               <div class="custom-control custom-radio">
                 <input id="geneOnly" name="expTypeChoice" value="Gene_Only" type="radio" class="custom-control-input" checked required>
@@ -133,11 +134,11 @@
                 <input id="geneResp" name="expTypeChoice" value="Gene_Response" type="radio" class="custom-control-input" required>
                 <label class="custom-control-label" for="geneResp">Gene Response</label>
               </div>
-            </div>
+            </div> -->
 
               
 
-            <div class="col-md-12 mb-3" id="geneId" hidden>
+            <!-- <div class="col-md-12 mb-3" id="geneId" hidden>
               <h4 class="mb-3" id="geneIdTitle" hidden>Choose Gene ID Type</h4>
               <div class="custom-control custom-radio">
                 <input id="geneSymb" name="geneIdChoice" value="GeneSymbol" type="radio" class="custom-control-input" checked required>
@@ -147,13 +148,13 @@
                 <input id="refSeq" name="geneIdChoice" value="RefSeq" type="radio" class="custom-control-input" required>
                 <label class="custom-control-label" for="refSeq">Ref Seq</label>
               </div>
-            </div>
+            </div> -->
 
             
             <div class="col-md-12 mb-3">
-              <h4 class="mb-3">Upload your file(s).</h4>
+              <h4 class="mb-3">Upload your file.</h4>
               <p id="fileType" hidden></p>
-              <input id="uploadFiles" name="uploadFiles" type="file" multiple>
+              <input id="uploadFiles" name="uploadFiles" type="file"> <!-- not for multiple, only allow one file -->
             </div>
 
             <hr class="mb-4">
@@ -161,11 +162,11 @@
             <div class="row">
               <div class="col-md-12 mb-3">
                 <h3 class="mb-3">Generate unique key</h3>
-                <p>In order to retrieve your prediction result later, you need to input your username to generate your retrieval key.</p>
-                <label for="Username">Username</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                <p>In order to send your unique key, an e-mail input is recommended. Otherwise, you need to paste your key somewhere in your laptop.</p>
+                <label for="e-mail">E-mail(optional)</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="name@domain.edu" required>
                 <div class="invalid-feedback" style="width: 100%;">
-                  Your username is required.
+                    Your e-mail is required.
                 </div>
               </div>
             </div>
@@ -216,12 +217,12 @@
                 event.stopPropagation();
               }
               // whether at least one checkbox is checked
-              var chkbox = document.getElementById("rp").checked || document.getElementById("cis").checked || document.getElementById("tf").checked || document.getElementById("eh").checked
-              if (chkbox == true) {}
-              else{
-                event.preventDefault();
-                event.stopPropagation();
-              }
+              // var chkbox = document.getElementById("rp").checked || document.getElementById("cis").checked || document.getElementById("tf").checked || document.getElementById("eh").checked
+              // if (chkbox == true) {}
+              // else{
+              //   event.preventDefault();
+              //   event.stopPropagation();
+              // }
               form.classList.add('was-validated');
             }, false);
           });
@@ -229,66 +230,82 @@
       })();
     </script>
 
-    
-
+  
     <script>
     $("#dataType").change(function() {
-        if ($(this).val() === "ChIP-seq") {
-            $('input[type=checkbox]').prop('checked',false);
-            $("#eh").attr("disabled", "disabled");
-            $("#rp").removeAttr("disabled");
-            $("#cis").removeAttr("disabled");
-            $("#tf").removeAttr("disabled");
+        if ($(this).val() === "ChIP-seq-bed") {
+            // $('input[type=checkbox]').prop('checked',false);
+            // $("#eh").attr("disabled", "disabled");
+            // $("#rp").removeAttr("disabled");
+            // $("#cis").removeAttr("disabled");
+            // $("#tf").removeAttr("disabled");
 
-            $("#expTypeTitle").attr("hidden", true);
-            $("#expType").attr("hidden", true);
-            $("#geneIdTitle").attr("hidden", true);
-            $("#geneId").attr("hidden", true);
+            // $("#expTypeTitle").attr("hidden", true);
+            // $("#expType").attr("hidden", true);
+            // $("#geneIdTitle").attr("hidden", true);
+            // $("#geneId").attr("hidden", true);
 
-            $("#fileType").text("Only ChIP-seq file in .bam will be processed.");
+            $("#fileType").text("Only ChIP-seq file in .bed will be processed.");
+            $("#fileType").removeAttr("hidden");
+        } else if ($(this).val() === "ChIP-seq-bam") {
+            // $('input[type=checkbox]').prop('checked',false);
+            // $("#eh").removeAttr("disabled");
+            // $("#tf").removeAttr("disabled");
+            // $("#rp").attr("disabled", "disabled");
+            // $("#cis").attr("disabled", "disabled");
+
+            // $("#expTypeTitle").removeAttr("hidden");
+            // $("#expType").removeAttr("hidden");
+            // $("#geneIdTitle").removeAttr("hidden");
+            // $("#geneId").removeAttr("hidden");
+
+            $("#fileType").text("Only Geneset file in .bam will be processed.");
             $("#fileType").removeAttr("hidden");
         } else if ($(this).val() === "Geneset") {
-            $('input[type=checkbox]').prop('checked',false);
-            $("#eh").removeAttr("disabled");
-            $("#tf").removeAttr("disabled");
-            $("#rp").attr("disabled", "disabled");
-            $("#cis").attr("disabled", "disabled");
+            // $('input[type=checkbox]').prop('checked',false);
+            // $("#eh").removeAttr("disabled");
+            // $("#tf").removeAttr("disabled");
+            // $("#rp").attr("disabled", "disabled");
+            // $("#cis").attr("disabled", "disabled");
 
-            $("#expTypeTitle").removeAttr("hidden");
-            $("#expType").removeAttr("hidden");
-            $("#geneIdTitle").removeAttr("hidden");
-            $("#geneId").removeAttr("hidden");
+            // $("#expTypeTitle").removeAttr("hidden");
+            // $("#expType").removeAttr("hidden");
+            // $("#geneIdTitle").removeAttr("hidden");
+            // $("#geneId").removeAttr("hidden");
 
             $("#fileType").text("Only Geneset file in .txt will be processed.");
             $("#fileType").removeAttr("hidden");
-        } else if ($(this).val() === "Both") {
-            $('input[type=checkbox]').prop('checked',false);
-            $("#rp").removeAttr("disabled");
-            $("#cis").removeAttr("disabled");
-            $("#eh").removeAttr("disabled");
-            $("#tf").removeAttr("disabled");
+        }  
+        
+        
+        // else if ($(this).val() === "Both") {
+        //     $('input[type=checkbox]').prop('checked',false);
+        //     $("#rp").removeAttr("disabled");
+        //     $("#cis").removeAttr("disabled");
+        //     $("#eh").removeAttr("disabled");
+        //     $("#tf").removeAttr("disabled");
 
-            $("#expTypeTitle").removeAttr("hidden");
-            $("#expType").removeAttr("hidden");
-            $("#geneIdTitle").removeAttr("hidden");
-            $("#geneId").removeAttr("hidden");
+        //     $("#expTypeTitle").removeAttr("hidden");
+        //     $("#expType").removeAttr("hidden");
+        //     $("#geneIdTitle").removeAttr("hidden");
+        //     $("#geneId").removeAttr("hidden");
 
-            $("#fileType").text("ChIP-seq in .bam and Geneset file in .txt will be processed.");
-            $("#fileType").removeAttr("hidden");
-        } else if ($(this).val() === "") {
-            $('input[type=checkbox]').prop('checked',false);
-            $("#eh").attr("disabled", "disabled");
-            $("#rp").attr("disabled", "disabled");
-            $("#cis").attr("disabled", "disabled");
-            $("#tf").attr("disabled", "disabled");
+        //     $("#fileType").text("ChIP-seq in .bam and Geneset file in .txt will be processed.");
+        //     $("#fileType").removeAttr("hidden");
+        // } else if ($(this).val() === "") {
+        //     $('input[type=checkbox]').prop('checked',false);
+        //     $("#eh").attr("disabled", "disabled");
+        //     $("#rp").attr("disabled", "disabled");
+        //     $("#cis").attr("disabled", "disabled");
+        //     $("#tf").attr("disabled", "disabled");
 
-            $("#expTypeTitle").attr("hidden", true);
-            $("#expType").attr("hidden", true);
-            $("#geneIdTitle").attr("hidden", true);
-            $("#geneId").attr("hidden", true);
+        //     $("#expTypeTitle").attr("hidden", true);
+        //     $("#expType").attr("hidden", true);
+        //     $("#geneIdTitle").attr("hidden", true);
+        //     $("#geneId").attr("hidden", true);
 
-            $("#fileType").attr("hidden", true);
-        }
+        //     $("#fileType").attr("hidden", true);
+        // }
     });
     </script>
   </body>

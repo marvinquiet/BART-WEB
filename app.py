@@ -9,7 +9,7 @@ import marge_bart
 from utils import model_logger as logger
 
 PROJECT_DIR = os.path.dirname(__file__)
-ALLOWED_EXTENSIONS = set(['txt', 'bam'])
+ALLOWED_EXTENSIONS = set(['txt', 'bam', '.bed'])
 
 # related to flask app
 app = Flask(__name__)
@@ -47,6 +47,7 @@ def get_config():
             # fetch user name and generate unique project path
             username = request.form['username']
             user_key = do_process.generate_user_key(username)
+            # docker user path
             user_path = do_process.init_project_path(user_key)
 
             # record user data
@@ -55,14 +56,18 @@ def get_config():
             user_data['user_path'] = user_path
             user_data['dataType'] = request.form['dataType']
             user_data['assembly'] = request.form['assembly']
-            user_data['prediction_type'] = request.form.getlist('predictionType')
-            if user_data['dataType'] != "ChIP-seq":
-                user_data['gene_exp_type'] = request.form['expTypeChoice']
-                user_data['gene_id_type'] = request.form['geneIdChoice']
-            else:
-                user_data['gene_exp_type'] = ""
-                user_data['gene_id_type'] = ""
+            # user_data['prediction_type'] = request.form.getlist('predictionType')
             user_data['files'] = []
+        
+
+            # remove 'gene_exp_type' and 'gene_id_type' from user_data
+            # if user_data['dataType'] != "ChIP-seq":
+            #     user_data['gene_exp_type'] = request.form['expTypeChoice']
+            #     user_data['gene_id_type'] = request.form['geneIdChoice']
+            # else:
+            #     user_data['gene_exp_type'] = ""
+            #     user_data['gene_id_type'] = ""
+            
 
             # process what user has uploaded
             if 'uploadFiles' not in request.files:
@@ -87,29 +92,34 @@ def get_config():
                     user_data['files'].append(filename_abs_path)
             
 
-            if u'tf' in user_data['prediction_type'] and \
-                len(user_data['prediction_type']) == 1 and  \
-                user_data['dataType'] == 'ChIP-seq':
-                # only do bart profile with .bam file
+            if user_data['dataType'] == "Geneset":
+                user_data['marge'] = True
+                user_data['bart'] = True
+            else:
                 user_data['marge'] = False
                 user_data['bart'] = True
 
-                # marge_bart.exe_bart_profile(user_data)
-            elif u'tf' not in user_data['prediction_type']:
-                # do marge process, repeat 3 times
-                user_data['marge'] = True
-                user_data['bart'] = False
-                # marge_bart.do_marge_bart(user_key, False)
-            else:
-                # do marge first to get enhancer prediction, and do bart geneset later
-                user_data['marge'] = True
-                user_data['bart'] = True
+            # if u'tf' in user_data['prediction_type'] and \
+            #     len(user_data['prediction_type']) == 1 and  \
+            #     user_data['dataType'] == 'ChIP-seq':
+            #     # only do bart profile with .bam file
+            #     user_data['marge'] = False
+            #     user_data['bart'] = True
+
+            #     # marge_bart.exe_bart_profile(user_data)
+            # elif u'tf' not in user_data['prediction_type']:
+            #     # do marge process, repeat 3 times
+            #     user_data['marge'] = True
+            #     user_data['bart'] = False
+            #     # marge_bart.do_marge_bart(user_key, False)
+            # else:
+            #     # do marge first to get enhancer prediction, and do bart geneset later
+            #     user_data['marge'] = True
+            #     user_data['bart'] = True
 
                 # marge_bart.do_marge_bart(user_key, True)
             do_process.init_user_config(user_path, user_data)
-
             marge_bart.do_marge_bart(user_data)
-            
             # post key 
             return redirect(url_for('show_key', key=user_key))
     return render_template('get_data_config.html')

@@ -6,6 +6,7 @@ import json
 import yaml
 import shutil
 
+import do_process
 import utils
 from utils import model_logger as logger
 
@@ -19,7 +20,8 @@ BART_DIR = ''
 BART_CORE = 4 
 MARGE_CORE = 4 
 MARGE_REPEAT_TIMES = 3
-with open('conf.yaml', 'r') as fyaml:
+# change to absolute path
+with open(os.path.join(PROJECT_DIR, 'conf.yaml'), 'r') as fyaml:
     try: 
         conf_data = yaml.safe_load(fyaml)
         BART_DIR = conf_data['BART']['project_path']
@@ -73,31 +75,35 @@ def config_marge(user_data, marge_output_dir):
     data["MARGEdir"] = os.path.join(MARGE_DIR, "marge")
     data["REFdir"] = os.path.join(MARGE_LIB_DIR, data["ASSEMBLY"] + "_all_reference")
 
-    if user_data['dataType'] == "ChIP-seq":
-        data["EXPSDIR"] = ""
-        data["EXPS"] = ""
-        data["EXPTYPE"] = ""
-        data["ID"] = ""
-        data["SAMPLESDIR"] = marge_input_dir
-        data["SAMPLES"] = utils.get_files_in_dir("ChIP", data["SAMPLESDIR"])
-    elif user_data['dataType'] == "Geneset":
+    # if user_data['dataType'] == "ChIP-seq":
+    #     data["EXPSDIR"] = ""
+    #     data["EXPS"] = ""
+    #     data["EXPTYPE"] = ""
+    #     data["ID"] = ""
+    #     data["SAMPLESDIR"] = marge_input_dir
+    #     data["SAMPLES"] = utils.get_files_in_dir("ChIP", data["SAMPLESDIR"])
+    
+    if user_data['dataType'] == "Geneset":
         data["SAMPLESDIR"] = ""
         data["SAMPLES"] = ""
         data["EXPSDIR"] = marge_input_dir
         data["EXPS"] = utils.get_files_in_dir("GeneList", data["EXPSDIR"])
         # Gene_Only & Gene_Response
-        data["EXPTYPE"] = user_data["gene_exp_type"]  
+        # data["EXPTYPE"] = user_data["gene_exp_type"]  
+        data["EXPTYPE"] = 'Gene_Only'
         # GeneSymbol & RefSeq
-        data["ID"] = user_data["gene_id_type"]
-    elif user_data['dataType'] == "Both":
-        data["SAMPLESDIR"] = marge_input_dir
-        data["EXPSDIR"] = marge_input_dir
-        data["SAMPLES"] = utils.get_files_in_dir("ChIP", data["SAMPLESDIR"])
-        data["EXPS"] = utils.get_files_in_dir("GeneList", data["EXPSDIR"])
-        # Gene_Only & Gene_Response
-        data["EXPTYPE"] = user_data["gene_exp_type"]  
-        # GeneSymbol & RefSeq
-        data["ID"] = user_data["gene_id_type"]
+        # data["ID"] = user_data["gene_id_type"]
+        data["ID"] = 'GeneSymbol'
+
+    # elif user_data['dataType'] == "Both":
+    #     data["SAMPLESDIR"] = marge_input_dir
+    #     data["EXPSDIR"] = marge_input_dir
+    #     data["SAMPLES"] = utils.get_files_in_dir("ChIP", data["SAMPLESDIR"])
+    #     data["EXPS"] = utils.get_files_in_dir("GeneList", data["EXPSDIR"])
+    #     # Gene_Only & Gene_Response
+    #     data["EXPTYPE"] = user_data["gene_exp_type"]  
+    #     # GeneSymbol & RefSeq
+    #     data["ID"] = user_data["gene_id_type"]
 
     with open(config_file, 'w') as data_file:
         json.dump(data, data_file)
@@ -143,6 +149,9 @@ def exe_bart_profile(user_data):
     for input_file in user_data['files']:
         if input_file.endswith(".bam"):
             subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+        elif input_file.endswith(".bed"):
+            subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bed", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+
 
 def exe_bart_geneset(user_data):
     '''
@@ -160,7 +169,6 @@ def exe_bart_geneset(user_data):
 
 def is_bart_done(user_path):
     user_key = os.path.basename(user_path)
-    import do_process
     user_data = do_process.get_user_data(user_key)
     for user_file in user_data['files']:
         uploaded_file = os.path.basename(user_file).split('.')[0] # path/to/user/upload/filename.bam(txt)
@@ -200,13 +208,13 @@ module load anaconda3
         slurm_user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
         exe_log_path = os.path.join(slurm_user_path, 'log/mb_pipe.log')
         if user_data['bart'] and user_data['marge']:
-            fopen.write('python ' + script_file + ' 3 ' + user_key + ' True # > ' + exe_log_path + ' 2>&1\n')
-            fopen.write('python ' + bart_plot_file + ' ' + user_key +  ' # >> ' + exe_log_path + ' 2>&1\n')
+            fopen.write('python ' + script_file + ' 3 ' + user_key + ' True  > ' + exe_log_path + ' 2>&1\n')
+            fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n')
             return
         
         if not user_data['bart'] and user_data['marge']:
-            fopen.write('python ' + script_file + ' 3 ' + user_key + ' False # > ' + exe_log_path + ' 2>&1\n')
-            fopen.write('python ' + bart_plot_file + ' ' + user_key +  ' # >> ' + exe_log_path + ' 2>&1\n')
+            fopen.write('python ' + script_file + ' 3 ' + user_key + ' False  > ' + exe_log_path + ' 2>&1\n')
+            fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n')
             return
 
         if user_data['bart'] and not user_data['marge']:
@@ -214,12 +222,31 @@ module load anaconda3
             plot_flag = False
             for input_file in user_data['files']:
                 if input_file.endswith(".bam"):
-                    fopen.write('bart profile -i ' + input_file + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + ' # > ' + exe_log_path + ' 2>&1\n')
+                    fopen.write('bart profile -i ' + input_file + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1\n')
+                    plot_flag = True # at least there are some result files being generated by bart
+                elif input_file.endswith(".bed"):
+                    fopen.write('bart profile -i ' + input_file + ' -f bed -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1\n')
                     plot_flag = True # at least there are some result files being generated by bart
                 
             if plot_flag:
-                fopen.write('python ' + bart_plot_file + ' ' + user_key +  ' # >> ' + exe_log_path + ' 2>&1\n')
+                fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n')
 
+    # after writing to slurm, change the path inside user.config to what rivanna could read
+    revise_user_config(user_key, user_path)
+
+DOCKER_DIR = '/var/www/apache-flask/'
+RIVANNA_DIR = '/sfs/qumulo/qproject/CPHG/BART/'
+def revise_user_config(user_key, user_path):
+    user_data = do_process.get_user_data(user_key)
+    user_data['user_path'] = user_data['user_path'].replace(DOCKER_DIR, RIVANNA_DIR)
+
+    new_file_path = []
+    for file_path in user_data['files']:
+        new_file_path.append(file_path.replace(DOCKER_DIR, RIVANNA_DIR))
+    user_data['files'] = new_file_path
+
+    do_process.init_user_config(user_path, user_data)
+    
 # ============== UNIT TEST ===============
 def test_is_marge_done():
     test_path = '/Users/marvin/Projects/flask_playground/usercase/a_1534972940.637962'

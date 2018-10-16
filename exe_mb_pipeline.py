@@ -79,7 +79,7 @@ def main():
             regression_score_file = os.path.join(marge_output_dir, 'margeoutput/regression/{}_target_regressionInfo.txt'.format(filename))
 
             if not os.path.exists(regression_score_file):
-                err_msg += "File not exists: %s" % (regression_score_file)
+                err_msg += "File does not exist: %s" % (regression_score_file)
                 continue
             
             with open(regression_score_file, 'r') as fopen:
