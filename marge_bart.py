@@ -184,6 +184,8 @@ def is_bart_done(user_path):
 
 # slurm project dir
 SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/CPHG/BART'   # hard-code path 
+DOCKER_DIR = '/var/www/apache-flask/'
+RIVANNA_DIR = '/sfs/qumulo/qproject/CPHG/BART/'
 
 def do_marge_bart(user_data):
     # write slurm
@@ -191,6 +193,9 @@ def do_marge_bart(user_data):
     user_key = user_data['user_key']
     # user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
     slurm_file = os.path.join(user_path, 'exe.slurm')
+    
+    revise_user_config(user_key, user_path)
+    user_path = user_path.replace(DOCKER_DIR, RIVANNA_DIR)
     with open(slurm_file, 'w') as fopen:
         fopen.write('''#!/bin/bash
 #SBATCH -n 1
@@ -231,11 +236,9 @@ module load anaconda3
             if plot_flag:
                 fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n')
 
-    # after writing to slurm, change the path inside user.config to what rivanna could read
-    revise_user_config(user_key, user_path)
+    
 
-DOCKER_DIR = '/var/www/apache-flask/'
-RIVANNA_DIR = '/sfs/qumulo/qproject/CPHG/BART/'
+
 def revise_user_config(user_key, user_path):
     user_data = do_process.get_user_data(user_key)
     new_user_path = user_data['user_path'].replace(DOCKER_DIR, RIVANNA_DIR)
@@ -245,10 +248,6 @@ def revise_user_config(user_key, user_path):
     for file_path in user_data['files']:
         new_file_path.append(file_path.replace(DOCKER_DIR, RIVANNA_DIR))
     user_data['files'] = new_file_path
-
-    logger.info (new_user_path)
-    logger.info (user_data)
-
     do_process.init_user_config(user_path, user_data)
     
 # ============== UNIT TEST ===============
@@ -258,4 +257,6 @@ def test_is_marge_done():
 
 
 if __name__ == '__main__':
-    revise_user_config('mawenjing_1539719091.938166', '/Users/marvin/Projects/flask_playground/usercase/mawenjing_1539719091.938166')
+    user_data = do_process.get_user_data('mawenjing_1539719091.938166')
+    do_marge_bart(user_data)
+    
