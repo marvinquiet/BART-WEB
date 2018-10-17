@@ -29,7 +29,7 @@ def get_files_in_dir(proc_type, directory):
 
 def send_sqs_message(directory):
     sqs = boto3.resource('sqs')
-    queue = sqs.get_queue_by_name(QueueName='test')
+    queue = sqs.get_queue_by_name(QueueName='bart-web')
     response = queue.send_message(MessageBody='BART submission', MessageAttributes={
         'submission': {
             'StringValue': directory,
