@@ -52,6 +52,7 @@ def get_config():
 
             # record user data
             user_data = {}
+            user_data['user_email'] = username
             user_data['user_key'] = user_key
             user_data['user_path'] = user_path
             user_data['dataType'] = request.form['dataType']

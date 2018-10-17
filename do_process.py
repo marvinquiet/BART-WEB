@@ -15,6 +15,12 @@ PROJECT_DIR = os.path.dirname(__file__)
 def generate_user_key(username):
     import time
     tstamp = time.time()
+
+    # whether username is actually an e-mail
+    if username == '':
+        username = 'anonymous'
+    else:
+        username = username.split('@')[0]
     key = username + '_' + str(tstamp)
     return key
 
