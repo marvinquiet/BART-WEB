@@ -3,6 +3,7 @@
 import os
 import shutil
 import logging
+import boto3
 from logging.handlers import RotatingFileHandler
 
 
@@ -26,6 +27,15 @@ def get_files_in_dir(proc_type, directory):
             sample_files += content[:-4] + ' '
     return sample_files.strip()
 
+def send_sqs_message(directory):
+    sqs = boto3.resource('sqs')
+    queue = sqs.get_queue_by_name(QueueName='test')
+    response = queue.send_message(MessageBody='BART submission', MessageAttributes={
+        'submission': {
+            'StringValue': directory,
+            'DataType': 'String'
+        }
+    })
 
 ################################
 # Conf to edit

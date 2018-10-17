@@ -37,6 +37,8 @@ def init_project_path(user_key):
     utils.create_dir(user_log_path)
     utils.create_dir(bart_output_path)
 
+    utils.send_sqs_message(user_key)
+
     return user_path
 
 
