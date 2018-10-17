@@ -6,7 +6,6 @@ import logging
 import boto3
 from logging.handlers import RotatingFileHandler
 
-
 def create_dir(directory):
     try:
         if not os.path.exists(directory):
@@ -34,10 +33,16 @@ def get_secret(secret_name):
     except IOError:
         return None
 
+session = boto3.Session(
+    AWS_ACCESS_KEY_ID = get_secret('aws_access_key_id')
+    AWS_ACCESS_SECRET_KEY = get_secret('aws_access_secret_key')
+    aws_access_key_id=AWS_SERVER_PUBLIC_KEY,
+    aws_secret_access_key=AWS_SERVER_SECRET_KEY,
+)
+
+
 def send_sqs_message(directory):
-    aws_access_key_id = get_secret('aws_access_key_id')
-    aws_access_secret_key = get_secret('aws_access_secret_key')
-    sqs = boto3.resource('sqs')
+    sqs = boto3.resource('sqs', region_name='us-east-1')
     queue = sqs.get_queue_by_name(QueueName='bart-web')
     response = queue.send_message(MessageBody='BART submission', MessageAttributes={
         'submission': {
