@@ -89,7 +89,7 @@ def get_config():
                     filename_abs_path = os.path.join(upload_path, filename)
                     file.save(filename_abs_path)
 
-                    user_data['files'].append(filename_abs_path)
+                    user_data['files'].append(filename) # only save file name, since the uploaded path is always the same
             
 
             if user_data['dataType'] == "Geneset":
