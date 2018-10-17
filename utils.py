@@ -27,7 +27,16 @@ def get_files_in_dir(proc_type, directory):
             sample_files += content[:-4] + ' '
     return sample_files.strip()
 
+def get_secret(secret_name):
+    try:
+        with open('/run/secrets/{0}'.format(secret_name), 'r') as secret_file:
+            return secret_file.read()
+    except IOError:
+        return None
+
 def send_sqs_message(directory):
+    aws_access_key_id = get_secret('aws_access_key_id')
+    aws_access_secret_key = get_secret('aws_access_secret_key')
     sqs = boto3.resource('sqs')
     queue = sqs.get_queue_by_name(QueueName='bart-web')
     response = queue.send_message(MessageBody='BART submission', MessageAttributes={
