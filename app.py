@@ -37,10 +37,9 @@ def index():
                 return redirect(url_for('get_result', user_key=user_key))
             else:
                 logger.info("retrieve result: did not find the result.")
-                
-                err_msg = "User key does not exist, make sure you entered the right key"
-                session['err_msg'] = err_msg
-                return redirect(url_for('error_page'))
+
+                err_msg = "The key does not exist, make sure you enter the right key"
+                return redirect(url_for('error_page', msg=err_msg))
     return render_template('index.html')
 
 
@@ -148,9 +147,9 @@ def show_key():
     user_key = request.args['key']
     return render_template('key_demonstration.html', key=user_key)
 
-@app.route('/error', methods=['GET', 'POST'])
+@app.route('/error')
 def error_page():
-    err_msg = session.get('err_msg')
+    err_msg = request.args['msg']
     return render_template('error.html', msg=err_msg)
 
 @app.route('/plot/<userkey_tfname>')
