@@ -257,12 +257,24 @@ def main():
     user_key = sys.argv[1]
 
     import do_process
+    import yaml
+
     user_data = do_process.get_user_data(user_key)
     user_path = user_data['user_path']
     new_user_path = user_path.replace(SLURM_PROJECT_DIR, DOCKER_DIR)
     user_data['user_path'] = new_user_path
     do_process.init_user_config(user_path, user_data)
 
+    # change user_queue.yaml status to Finished
+    usercase_dir = os.path.dirname(user_path)
+    user_queue_file = os.path.join(usercase_dir, 'user_queue.yaml')
+    with open(user_queue_file, 'r') as fqueue:
+        queue_data = yaml.safe_load(fqueue)
+
+    del queue_data[user_key]
+
+    with open(user_queue_file, 'w') as fqueue:
+        yaml.safe_dump(queue_data, fqueue)
 
 
 if __name__ == '__main__':
