@@ -276,9 +276,13 @@ def main():
     else:
         logger.error('User: {} job failed! Please check!'.format(user_key))
 
+    
     with open(user_queue_file, 'w') as fqueue:
-        yaml.safe_dump(queue_data, fqueue)
-
+        if len(queue_data) > 0:
+            yaml.safe_dump(queue_data, fqueue)
+        else:
+            yaml.safe_dump(None, fqueue)
+        
 
 if __name__ == '__main__':
     main()
