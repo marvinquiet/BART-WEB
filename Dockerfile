@@ -39,8 +39,9 @@ WORKDIR /var/www/apache-flask
 
 
 RUN mkdir log
+RUN touch log/bart-web.log
 RUN chown -R www-data:www-data log
-RUN chmod 755 log
+RUN chmod -R 775 log
 
 
 CMD /usr/sbin/apache2ctl -D FOREGROUND
