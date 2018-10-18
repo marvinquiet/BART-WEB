@@ -17,7 +17,6 @@ app.secret_key = os.urandom(24)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    logger.info('Start using bart-web!')
     if request.method == 'POST':
         # predict data button
         if request.form['index_submit'] == 'predict_data':
@@ -141,7 +140,7 @@ def show_key():
 
 @app.route('/error', methods=['GET', 'POST'])
 def error_page():
-    err_msg = session.get('err_msg', None)
+    err_msg = session.get('err_msg')
     return render_template('error.html', msg=err_msg)
 
 @app.route('/plot/<userkey_tfname>')
