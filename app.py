@@ -29,9 +29,15 @@ def index():
             if user_key == "":
                 return render_template('index.html')
 
+            logger.info("retrieve result for " + user_key)
+
             if do_process.is_user_key_exists(user_key):
+                logger.info("retrieve result: user exists.")
+
                 return redirect(url_for('get_result', user_key=user_key))
             else:
+                logger.info("retrieve result: did not find the result.")
+                
                 err_msg = "User key does not exist, make sure you entered the right key"
                 session['err_msg'] = err_msg
                 return redirect(url_for('error_page'))
@@ -129,6 +135,10 @@ def get_config():
 def get_result():
     user_key = request.args['user_key']
     user_data = do_process.get_user_data(user_key)
+
+    logger.info('get result for ' + user_key)
+    logger.info(user_data)
+
     results = do_process.generate_results(user_data)
     return render_template('result_demonstration.html', results=results)
 
