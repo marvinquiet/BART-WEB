@@ -6,7 +6,7 @@ import json
 import shutil
 
 import utils
-from marge_bart import *
+import marge_bart
 from utils import model_logger as logger
 
 sys.setrecursionlimit(20000)
@@ -49,17 +49,17 @@ def main():
     err_msg = ""
     for i in range(repeat_times):
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
-        if init_marge(marge_output_dir):
-            config_marge(user_data, marge_output_dir)
+        if marge_bart.init_marge(marge_output_dir):
+            marge_bart.config_marge(user_data, marge_output_dir)
             subprocess.call(["snakemake", "-n"], stdout=subprocess.PIPE, cwd=marge_output_dir)
         else:
             err_msg += "Error in init marge NO.%d \n" % (i+1) 
 
     import multiprocessing
-    pool = multiprocessing.Pool(processes=MARGE_CORE)
+    pool = multiprocessing.Pool(processes=marge_bart.MARGE_CORE)
     for i in range(repeat_times):
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
-        pool.apply_async(exe_marge, args=(marge_output_dir, ))
+        pool.apply_async(marge_bart.exe_marge, args=(marge_output_dir, ))
 
     pool.close()
     pool.join() 
@@ -105,11 +105,11 @@ def main():
         os.rename(auc_file, os.path.join(user_path, 'marge_data'))
 
     # if bart
-    print (user_data)
+    logger.info(user_data)
     if bart_flag:
-        exe_bart_geneset(user_data)
+        marge_bart.exe_bart_geneset(user_data)
 
-    print (err_msg)
+    logger.info(err_msg)
 
 
 if __name__ == '__main__':
