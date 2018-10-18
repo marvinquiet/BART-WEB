@@ -219,12 +219,10 @@ module load anaconda3
         if user_data['bart'] and user_data['marge']:
             fopen.write('python ' + script_file + ' 3 ' + user_key + ' True  > ' + exe_log_path + ' 2>&1\n')
             fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n')
-            return
         
         # if not user_data['bart'] and user_data['marge']:
         #     fopen.write('python ' + script_file + ' 3 ' + user_key + ' False  #> ' + exe_log_path + ' 2>&1\n')
         #     fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  #>> ' + exe_log_path + ' 2>&1\n')
-        #     return
 
         if user_data['bart'] and not user_data['marge']:
             bart_output_path = os.path.join(slurm_user_path, 'download')
