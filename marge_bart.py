@@ -271,7 +271,10 @@ def main():
     with open(user_queue_file, 'r') as fqueue:
         queue_data = yaml.safe_load(fqueue)
 
-    del queue_data[user_key]
+    if queue_data[user_key]['clean_flag'] == 'Processing':
+        del queue_data[user_key]
+    else:
+        logger.error('User: {} job failed! Please check!'.format(user_key))
 
     with open(user_queue_file, 'w') as fqueue:
         yaml.safe_dump(queue_data, fqueue)
