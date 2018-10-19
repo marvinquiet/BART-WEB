@@ -39,6 +39,7 @@ def main():
     import multiprocessing
     pool = multiprocessing.Pool(processes=marge_bart.MARGE_CORE)
     for i in range(repeat_times):
+        time.sleep(30)
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
         pool.apply_async(marge_bart.exe_marge, args=(marge_output_dir, ))
 
