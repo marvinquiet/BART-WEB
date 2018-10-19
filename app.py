@@ -174,6 +174,7 @@ def download_marge_file(userkey_filename):
     download_path = os.path.join(user_path, 'download')
     return send_from_directory(download_path, filename)
 
+
 @app.route('/download/bart_output/<userkey_filename>')
 def download_bart_res_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
