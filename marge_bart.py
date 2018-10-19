@@ -23,7 +23,7 @@ MARGE_REPEAT_TIMES = 3
 # change to absolute path
 with open(os.path.join(PROJECT_DIR, 'conf.yaml'), 'r') as fyaml:
     try: 
-        conf_data = yaml.safe_load(fyaml)
+        conf_data = yaml.load(fyaml)
         BART_DIR = conf_data['BART']['project_path']
         MARGE_DIR = conf_data['MARGE']['project_path']
         MARGE_LIB_DIR = conf_data['MARGE']['lib_path']
@@ -183,8 +183,8 @@ def is_bart_done(user_path):
 # call file in background to execute pipeline, otherwise, it will block the web server
 
 # slurm project dir
-SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/CPHG/BART/'   # hard-code path 
-DOCKER_DIR = '/var/www/apache-flask/'
+SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/CPHG/BART'   # hard-code path 
+DOCKER_DIR = '/var/www/apache-flask'
 
 def do_marge_bart(user_data):
     # write slurm
@@ -198,7 +198,6 @@ def do_marge_bart(user_data):
     user_data['user_path'] = new_user_path
     do_process.init_user_config(user_path, user_data)
 
-    user_path = user_path.replace(DOCKER_DIR, SLURM_PROJECT_DIR)
     with open(slurm_file, 'w') as fopen:
         fopen.write('''#!/bin/bash
 #SBATCH -n 1
@@ -217,7 +216,7 @@ source ~/.bashrc
         exe_log_path = os.path.join(slurm_user_path, 'log/mb_pipe.log')
         if user_data['bart'] and user_data['marge']:
             fopen.write('python ' + script_file + ' 3 ' + user_key + ' True  > ' + exe_log_path + ' 2>&1 && \\ \n')
-            fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n')
+            fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1 && \\ \n')
         
         # if not user_data['bart'] and user_data['marge']:
         #     fopen.write('python ' + script_file + ' 3 ' + user_key + ' False  #> ' + exe_log_path + ' 2>&1\n')
@@ -268,7 +267,7 @@ def main():
     usercase_dir = os.path.dirname(user_path)
     user_queue_file = os.path.join(usercase_dir, 'user_queue.yaml')
     with open(user_queue_file, 'r') as fqueue:
-        queue_data = yaml.safe_load(fqueue)
+        queue_data = yaml.load(fqueue)
 
     
     if user_key in queue_data:
@@ -279,7 +278,7 @@ def main():
     
     with open(user_queue_file, 'w') as fqueue:
         if len(queue_data) > 0:
-            yaml.safe_dump(queue_data, fqueue)
+            yaml.dump(queue_data, fqueue)
 
         
 

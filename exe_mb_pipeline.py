@@ -12,26 +12,6 @@ from utils import model_logger as logger
 
 sys.setrecursionlimit(20000)
 
-# ======== load conf.yaml ========
-# PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
-# MARGE_DIR = ''
-# BART_DIR = ''
-# # default
-# BART_CORE = 4 
-# MARGE_CORE = 4 
-# MARGE_REPEAT_TIMES = 3
-# with open('conf.yaml', 'r') as fyaml:
-#     try: 
-#         conf_data = yaml.load(fyaml)
-#         BART_DIR = conf_data['BART']['project_path']
-#         MARGE_DIR = conf_data['MARGE']['project_path']
-
-#         BART_CORE = conf_data['BART']['core']
-#         MARGE_CORE = conf_data['MARGE']['core']
-#         MARGE_REPEAT_TIMES = conf_data['MARGE']['repeat_times']
-#     except yaml.YAMLError as e: 
-#         print (e)
-
 def main():
     # example: python exe_mb_pipline.py 3 user_key True/False
     # print (sys.argv)
