@@ -102,8 +102,6 @@ def plot_top_tf(bart_table_df, bart_output_dir, AUCs):
     for ID in tf_intersection:
         stat_plot(bart_table_df, tfs, ID, bart_output_dir)
 
-
-
 def get_AUCs(auc_file):
     AUCs = {}
     with open(auc_file, 'r') as fopen:
@@ -114,6 +112,7 @@ def get_AUCs(auc_file):
     return AUCs
 
 def main():
+    logger.info("Bart plot: start plotting...")
     # example: python bart_plot.py user_key
     # print (sys.argv)
 

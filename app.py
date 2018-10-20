@@ -29,14 +29,14 @@ def index():
             if user_key == "":
                 return render_template('index.html')
 
-            logger.info("retrieve result for " + user_key)
+            logger.info("Retrieve result: for " + user_key)
 
             if do_process.is_user_key_exists(user_key):
-                logger.info("retrieve result: user exists.")
+                logger.info("Retrieve result: user exists.")
 
                 return redirect(url_for('get_result', user_key=user_key))
             else:
-                logger.info("retrieve result: did not find the result.")
+                logger.error("Retrieve result: did not find the result.")
 
                 err_msg = "The key does not exist, make sure you enter the right key"
                 return redirect(url_for('error_page', msg=err_msg))
@@ -73,7 +73,6 @@ def get_config():
             #     user_data['gene_exp_type'] = ""
             #     user_data['gene_id_type'] = ""
             
-
             # process what user has uploaded
             if 'uploadFiles' not in request.files:
                 flash('Please choose a file')
@@ -104,25 +103,6 @@ def get_config():
                 user_data['marge'] = False
                 user_data['bart'] = True
 
-            # if u'tf' in user_data['prediction_type'] and \
-            #     len(user_data['prediction_type']) == 1 and  \
-            #     user_data['dataType'] == 'ChIP-seq':
-            #     # only do bart profile with .bam file
-            #     user_data['marge'] = False
-            #     user_data['bart'] = True
-
-            #     # marge_bart.exe_bart_profile(user_data)
-            # elif u'tf' not in user_data['prediction_type']:
-            #     # do marge process, repeat 3 times
-            #     user_data['marge'] = True
-            #     user_data['bart'] = False
-            #     # marge_bart.do_marge_bart(user_key, False)
-            # else:
-            #     # do marge first to get enhancer prediction, and do bart geneset later
-            #     user_data['marge'] = True
-            #     user_data['bart'] = True
-
-                # marge_bart.do_marge_bart(user_key, True)
             do_process.init_user_config(user_path, user_data)
             marge_bart.do_marge_bart(user_data)
             # post key 

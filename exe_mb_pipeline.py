@@ -27,17 +27,24 @@ def main():
     user_path = user_data['user_path']
     files = user_data['files']
 
-    err_msg = ""
+    logger.info("Pipeline Start: {}... ".format(user_key))
+
     for i in range(repeat_times):
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
+        logger.info("Pipeline Marge: init marge in {} ...".format(marge_output_dir))
         if marge_bart.init_marge(marge_output_dir):
+            logger.info("Pipeline Marge: config marge config.json ...")
             marge_bart.config_marge(user_data, marge_output_dir)
             subprocess.call(["snakemake", "-n"], stdout=subprocess.PIPE, cwd=marge_output_dir)
         else:
-            err_msg += "Error in init marge NO.%d \n" % (i+1) 
+            logger.error("Pipeline Marge: error in initing marge %d !"%(i+1))
+            return  # will not execute anymore
 
+    # multiprocessing for marge
     import multiprocessing
     pool = multiprocessing.Pool(processes=marge_bart.MARGE_CORE)
+    
+    logger.info("Pipeline Marge: execute marge... ")
     for i in range(repeat_times):
         time.sleep(30)
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
@@ -52,7 +59,7 @@ def main():
     import re
     pattern = r"\d+\.?\d*" # integer or float
 
-    # find AUC score
+    # find AUC score in marge output
     for i in range(repeat_times):
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
         for upload_file in files:
@@ -61,7 +68,7 @@ def main():
             regression_score_file = os.path.join(marge_output_dir, 'margeoutput/regression/{}_target_regressionInfo.txt'.format(filename))
 
             if not os.path.exists(regression_score_file):
-                err_msg += "File does not exist: %s" % (regression_score_file)
+                logger.error("Pipeline Marge: {} does not exist".format(regression_score_file))
                 continue
             
             with open(regression_score_file, 'r') as fopen:
@@ -70,6 +77,12 @@ def main():
                         score = re.findall(pattern, line)[0]
                         auc_scores.append(float(score))
                         auc_files.append(marge_output_dir)
+
+    # whether marge generated results
+    if len(auc_files) == 0 or len(auc_scores) == 0:
+        logger.error("Pipeline Marge: error executing marge !")
+        logger.error("Pipeline Marge: check why marge for user {}!".format(user_key))
+        return
 
     # find max AUC score
     max_auc = max(auc_scores)
@@ -80,11 +93,15 @@ def main():
             break
 
     # find max AUC folder & change it to folder /marge_data
-    if max_index == -1:
-        err_msg += "Severe error in marge process!!\n"
-    else:
-        auc_file = auc_files[i]
-        os.rename(auc_file, os.path.join(user_path, 'marge_data'))
+    logger.info("Pipeline Marge: marge successfully done for {}...".format(user_key))
+    logger.info("Pipeline Marge: find the one with max auc and change it to marge_data ...")
+    auc_file = auc_files[max_index]
+    os.rename(auc_file, os.path.join(user_path, 'marge_data'))
+
+    logger.info("Pipeline Marge: copy marge_data to download directory...")
+
+
+
 
     # if bart
     logger.info(user_data)

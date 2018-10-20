@@ -44,7 +44,7 @@ with open(os.path.join(PROJECT_DIR, 'conf.yaml'), 'r') as fyaml:
 
 # init marge env
 def init_marge(marge_output_dir):
-    # subprocess.call(["cd", MARGE_DIR])
+    logger.info("Exe cmd: marge init {}".format(marge_output_dir))
     marge_res = subprocess.check_call(["marge", "init", marge_output_dir])
     if marge_res == 0:
         return True
@@ -74,14 +74,6 @@ def config_marge(user_data, marge_output_dir):
     data["ASSEMBLY"] = user_data["assembly"]
     data["MARGEdir"] = os.path.join(MARGE_DIR, "marge")
     data["REFdir"] = os.path.join(MARGE_LIB_DIR, data["ASSEMBLY"] + "_all_reference")
-
-    # if user_data['dataType'] == "ChIP-seq":
-    #     data["EXPSDIR"] = ""
-    #     data["EXPS"] = ""
-    #     data["EXPTYPE"] = ""
-    #     data["ID"] = ""
-    #     data["SAMPLESDIR"] = marge_input_dir
-    #     data["SAMPLES"] = utils.get_files_in_dir("ChIP", data["SAMPLESDIR"])
     
     if user_data['dataType'] == "Geneset":
         data["SAMPLESDIR"] = ""
@@ -95,21 +87,14 @@ def config_marge(user_data, marge_output_dir):
         # data["ID"] = user_data["gene_id_type"]
         data["ID"] = 'GeneSymbol'
 
-    # elif user_data['dataType'] == "Both":
-    #     data["SAMPLESDIR"] = marge_input_dir
-    #     data["EXPSDIR"] = marge_input_dir
-    #     data["SAMPLES"] = utils.get_files_in_dir("ChIP", data["SAMPLESDIR"])
-    #     data["EXPS"] = utils.get_files_in_dir("GeneList", data["EXPSDIR"])
-    #     # Gene_Only & Gene_Response
-    #     data["EXPTYPE"] = user_data["gene_exp_type"]  
-    #     # GeneSymbol & RefSeq
-    #     data["ID"] = user_data["gene_id_type"]
-
     with open(config_file, 'w') as data_file:
         json.dump(data, data_file)
 
 def exe_marge(marge_output_dir):
-    subprocess.call(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir, stdout=subprocess.PIPE)
+    cmd = "snakemake --cores {}".format(str(MARGE_CORE))
+    logger.info("Exe cmd: " + cmd)
+    subprocess.call(cmd, cwd=marge_output_dir, stdout=subprocess.PIPE)
+    # subprocess.call(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir, stdout=subprocess.PIPE)
 
 def is_marge_done(user_path):
     snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
@@ -143,14 +128,20 @@ def exe_bart_profile(user_data):
 
     Example:
 
-    bart profile -i ChIP.bed -f bed -s hg38 -t target.txt -p 4 --outdir bart_output
+    bart profile -i ChIP.bed/ChIP.bam -f bed/bam -s hg38 -t target.txt -p 4 --outdir bart_output
     '''
     bart_output_path = os.path.join(user_data['user_path'], 'download/bart_output')
     for input_file in user_data['files']:
         if input_file.endswith(".bam"):
-            subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+            cmd = "bart profile -i {} -f bam -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
+            logger.info("Exe cmd: " + cmd)
+            subprocess.call(cmd, cwd=bart_output_path)
+            # subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
         elif input_file.endswith(".bed"):
-            subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bed", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+            cmd = "bart profile -i {} -f bed -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
+            logger.info("Exe cmd: " + cmd)
+            subprocess.call(cmd, cwd=bart_output_path)
+            # subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bed", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
 
 
 def exe_bart_geneset(user_data):
@@ -165,7 +156,11 @@ def exe_bart_geneset(user_data):
     bart_output_path = os.path.join(user_data['user_path'], 'download/bart_output')
     eh_files = get_enhancer_prediction(user_data['user_path'])
     for eh_file in eh_files:
-        subprocess.call(["bart", "geneset", "-i", eh_file, "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+        cmd = "bart geneset -i {} -s {} -p {} --outdir {}".format(eh_file, user_data["assembly"], str(BART_CORE), bart_output_path)
+        logger.info("Exe cmd: " + cmd)
+        # subprocess.call(["bart", "geneset", "-i", eh_file, "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+        subprocess.call(cmd, cwd=bart_output_path)
+
 
 def is_bart_done(user_path):
     user_key = os.path.basename(user_path)
@@ -193,6 +188,8 @@ def do_marge_bart(user_data):
     # user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
     slurm_file = os.path.join(user_path, 'exe.slurm')
 
+    logger.info("Write slurm: write {} data to {}...".format(user_key, slurm_file))
+    logger.info("Write slurm: change docker path to rivanna path...")
     # change user path
     new_user_path = user_data['user_path'].replace(DOCKER_DIR, SLURM_PROJECT_DIR)
     user_data['user_path'] = new_user_path
@@ -214,13 +211,15 @@ source ~/.bashrc
         marge_bart_script = os.path.join(SLURM_PROJECT_DIR, 'marge_bart.py')
         slurm_user_path = SLURM_PROJECT_DIR + '/usercase/' + user_key
         exe_log_path = os.path.join(slurm_user_path, 'log/mb_pipe.log')
+
         if user_data['bart'] and user_data['marge']:
-            fopen.write('python ' + script_file + ' 3 ' + user_key + ' True  > ' + exe_log_path + ' 2>&1 && \\ \n')
-            fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1 && \\ \n')
-        
-        # if not user_data['bart'] and user_data['marge']:
-        #     fopen.write('python ' + script_file + ' 3 ' + user_key + ' False  #> ' + exe_log_path + ' 2>&1\n')
-        #     fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  #>> ' + exe_log_path + ' 2>&1\n')
+            cmd = 'python ' + script_file + ' 3 ' + user_key + ' True  > ' + exe_log_path + ' 2>&1 && \\ \n'
+            logger.info("Write slurm: " + cmd)
+            fopen.write(cmd)
+
+            cmd = 'python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1 && \\ \n'
+            logger.info("Write slurm: " + cmd)
+            fopen.write(cmd)
 
         if user_data['bart'] and not user_data['marge']:
             bart_output_path = os.path.join(slurm_user_path, 'download')
@@ -228,17 +227,27 @@ source ~/.bashrc
             for input_file in user_data['files']:
                 input_file_path = os.path.join(slurm_user_path, 'upload/' + input_file)
                 if input_file.endswith(".bam"):
-                    fopen.write('bart profile -i ' + input_file_path + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1 && \\ \n')
+                    cmd = 'bart profile -i ' + input_file_path + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1 && \\ \n'
+                    logger.info("Write slurm: " + cmd)
+                    fopen.write(cmd)
+
                     plot_flag = True # at least there are some result files being generated by bart
                 elif input_file.endswith(".bed"):
-                    fopen.write('bart profile -i ' + input_file_path + ' -f bed -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1 && \\ \n')
+                    cmd = 'bart profile -i ' + input_file_path + ' -f bed -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1 && \\ \n'
+                    logger.info("Write slurm: " + cmd)
+                    fopen.write(cmd)
+
                     plot_flag = True # at least there are some result files being generated by bart
                 
             if plot_flag:
-                fopen.write('python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1 && \\ \n')
+                cmd = 'python ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1 && \\ \n'
+                logger.info("Write slurm: " + cmd)
+                fopen.write(cmd)
         
         # change back the user.config to what Docker could recognize
-        fopen.write('python ' + marge_bart_script + ' ' + user_key + ' >> ' + exe_log_path + ' 2>&1\n')
+        cmd = 'python ' + marge_bart_script + ' ' + user_key + ' >> ' + exe_log_path + ' 2>&1\n'
+        logger.info("Write slurm: " + cmd)
+        fopen.write(cmd)
 
     
 # ============== UNIT TEST ===============
@@ -257,30 +266,41 @@ def main():
     import do_process
     import yaml
 
+    # get user data
     user_data = do_process.get_user_data(user_key)
     user_path = user_data['user_path']
+    logger.info("Job Finish: clean up the data for {}...".format(user_key))
+    if 'status' in user_data and user_data['status'] == 'Error':
+        logger.error("Job Finish: user {} job error, check log!".format(user_key))
+        return
+
+    logger.info("Job Check: whether job succeeded... ")
+    logger.info("Job Finish: change user.config path to docker... ")
+    logger.info("Job Finish: change user.config status to Done... ")
     new_user_path = user_path.replace(SLURM_PROJECT_DIR, DOCKER_DIR)
     user_data['user_path'] = new_user_path
+    user_data['status'] = 'Done'
     do_process.init_user_config(user_path, user_data)
 
-    # change user_queue.yaml status to Finished
+    # delete user in queue
     usercase_dir = os.path.dirname(user_path)
     user_queue_file = os.path.join(usercase_dir, 'user_queue.yaml')
     with open(user_queue_file, 'r') as fqueue:
         queue_data = yaml.load(fqueue)
 
-    
-    if user_key in queue_data:
+    logger.info("Job Finish: delete user in queue... ")
+    if queue_data and user_key in queue_data: # delete the user whose job is done
+        logger.info("Job Finish: Delete {} successfully...".format(user_key))
         del queue_data[user_key]
     else:
-        logger.error('User: {} job failed! Please check!'.format(user_key))
+        logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
 
     
     with open(user_queue_file, 'w') as fqueue:
+        logger.info("Job Finish: save to user queue... ")
         if len(queue_data) > 0:
-            yaml.dump(queue_data, fqueue)
+            yaml.dump(queue_data, fqueue, default_flow_style=False)
 
-        
 
 if __name__ == '__main__':
     main()

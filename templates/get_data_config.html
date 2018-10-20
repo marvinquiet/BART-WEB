@@ -18,53 +18,16 @@
   </head>
 
   <body class="bg-light">
-
-    <header style="padding-bottom:40px;">
-      <!-- Fixed navbar -->
-      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="/">TF Binding</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
-            </li>
-            <!-- <li class="nav-item active">
-                <a class="nav-link" href="/config-data">Start Prediction<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="/result">Results<span class="sr-only">(current)</span></a>
-            </li> -->
-            <li class="nav-item">
-              <a class="nav-link" target="_new" href="http://faculty.virginia.edu/zanglab/">Zanglab</a>
-            </li>
-            <!--
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Disabled</a>
-            </li>
-            -->
-          </ul>
-          <!--
-          <form class="form-inline mt-2 mt-md-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
-          -->
-        </div>
-      </nav>
-    </header>
-  
+  {% include "header.html" %}
     <!-- Begin page content -->
     <main role="main" class="container">
-      <h1 class="mt-5">Predict your own data now!</h1>
+      <h3 class="mt-5">Predict your own data now!</h3>
       <div class="row">
         <div class="col-md-12 order-md-1">
           <form class="needs-validation" method=post enctype=multipart/form-data novalidate>
             <div class="col-md-12 mb-3">
               <h4 class="mb-3">What is your data type?</h4>
-              <select class="custom-select d-block w-100" id="dataType" name=dataType required>
+              <select class="custom-select d-block w-100" id="dataType" name="dataType" required>
                 <option value="">Choose...</option>
                 <option value="ChIP-seq-bam">ChIP-seq Bam File</option>
                 <option value="ChIP-seq-bed">ChIP-seq Bed File</option>
@@ -90,39 +53,6 @@
               </div>
             </div>
 
-              
-            <!-- <div class="col-md-12 mb-3">
-              <h4 class="mb-3">Choose What to Predict</h4>
-              <div class="custom-control custom-checkbox">
-                <input id="rp" class="custom-control-input" type="checkbox" name="predictionType" value="rp" disabled>
-                <label class="custom-control-label" for="rp">
-                    Relative Regulatory Potentials
-                </label>
-              </div>
-
-              <div class="custom-control custom-checkbox">
-                <input id="cis" class="custom-control-input" type="checkbox" name="predictionType" value="cis" disabled>
-                <label class="custom-control-label" for="cis">
-                    Cis-regulatory Elements
-                </label>
-              </div>
-
-              <div class="custom-control custom-checkbox">
-                <input id="tf" class="custom-control-input" type="checkbox" name="predictionType" value="tf" disabled>
-                <label class="custom-control-label" for="tf">
-                    Potential TF patterns
-                </label>
-              </div>
-
-              <div class="custom-control custom-checkbox">
-                <input id="eh" class="custom-control-input" type="checkbox" name="predictionType" value="eh" disabled>
-                <label class="custom-control-label" for="eh">
-                    Potential Enhancers
-                </label>
-              </div>
-            </div> -->
-
-              
 
             <!-- <div class="col-md-12 mb-3" id='expType' hidden>
               <h4 class="mb-3" id='expTypeTitle' hidden>Choose Gene Expression Type</h4>

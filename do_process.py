@@ -12,7 +12,10 @@ from utils import model_logger as logger
 
 PROJECT_DIR = os.path.dirname(__file__)
 
+# generate key according to username or e-mail
 def generate_user_key(username):
+    logger.info("Init project: generate key for {}...".format(username))
+
     import time
     tstamp = time.time()
 
@@ -22,9 +25,18 @@ def generate_user_key(username):
     else:
         username = username.split('@')[0]
     key = username + '_' + str(tstamp)
+
+    logger.info("Init project: user key is {}...".format(key))
     return key
+    
+# send user key to user e-mail
+def send_user_key():
+    pass
+
 
 def init_project_path(user_key):
+    logger.info("Init project: init project path for {}...".format(user_key))
+
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     user_upload_path = os.path.join(user_path, 'upload')
     user_download_path = os.path.join(user_path, 'download')
@@ -37,12 +49,17 @@ def init_project_path(user_key):
     utils.create_dir(user_log_path)
     utils.create_dir(bart_output_path)
 
+    logger.info("Init project: send user key to Amazon SQS...")
+    logger.info("Init project: add user to user_queue.yaml...")
     utils.send_sqs_message(user_key)
 
     return user_path
 
 
 def init_user_config(user_path, user_data):
+    logger.info("Save data: save data to user.config...")
+    logger.info(user_data)
+
     # init username.config and save config data
     config_file = os.path.join(user_path, 'user.config')
     with open(config_file, 'w') as fopen:
@@ -50,6 +67,8 @@ def init_user_config(user_path, user_data):
 
 
 def get_user_data(user_key):
+    logger.info("Get data: get data from user.config for {}...".format(user_key))
+
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     config_file = os.path.join(user_path, 'user.config')
     with open(config_file, 'r') as fopen:
@@ -79,16 +98,6 @@ def config_results(results, user_data):
     # if user_data['gene_id_type'] != "":
     #     results['user_conf']['GeneIdType'] = user_data['gene_id_type']
 
-    # results['user_conf']['PredictionType'] = []
-    # if 'rp' in user_data['prediction_type']:
-    #     results['user_conf']['PredictionType'].append("Relative Potentials")
-    # if 'cis' in user_data['prediction_type']:
-    #     results['user_conf']['PredictionType'].append("Cisregulatory Elements")
-    # if 'tf' in user_data['prediction_type']:
-    #     results['user_conf']['PredictionType'].append("TF patterns")
-    # if 'eh' in user_data['prediction_type']:
-    #     results['user_conf']['PredictionType'].append("Enhancer")
-
     results['user_conf']['UploadFiles'] = []
     for file_path in user_data['files']:
         results['user_conf']['UploadFiles'].append(str(file_path.split('/')[-1]))
@@ -104,16 +113,20 @@ def generate_results(user_data):
     # assembly: hg38, mm10
     # gene_exp_type: Gene_Only, Gene_Response
     # gene_id_type: GeneSymbol, RefSeq
-    # marge & bart
+    logger.info("Generate results: generate result for {}...".format(user_data['user_key']))
     if user_data['marge'] and not marge_bart.is_marge_done(user_data['user_path']):
         results['done'] = False
         return results
+
+    logger.info("Generate results: generate marge file results...")
     marge_file_dict = generate_marge_file_results(user_data)
     results.update(marge_file_dict)
 
     if user_data['bart'] and not marge_bart.is_bart_done(user_data['user_path']):
         results['done'] = False
         return results
+
+    logger.info("Generate results: generate bart file results...")
     bart_file_results, bart_chart_results, bart_table_results = generate_bart_file_results(user_data)
     results.update(bart_file_results)
     results.update(bart_chart_results)
@@ -193,10 +206,6 @@ def generate_bart_file_results(user_data):
     if not user_data['bart']:
         return bart_file_results, bart_chart_results, bart_table_results
 
-    user_files = []
-    for uf in user_data['files']:
-        user_files.append(os.path.basename(uf).split('.')[0])
-
     # bart output file path
     bart_output_dir = os.path.join(user_data['user_path'], 'download/bart_output')
     for root, dirs, files in os.walk(bart_output_dir):
@@ -220,7 +229,6 @@ def generate_bart_file_results(user_data):
                     bart_table_results['bartResult'] = parse_bart_results(src_file)
 
                     # just finding chart files in bart_output/plot
-
                     # bart_chart_results['bart_chart_files'] = plot_top_tf(bart_df, bart_output_dir, AUCs)
         
     return bart_file_results, bart_chart_results, bart_table_results
