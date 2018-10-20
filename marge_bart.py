@@ -294,9 +294,9 @@ def main():
         del queue_data[user_key]
 
         with open(user_queue_file, 'w') as fqueue:
-        logger.info("Job Finish: save to user queue... ")
-        if len(queue_data) > 0:
-            yaml.dump(queue_data, fqueue, default_flow_style=False)
+            logger.info("Job Finish: save to user queue... ")
+            if len(queue_data) > 0:
+                yaml.dump(queue_data, fqueue, default_flow_style=False)
     else:
         logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
 
