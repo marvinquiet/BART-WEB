@@ -42,16 +42,18 @@ def main():
 
     # multiprocessing for marge
     import multiprocessing
-    pool = multiprocessing.Pool(processes=marge_bart.MARGE_CORE)
-    
+
+    jobs = []
     logger.info("Pipeline Marge: execute marge... ")
     for i in range(repeat_times):
         time.sleep(30)
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
-        pool.apply_async(marge_bart.exe_marge, args=(marge_output_dir, ))
+        p = multiprocessing.Process(target=marge_bart.exe_marge, args=(marge_output_dir, ))
+        jobs.append(p)
+        p.start()
 
-    pool.close()
-    pool.join() 
+    for job in jobs:
+        job.join()
 
     # get marge output
     auc_scores = []
@@ -81,7 +83,7 @@ def main():
     # whether marge generated results
     if len(auc_files) == 0 or len(auc_scores) == 0:
         logger.error("Pipeline Marge: error executing marge !")
-        logger.error("Pipeline Marge: check why marge for user {}!".format(user_key))
+        logger.error("Pipeline Marge: check marge for user {}!".format(user_key))
         return
 
     # find max AUC score
@@ -100,15 +102,10 @@ def main():
 
     logger.info("Pipeline Marge: copy marge_data to download directory...")
 
-
-
-
     # if bart
     logger.info(user_data)
     if bart_flag:
         marge_bart.exe_bart_geneset(user_data)
-
-    logger.info(err_msg)
 
 
 if __name__ == '__main__':

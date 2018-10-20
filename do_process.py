@@ -63,7 +63,7 @@ def init_user_config(user_path, user_data):
     # init username.config and save config data
     config_file = os.path.join(user_path, 'user.config')
     with open(config_file, 'w') as fopen:
-        yaml.dump(user_data, fopen, encoding='utf-8', allow_unicode=True, default_flow_style=False)
+        yaml.safe_dump(user_data, fopen, encoding='utf-8', allow_unicode=True, default_flow_style=False)
 
 
 def get_user_data(user_key):

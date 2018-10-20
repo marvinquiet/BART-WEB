@@ -93,8 +93,8 @@ def config_marge(user_data, marge_output_dir):
 def exe_marge(marge_output_dir):
     cmd = "snakemake --cores {}".format(str(MARGE_CORE))
     logger.info("Exe cmd: " + cmd)
-    subprocess.call(cmd, cwd=marge_output_dir, stdout=subprocess.PIPE)
-    # subprocess.call(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir, stdout=subprocess.PIPE)
+    # subprocess.call(cmd, cwd=marge_output_dir, stdout=subprocess.PIPE)
+    subprocess.call(["snakemake", "--cores", str(MARGE_CORE)], cwd=marge_output_dir, stdout=subprocess.PIPE)
 
 def is_marge_done(user_path):
     snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
@@ -135,13 +135,13 @@ def exe_bart_profile(user_data):
         if input_file.endswith(".bam"):
             cmd = "bart profile -i {} -f bam -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
             logger.info("Exe cmd: " + cmd)
-            subprocess.call(cmd, cwd=bart_output_path)
-            # subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+            # subprocess.call(cmd, cwd=bart_output_path)
+            subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
         elif input_file.endswith(".bed"):
             cmd = "bart profile -i {} -f bed -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
             logger.info("Exe cmd: " + cmd)
-            subprocess.call(cmd, cwd=bart_output_path)
-            # subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bed", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+            # subprocess.call(cmd, cwd=bart_output_path)
+            subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bed", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
 
 
 def exe_bart_geneset(user_data):
@@ -158,8 +158,8 @@ def exe_bart_geneset(user_data):
     for eh_file in eh_files:
         cmd = "bart geneset -i {} -s {} -p {} --outdir {}".format(eh_file, user_data["assembly"], str(BART_CORE), bart_output_path)
         logger.info("Exe cmd: " + cmd)
-        # subprocess.call(["bart", "geneset", "-i", eh_file, "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
-        subprocess.call(cmd, cwd=bart_output_path)
+        subprocess.call(["bart", "geneset", "-i", eh_file, "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
+        # subprocess.call(cmd, cwd=bart_output_path)
 
 
 def is_bart_done(user_path):
@@ -292,15 +292,13 @@ def main():
     if queue_data and user_key in queue_data: # delete the user whose job is done
         logger.info("Job Finish: Delete {} successfully...".format(user_key))
         del queue_data[user_key]
-    else:
-        logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
 
-    
-    with open(user_queue_file, 'w') as fqueue:
+        with open(user_queue_file, 'w') as fqueue:
         logger.info("Job Finish: save to user queue... ")
         if len(queue_data) > 0:
             yaml.dump(queue_data, fqueue, default_flow_style=False)
-
+    else:
+        logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
 
 if __name__ == '__main__':
     main()
