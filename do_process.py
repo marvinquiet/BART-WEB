@@ -132,6 +132,21 @@ def generate_results(user_data):
     results.update(bart_chart_results)
     results.update(bart_table_results)
 
+    logger.info("Generate results: log for user to check procedure...")
+    user_path = user_data['user_path']
+    proc_log = 'mb_pipe.log'
+    src_log = os.path.join(user_path, 'log/'+proc_log)
+    results['proc_log'] = []
+    if os.path.exists(src_log):
+        logger.info("Generate results: copy log to download directory... ")
+        dest_file = os.path.join(user_path, 'download/'+proc_log)
+        shutil.copyfile(src_log, dest_file)
+        
+        dest_file_url = '/download/%s___%s' % (user_data['user_key'], proc_log)
+        results['proc_log'].append((proc_log, dest_file_url))
+    else:
+        logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
+
     return results  
 
 
@@ -154,17 +169,6 @@ def generate_marge_file_results(user_data):
         return marge_file_results
 
     user_path = user_data['user_path']
-    snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
-    
-    for log_file in os.listdir(snakemake_log_dir):
-        if log_file.endswith(".log"):
-            src_log = os.path.join(snakemake_log_dir, log_file)
-            dest_log = os.path.join(user_path, 'download/' + log_file)
-            shutil.copyfile(src_log, dest_log)
-            
-            log_file_url = '/download/%s___%s' % (user_data['user_key'], log_file)
-            marge_file_results['proc_log'].append((log_file, log_file_url))
-
     # marge output file path
     marge_output_path = os.path.join(user_path, 'marge_data/margeoutput')
     marge_suffix_type = ['_enhancer_prediction.txt', '_all_relativeRP.txt', '_Strength.txt', '_all_RP.txt', '_target_regressionInfo.txt']

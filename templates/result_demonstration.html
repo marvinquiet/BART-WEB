@@ -19,11 +19,15 @@
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='sticky-footer-navbar.css') }}" rel="stylesheet">
+
   </head>
 
   <body class="bg-light">
   {% include "header.html" %}
 
+  <main role="main" class="container">
     <div class="container">
       <div class="row">
         <div class="col-md-12 order-md-1">
@@ -35,14 +39,14 @@
           </div>
 
           <div id="userConfig" class="col-md-12 mb-3">
-            <h4 class="mb-3">YOUR CONFIGS</h4>
+            <h5 class="mb-3">YOUR CONFIGS</h5>
             {% for key, value in results['user_conf'].items() %}
               <p> {{ key }}: {{ value }} </p>
             {% endfor %}
           </div>
 
           <div id="procLog" class="col-md-12 mb-3">
-            <h4 class="mb-3">PROCEDURE LOG</h4>
+            <h5 class="mb-3">PROCEDURE LOG</h5>
             {% for log in results['proc_log'] %}
               <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
             {% endfor %}
@@ -67,6 +71,7 @@
         <a href="/">Go back to main page.</a>
       </div>
 
+    </main>
       <footer class="my-5 pt-5 text-muted text-center text-small">
         <p class="mb-1">&copy; 2017-2018 Chongzhi Zang Lab at the University of Virginia</p>
         <ul class="list-inline">
@@ -87,7 +92,8 @@
           // document.getElementById("stopPrediction").style.display = 'none';
           var margeResultFiles = myResult.marge_result_files;
           var bartResultFiles = myResult.bart_result_files;
-          var resultFiles = margeResultFiles.concat(bartResultFiles)
+
+          var resultFiles = bartResultFiles.concat(margeResultFiles)
           for (var i = 0; i < resultFiles.length; i++) {
               if (resultFiles[i] != null) {
                   var resultFile = resultFiles[i][0];

@@ -12,27 +12,30 @@
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='sticky-footer-navbar.css') }}" rel="stylesheet">
 
   </head>
 
   <body class="bg-light">
-
-  {% include "header.html" %}
+  
+    {% include "header.html" %}
 
     <!-- Begin page content -->
-    <main role="main" class="container">
-      <h1>BART:</h1>
-      <h3><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h3>
-
-      <p class="lead">We combine these two tools: <a href="http://cistrome.org/MARGE/index.html">MARGE</a> and <a href="http://faculty.virginia.edu/zanglab/bart/">BART</a>
-        as a pipeline to find functional TF binding easily!</p>
-      <p>It is a powerful tool which could help you find the essence of gene! Hooray! </p>
+    <div class="container">
+      <!-- <p class="lead">We combine these two tools: <a href="http://cistrome.org/MARGE/index.html">MARGE</a> and <a href="http://faculty.virginia.edu/zanglab/bart/">BART</a>
+        as a pipeline to find functional TF binding easily!</p> -->
+      <!-- <p>It is a powerful tool which could help you find the essence of gene! Hooray! </p> -->
       <!-- <img class="mx-auto mb-4" src="{{ url_for('static', filename='how_marge_bart_works.png') }}" alt="" width="800"> -->
-      <img class="mx-auto mb-4 text-center" src="{{ url_for('static', filename='bart_web.png') }}" alt="" width="800">
-
+      <div class="text-center">
+        <h2>BART</h2>
+        <h4><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h4>
+        <br>
+        <img class="d-block mx-auto mb-3" src="{{ url_for('static', filename='bart_web.png') }}" alt="" width="700">
+      </div>
 
       <hr class="mb-3">
+
       <div class="row">
         <div class="col-md-12 order-md-1">
           <form method=post>
@@ -47,7 +50,7 @@
           </form>
         </div>
       </div>
-    </main>
+    </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
       <p class="mb-1">&copy; 2017-2018 Chongzhi Zang Lab at the University of Virginia</p>
