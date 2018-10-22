@@ -22,7 +22,10 @@
   {% include "header.html" %}
     <!-- Begin page content -->
     <main role="main" class="container">
-      <h3 class="mt-5">Your Prediction has started.</h3>
+      <div class="py-3">
+        <h3>Your job has started.</h3>
+      </div>
+
       <div class="row">
         <div class="col-md-12 order-md-1">
           <p class="lead">If you did not write your e-mail or your e-mail was incorrect. Please press the "Copy Key" button and paste it somewhere.</p>
@@ -39,7 +42,12 @@
       </div>
 
       <div class="py-5 text-center">
-        <a href="/">Go back to main page.</a>
+        <button class="btn btn-link" onclick="location.href = '/';">Back to index page</button>
+        <!-- <a style="display:inline-block; " href="/">Go back to main page.</a> -->
+        <p style="display:inline-block;">|</p>
+        <form style="display: inline;" method=post enctype=multipart/form-data novalidate>
+          <button id="get_result" class="btn btn-link" type="submit" name="index_submit" value={{key}} onclick="pop_up_func()">Get your result</button>
+        </form>
       </div>
     </main>
 
@@ -74,8 +82,22 @@
           /* Alert the copied text */
           alert("Copied the text: " + copyText.value);
       }
-    
-    
     </script>
+
+    
+    <script type="text/javascript">
+    // TODO: Need to figure out why cancel lead to result page
+      function pop_up_func() {
+          var btn = document.getElementById('get_result');
+          var key = prompt("Please enter the key.", btn.value);
+          console.log(key);
+          if (key == null || key == "") {
+              alert("You need to enter your key.");
+          } else {
+              btn.value = key;
+          }
+      }
+    </script>
+    
   </body>
 </html>

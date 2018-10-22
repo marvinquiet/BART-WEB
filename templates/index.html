@@ -27,27 +27,129 @@
         as a pipeline to find functional TF binding easily!</p> -->
       <!-- <p>It is a powerful tool which could help you find the essence of gene! Hooray! </p> -->
       <!-- <img class="mx-auto mb-4" src="{{ url_for('static', filename='how_marge_bart_works.png') }}" alt="" width="800"> -->
-      <div class="text-center">
+      <div class="py-3">
         <h2>BART</h2>
         <h4><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h4>
         <br>
-        <img class="d-block mx-auto mb-3" src="{{ url_for('static', filename='bart_web.png') }}" alt="" width="700">
+        <img class="mb-3" src="{{ url_for('static', filename='bart_web.png') }}" alt="" width="600">
       </div>
 
-      <hr class="mb-3">
+      <!-- <hr class="mb-3"> -->
 
       <div class="row">
-        <div class="col-md-12 order-md-1">
-          <form method=post>
+        <div class="col-md-8 order-md-1">
+          <form method=post enctype=multipart/form-data novalidate>
+            <h4 style="display:inline-block; vertical-align: middle;">Submit your job now</span></h4>
+            <button id="get_result" class="btn btn-link" type="submit" name="index_submit" onclick="pop_up_func()">or get your result here</button>
+          </form>
+          
+          <form class="needs-validation" method=post enctype=multipart/form-data novalidate>
             <div class="row">
-              <div class="col-md-6 mb-3">
-                <button class="btn btn-primary btn-lg btn-block" type="submit" name="index_submit" value="predict_data">Predict Your Own Data</button>
+              <div class="col-md-2 mb-3">
+                <p class="mb-3" id="assembly"><b>Species:</b></p>
               </div>
-              <div class="col-md-6 mb-3">
-                <button id="retrieve_result" class="btn btn-primary btn-lg btn-block" type="submit" name="index_submit" onclick="pop_up_func()">Retrieve Result</button>
+              <div class="col-md-10 mb-3">
+                <div class="custom-control custom-radio">
+                  <input id="human" name="species" value="hg38" type="radio" class="custom-control-input" checked required>
+                  <label class="custom-control-label" for="human">Human(hg38)</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input id="mouse" name="species" value="mm10" type="radio" class="custom-control-input" required>
+                  <label class="custom-control-label" for="mouse">Mouse(mm10)</label>
+                </div>
               </div>
             </div>
+
+            <!-- Choose Data Type: Genelist/ChIP-seq -->
+            <div class="row">
+              <div class="col-md-2 mb-3">
+                <p class="mb-3" id="assembly"><b>Input data type:</b></p>
+              </div>
+              <div class="col-md-10 mb-3">
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="genelist" name="dataType" value="Geneset" class="custom-control-input" checked required>
+                  <label class="custom-control-label" for="genelist">Genelist</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="ChIP-seq" name="dataType" value="ChIP-seq" class="custom-control-input" required>
+                  <label class="custom-control-label" for="ChIP-seq">ChIP-seq data</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Input Data: Genelist/ChIP-seq -->
+            <div class="row">
+              <div class="col-md-2">
+                <p class="mb-3" id="assembly"><b>Input:</b></p>
+              </div>
+              <div class="col-md-10">
+                <div class="row">
+                  <div class="col-md-2">
+                    <div id="geneFileRadio" class="custom-control custom-radio">
+                      <input type="radio" id="geneFile" name="geneType" value="geneFile" class="custom-control-input" checked required>
+                      <label class="custom-control-label" for="geneFile">Upload: </label>
+                    </div>
+                    <p id="ChIPFile" hidden>Upload: </p>
+                  </div>
+                  <div class="col-md-10">
+                    <input id="uploadFiles" name="uploadFiles" type="file" required> <!-- not for multiple, only allow one file -->
+                    <p id="geneFileType">Genelist must be <b>official gene sysmbol</b> in .txt format.</p>
+                    <p id="chipFileType" hidden>ChIP-seq must be <b>mapped reads data files</b> in .bed/.bam format in the corresponding genome assembly.</p>
+                  </div>
+                </div>
+
+                <div id="geneDataRadio" class="row mb-3">
+                  <div class="col-md-2">
+                    <div  class="custom-control custom-radio">
+                      <input type="radio" id="geneData" name="geneType" value="geneData" class="custom-control-input" required>
+                      <label class="custom-control-label" for="geneData">Paste:</label>
+                    </div>
+                  </div>
+                  <div class="col-md-10">
+                    <textarea id="uploadList" name="uploadList" class="form-control" rows="5" disabled required></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-2 mb-3">
+                <p><b>Job name:</b><br /><span class="text-muted">(Optional)</span></p>
+              </div>
+              <div class="col-md-10 mb-3">
+                <input type="text" class="form-control" id="jobname" name="jobname" placeholder="job1">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-2 mb-3">
+                <p><b>E-mail:</b><br /><span class="text-muted">(Optional)</span></p>
+              </div>
+              <div class="col-md-10 mb-3">
+                <input type="email" class="form-control" id="username" name="username" placeholder="name@domain.com">
+                <div class="invalid-feedback" style="width: 100%;">
+                    Your e-mail is incorrect.
+                </div>
+              </div>
+            </div>
+
+            <hr class="mb-3">
+
+            <div class="row">
+              <div class="col-md-2 mb-3">
+              </div>
+              <div class="col-md-2 mb-3">
+                <button class="btn btn-primary btn-lg btn-block btn-sm" type="submit" name="index_submit" value="predict_data">Submit</button>
+              </div>
+              <div class="col-md-2 mb-3">
+                <button id="reset" class="btn btn-secondary btn-lg btn-block btn-sm" type="button" name="reset" value="reset" onClick="window.location.reload()">Reset</button>
+              </div>
+              <div class="col-md-6 mb-3">
+              </div>
+            </div>
+ 
           </form>
+
         </div>
       </div>
     </div>
@@ -71,12 +173,12 @@
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script> -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='holder.min.js') }}"></script>
+
     
     <script type="text/javascript">
       function pop_up_func() {
-          var btn = document.getElementById('retrieve_result');
-          var txt;
-          var key = prompt("Please enter the key you saved before:", "");
+          var btn = document.getElementById('get_result');
+          var key = prompt("Please enter the key.", "");
           if (key == null || key == "") {
               alert("You need to enter your key.");
           } else {
@@ -84,6 +186,100 @@
           }
       }
     </script>
-    
+
+    <script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+      (function() {
+        'use strict';
+
+        window.addEventListener('load', function() {
+          // Fetch all the forms we want to apply custom Bootstrap validation styles to
+          var forms = document.getElementsByClassName('needs-validation');
+
+          // Loop over them and prevent submission
+          var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+              if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+                alert('Please make sure you uploaded your data!')
+              }
+              // form.classList.add('was-validated');
+            }, false);
+          });
+        }, false);
+      })();
+    </script>
+
+    <script>
+    // datatype genelist/ChIP-seq
+    $('input[type=radio][name=dataType]').on('change', function() {
+      var n = $(this).val();
+      // console.log(n);
+      switch(n)
+      {
+        case 'ChIP-seq':
+          $('#geneDataRadio').prop("hidden", true);
+          $('#geneFileRadio').prop("hidden", true);
+          $('#ChIPFile').removeAttr('hidden');
+
+          // related to upload file type
+          $('#geneFileType').prop("hidden", true);
+          $('#chipFileType').removeAttr('hidden');
+
+          // enable upload files if diabled due to geneFile choice
+          $('#uploadFiles').prop('disabled', false);
+          $('#uploadList').prop('disabled', true);
+          $('#uploadList').css('background-color' , '#e9ecef');
+
+          // clear genelist data
+          $('#uploadFiles').val('');
+          $('#uploadList').val('');
+          break;
+        case 'Geneset':
+          $('#geneDataRadio').removeAttr('hidden');
+          $('#geneFileRadio').removeAttr('hidden');
+          $('#ChIPFile').prop("hidden", true);
+
+          // related to upload file type
+          $('#geneFileType').removeAttr('hidden');
+          $('#chipFileType').prop("hidden", true);
+
+          // change back following input data choices
+          $('input:radio[name=geneType]')[0].checked = true;
+          $('#uploadFiles').prop('disabled', false);
+          $('#uploadList').prop('disabled', true);
+          $('#uploadList').css('background-color' , '#e9ecef');
+
+          // clear ChIP-seq data
+          $('#uploadFiles').val('');
+          break;
+      }
+    });
+    </script>
+
+    <script>
+    // genelist file/textarea
+    $('input[name=geneType]').on('change', function() {
+      var n = $(this).val();
+      // console.log(n);
+      switch(n)
+      {
+        case 'geneData':
+          $('#uploadFiles').prop('disabled', true);
+          $('#uploadFiles').val('');
+          $('#uploadList').prop('disabled', false);
+          $('#uploadList').css('background-color' , '#FFFFFF');
+          break;
+        case 'geneFile':
+          $('#uploadFiles').prop('disabled', false);
+          $('#uploadList').val('');
+          $('#uploadList').prop('disabled', true);
+          $('#uploadList').css('background-color' , '#e9ecef');
+          break;
+      }
+    });
+    </script>
+
   </body>
 </html>

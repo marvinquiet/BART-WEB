@@ -12,25 +12,31 @@ from utils import model_logger as logger
 
 PROJECT_DIR = os.path.dirname(__file__)
 
-# generate key according to username or e-mail
-def generate_user_key(username):
-    logger.info("Init project: generate key for {}...".format(username))
+# generate key according to e-mail or jobname
+def generate_user_key(username, jobname):
+    logger.info("Init project: generate key ...")
 
     import time
     tstamp = time.time()
 
-    # whether username is actually an e-mail
-    if username == '':
+    if username == '' and jobname == '':
+        logger.info("Init project: user does not input e-mail or jobname...")
         username = 'anonymous'
-    else:
+    if jobname == '' and username != '':  # e-mail
+        logger.info("Init project: user e-mail is {}...".format(username))
         username = username.split('@')[0]
+    if jobname != '': # job name in first priority
+        logger.info("Init project: user jobname is {}...".format(jobname))
+        username = jobname.replace(' ', '')  # get rid of spaces
     key = username + '_' + str(tstamp)
 
     logger.info("Init project: user key is {}...".format(key))
     return key
     
 # send user key to user e-mail
-def send_user_key():
+def send_user_key(username, user_key):
+    logger.info("Init project: send e-mail to {} for {}".format(username, user_key))
+
     pass
 
 
@@ -51,7 +57,7 @@ def init_project_path(user_key):
 
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
-    utils.send_sqs_message(user_key)
+    # utils.send_sqs_message(user_key)
 
     return user_path
 
@@ -90,19 +96,20 @@ def config_results(results, user_data):
     user_data: user configuration
     '''
     results['user_conf'] = {}
-    results['user_conf']['YourKey'] = user_data['user_key']
-    results['user_conf']['Assembly'] = user_data['assembly']
-    results['user_conf']['DataType'] = user_data['dataType']
+    results['user_conf']['Job_key'] = user_data['user_key']
+    results['user_conf']['Species'] = user_data['assembly']
+    results['user_conf']['Input_data_type'] = user_data['dataType']
     # if user_data['gene_exp_type'] != "":
     #     results['user_conf']['GeneExpressionType'] = user_data['gene_exp_type']
     # if user_data['gene_id_type'] != "":
     #     results['user_conf']['GeneIdType'] = user_data['gene_id_type']
 
-    results['user_conf']['UploadFiles'] = []
-    for file_path in user_data['files']:
-        results['user_conf']['UploadFiles'].append(str(file_path.split('/')[-1]))
-
-
+    results['user_conf']['Input_data'] = ""
+    for index, file_path in enumerate(user_data['files']):
+        results['user_conf']['Input_data'] += str(file_path.split('/')[-1])
+        if index != len(user_data['files'])-1:
+            results['user_conf']['Input_data'] += ', '
+        
 def generate_results(user_data):
     results = {}
     config_results(results, user_data)

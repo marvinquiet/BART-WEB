@@ -26,52 +26,49 @@
 
   <body class="bg-light">
   {% include "header.html" %}
-
-  <main role="main" class="container">
     <div class="container">
       <div class="row">
-        <div class="col-md-12 order-md-1">
+        <div class="col-md-8 order-md-1">
 
           <div id="resultOutputDiv" class="col-md-12 mb-3">
-            <h4 id="resultOutput" class="mb-3"></h4>
+            <h3 id="resultOutput" ></h4>
             <!-- bart result table by tabulor -->
             <div id="bart-result"></div>
           </div>
 
-          <div id="userConfig" class="col-md-12 mb-3">
-            <h5 class="mb-3">YOUR CONFIGS</h5>
-            {% for key, value in results['user_conf'].items() %}
-              <p> {{ key }}: {{ value }} </p>
-            {% endfor %}
-          </div>
-
           <div id="procLog" class="col-md-12 mb-3">
-            <h5 class="mb-3">PROCEDURE LOG</h5>
-            {% for log in results['proc_log'] %}
-              <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
-            {% endfor %}
-            <div id="procLogTextDiv" class="card-deck mb-3" hidden>
-              <div class="card mb-4 shadow-sm">
-                <div class="card-header">
-                  <h4 class="my-0 font-weight-normal">Processing...</h4>
-                </div>
-                <div id="procLogText" class="card-body">
-
+              <!-- <h5 class="mb-3">PROCEDURE LOG</h5> -->
+              <!-- {% for log in results['proc_log'] %}
+                <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
+              {% endfor %} -->
+              <div id="procLogTextDiv" class="card-deck mb-3" hidden>
+                <div class="card mb-4 shadow-sm">
+                  <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Processing log</h4>
+                  </div>
+                  <div id="procLogText" class="card-body">
+  
+                  </div>
                 </div>
               </div>
             </div>
+
+          <div id="userConfig" class="col-md-12 mb-3">
+            <h5 class="mb-3">Config</h5>
+            {% for key, value in results['user_conf'].items() %}
+              <p> {{ key }}:{{ value }} </p>
+            {% endfor %}
           </div>
 
           <hr class="mb-4">
-          <!-- <button id="stopPrediction" class="btn btn-primary btn-lg btn-block" type="submit" name="stop_prediction" value="stop_prediction">Stop your prediction</button> -->
+
         </div>
       </div>
 
       <div class="py-5 text-center">
-        <a href="/">Go back to main page.</a>
+        <a href="/">Back to index page</a>
       </div>
 
-    </main>
       <footer class="my-5 pt-5 text-muted text-center text-small">
         <p class="mb-1">&copy; 2017-2018 Chongzhi Zang Lab at the University of Virginia</p>
         <ul class="list-inline">
@@ -83,12 +80,19 @@
     </div>
 
     <script type="text/javascript">
-      var myResult = {{ results|tojson }}
+      var myResult = {{ results|tojson }};
 
       // if the procedure ran and finished, show RESULTS part
       // Otherwise, show "Your result is still being processed"
       if (myResult.done) {
-          document.getElementById("resultOutput").innerHTML = "RESULTS";
+          document.getElementById("resultOutput").innerHTML = "BART Transctriptional Factors";
+
+          document.getElementById("resultOutputDiv").appendChild(document.createElement("br"));
+          var pTag = document.createElement("p");
+          pTag.innerHTML = "<b>Download your results:</b>";
+          document.getElementById("resultOutputDiv").appendChild(pTag);
+
+
           // document.getElementById("stopPrediction").style.display = 'none';
           var margeResultFiles = myResult.marge_result_files;
           var bartResultFiles = myResult.bart_result_files;
@@ -111,8 +115,8 @@
               }
           }
       } else {
-          document.getElementById("resultOutput").innerHTML = "YOUR PREDICTION IS STILL BEING PROCESSED!!!";
-          document.getElementById("stopPrediction").style.display = '';
+          document.getElementById("resultOutput").innerHTML = "Your job is still being processed...";
+
           var brTag = document.createElement("br");
           document.getElementById("resultOutputDiv").appendChild(brTag);
 
@@ -120,8 +124,8 @@
           logTextDiv.removeAttribute("hidden");
 
           // var processingLog = myResult.processing_log;
-          var processingLog = "../do_bart.py"
-          var pTag = document.createElement("iframe");
+          var processingLog = ""
+          var pTag = document.createElement("t");
           var pSrc = document.createAttribute("src");
           pSrc.value = processingLog;
           pTag.setAttributeNode(pSrc);
@@ -129,7 +133,7 @@
       }
 
       // if bart ran and finished, show the results in the table
-      if (myResult.bartResult.length >= 0) {
+      if (('bartResult' in myResult) && (myResult.bartResult.length >= 0)) {
           $('#bart-result').tabulator({
           height: 608,
           layout: "fitColumns",
@@ -140,7 +144,7 @@
                 //e - the click event object
                 //cell - cell componen;
                 var cellObject = cell.cell;
-                PopupCenter("/plot/" + myResult.user_conf.YourKey + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
+                PopupCenter("/plot/" + myResult.user_conf.Job_key + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
             },
             formatter:function(cell, formatterParams){
                 var value = cell.getValue();

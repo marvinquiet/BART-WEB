@@ -41,7 +41,7 @@ def stat_plot(stat, tfs, ID, bart_output_dir):
     except:
         sys.exit('Output directory: {} could not be created.'.format(plotdir))
     figname1 = plotdir+os.sep+'{}_avg_z_p_boxplot'.format(ID)
-    plt.savefig(figname1,bbox_inches='tight')
+    plt.savefig(figname1, bbox_inches='tight', pad_inches=0.5)
     plt.close()    
     
     
@@ -78,7 +78,6 @@ def plot_top_tf(bart_table_df, bart_output_dir, AUCs):
 
     # draw all first
     top_cnt = round(len(bart_table_df.index))
-
     tf_score_list = set(bart_table_df.sort_values(by=['tf_score'], ascending=False).head(top_cnt).index.values)
     z_score_list = set(bart_table_df.sort_values(by=['z_score'], ascending=False).head(top_cnt).index.values)
     max_auc_list = set(bart_table_df.sort_values(by=['max_auc'], ascending=False).head(top_cnt).index.values)
