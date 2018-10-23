@@ -46,7 +46,7 @@ def init_project_path(user_key):
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     user_upload_path = os.path.join(user_path, 'upload')
     user_download_path = os.path.join(user_path, 'download')
-    user_log_path = os.path.join(user_path, 'log')
+    user_log_path = os.path.join(user_path, 'log/mb_pipe.log')
     bart_output_path = os.path.join(user_download_path, 'bart_output')
 
     utils.create_dir(user_path)
@@ -57,7 +57,7 @@ def init_project_path(user_key):
 
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
-    # utils.send_sqs_message(user_key)
+    utils.send_sqs_message(user_key)
 
     return user_path
 
