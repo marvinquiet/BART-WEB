@@ -36,21 +36,23 @@
             <div id="bart-result"></div>
           </div>
 
-          <div id="procLog" class="col-md-12 mb-3">
-              <!-- <h5 class="mb-3">PROCEDURE LOG</h5> -->
-              <!-- {% for log in results['proc_log'] %}
-                <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
-              {% endfor %} -->
-              <div id="procLogTextDiv" class="card-deck mb-3" hidden>
-                <div class="card mb-4 shadow-sm">
-                  <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Processing log</h4>
+            <div id="procLog" class="col-md-12 mb-3" hidden>
+              <h5 class="mb-3">Processing log</h5>
+              <textarea id="procLogText" class="form-control" name="procLogText" rows="5" disabled></textarea>
+                <!-- <h5 class="mb-3">PROCEDURE LOG</h5> -->
+                <!-- {% for log in results['proc_log'] %}
+                  <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
+                {% endfor %} -->
+                <!-- <div id="procLogTextDiv" class="card-deck mb-3" hidden>
+                  <div class="card mb-4 shadow-sm">
+                    <div class="card-header">
+                      <h4 class="my-0 font-weight-normal">Processing log</h4>
+                    </div>
+                    <div id="procLogText" class="card-body">
+    
+                    </div>
                   </div>
-                  <div id="procLogText" class="card-body">
-  
-                  </div>
-                </div>
-              </div>
+                </div> -->
             </div>
 
           <div id="userConfig" class="col-md-12 mb-3">
@@ -89,7 +91,7 @@
 
           document.getElementById("resultOutputDiv").appendChild(document.createElement("br"));
           var pTag = document.createElement("p");
-          pTag.innerHTML = "<b>Download your results:</b>";
+          pTag.innerHTML = "<b>Download results as file:</b>";
           document.getElementById("resultOutputDiv").appendChild(pTag);
 
 
@@ -116,20 +118,21 @@
           }
       } else {
           document.getElementById("resultOutput").innerHTML = "Your job is still being processed...";
-
           var brTag = document.createElement("br");
           document.getElementById("resultOutputDiv").appendChild(brTag);
-
-          var logTextDiv = document.getElementById("procLogTextDiv");
+          
+          // load processing log
+          var logTextDiv = document.getElementById("procLog");
           logTextDiv.removeAttribute("hidden");
-
-          // var processingLog = myResult.processing_log;
-          var processingLog = ""
-          var pTag = document.createElement("t");
-          var pSrc = document.createAttribute("src");
-          pSrc.value = processingLog;
-          pTag.setAttributeNode(pSrc);
-          document.getElementById("procLogText").appendChild(pTag);
+          var file = myResult.proc_log;
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+              document.getElementById("procLogText").innerHTML = xmlhttp.responseText;
+            }
+          }
+          xmlhttp.open("GET", file, true);
+          xmlhttp.send();
       }
 
       // if bart ran and finished, show the results in the table

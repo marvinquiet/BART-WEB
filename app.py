@@ -201,6 +201,12 @@ def bart_plot_result(userkey_tfname):
     plot_results['dist_plot'] = distribution_plot
     return render_template('plot_result.html', plotResults=plot_results)
 
+@app.route('/log/<userkey_filename>')
+def download_log_file(userkey_filename):
+    user_key, filename = userkey_filename.split('___')
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
+    log_path = os.path.join(user_path, 'log')
+    return send_from_directory(log_path, filename)
 
 @app.route('/download/<userkey_filename>')
 def download_marge_file(userkey_filename):

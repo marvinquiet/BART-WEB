@@ -143,13 +143,13 @@ def generate_results(user_data):
     user_path = user_data['user_path']
     proc_log = 'mb_pipe.log'
     src_log = os.path.join(user_path, 'log/'+proc_log)
-    results['proc_log'] = []
+    results['proc_log'] = ""
     if os.path.exists(src_log):
         # dest_file = os.path.join(user_path, 'download/'+proc_log)
         # shutil.copyfile(src_log, dest_file)
-        # dest_file_url = '/download/%s___%s' % (user_data['user_key'], proc_log)
+        dest_file_url = '/log/%s___%s' % (user_data['user_key'], proc_log)
         logger.info('Generate results: add log to results, show it in result_demonstration...')
-        results['proc_log'].append(src_log)
+        results['proc_log'] = dest_file_url
     else:
         logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
 
@@ -182,9 +182,6 @@ def generate_marge_file_results(user_data):
         for file in files:
             for file_type in marge_suffix_type:
                 if file_type in str(file):
-                    # src_file = os.path.join(root, file)
-                    # dest_file = os.path.join(user_path, 'download/' + file)
-                    # shutil.copyfile(src_file, dest_file)
                     dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
                     marge_file_results['marge_result_files'].append((file, dest_file_url))
 
@@ -236,9 +233,6 @@ def generate_bart_file_results(user_data):
                     bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
                     # bart table results for demonstration
                     bart_table_results['bartResult'] = parse_bart_results(src_file)
-
-                    # just finding chart files in bart_output/plot
-                    # bart_chart_results['bart_chart_files'] = plot_top_tf(bart_df, bart_output_dir, AUCs)
         
     return bart_file_results, bart_chart_results, bart_table_results
 
