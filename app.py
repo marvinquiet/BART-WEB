@@ -72,45 +72,33 @@ def index():
             user_data['user_path'] = user_path
             user_data['dataType'] = request.form['dataType']
             user_data['assembly'] = request.form['species']
-
             user_data['files'] = []
-
-            # user_data['prediction_type'] = request.form.getlist('predictionType')
-
-            # remove 'gene_exp_type' and 'gene_id_type' from user_data
-            # if user_data['dataType'] != "ChIP-seq":
-            #     user_data['gene_exp_type'] = request.form['expTypeChoice']
-            #     user_data['gene_id_type'] = request.form['geneIdChoice']
-            # else:
-            #     user_data['gene_exp_type'] = ""
-            #     user_data['gene_id_type'] = ""
-            
-
+        
             # process input data
             if user_data['dataType'] == "ChIP-seq":
                 allowed_extensions = set(['bam', 'bed'])
-
                 # execute bart only
                 user_data['marge'] = False
                 user_data['bart'] = True
+            # process input data
             if user_data['dataType'] == "Geneset":
                 allowed_extensions = set(['txt'])
-
-                # save gene_list into file
-                gene_list = request.form['uploadList']
-                gene_list_file = 'genelist_by_user.txt'
-                gene_list_file_path = os.path.join(user_path, 'upload/' + gene_list_file)
-                with open(gene_list_file_path, 'w') as fopen:
-                    for gene in gene_list:
-                        fopen.write(gene)
-                user_data['files'].append(gene_list_file)
-                
                 # execute marge+bart
                 user_data['marge'] = True
                 user_data['bart'] = True
 
+                # if using genelist, save to file
+                if request.form.get('uploadList', None):
+                    gene_list = request.form['uploadList']
+                    gene_list_file = 'genelist_by_user.txt'
+                    gene_list_file_path = os.path.join(user_path, 'upload/' + gene_list_file)
+                    with open(gene_list_file_path, 'w') as fopen:
+                        for gene in gene_list:
+                            fopen.write(gene)
+                    user_data['files'].append(gene_list_file)
 
-            if request.form['geneType'] != 'geneData':
+            if request.form['dataType'] == 'ChIP-seq' or \
+                (request.form['dataType'] == 'Geneset' and request.form['geneType'] == 'geneFile'):
                 # process what user has uploaded
                 if 'uploadFiles' not in request.files:
                     flash('Please choose a file')
@@ -131,7 +119,7 @@ def index():
                         file.save(filename_abs_path)
 
                         user_data['files'].append(filename) # only save file name, since the uploaded path is always the same
-
+            
             do_process.init_user_config(user_path, user_data)
             marge_bart.do_marge_bart(user_data)
             # post key 

@@ -93,6 +93,7 @@
                   </div>
                   <div class="col-md-10">
                     <input id="uploadFiles" name="uploadFiles" type="file" required> <!-- not for multiple, only allow one file -->
+
                     <p id="geneFileType">Genelist must be <b>official gene sysmbol</b> in .txt format.</p>
                     <p id="chipFileType" hidden>ChIP-seq must be <b>mapped reads data files</b> in .bed/.bam format in the corresponding genome assembly.</p>
                   </div>
@@ -202,9 +203,8 @@
               if (form.checkValidity() === false) {
                 event.preventDefault();
                 event.stopPropagation();
-                alert('Please make sure you uploaded your data!')
               }
-              // form.classList.add('was-validated');
+              form.classList.add('was-validated');
             }, false);
           });
         }, false);
