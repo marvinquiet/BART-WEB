@@ -300,6 +300,25 @@ def main():
     else:
         logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
 
+
+    # move marge results to download
+    
+    if user_data['marge']:
+        logger.info('Job Finish: move marge result to download...')
+        import shutil
+        # marge output file path
+        marge_output_path = os.path.join(user_path, 'marge_data/margeoutput')
+        marge_suffix_type = ['_enhancer_prediction.txt', '_all_relativeRP.txt', '_Strength.txt', '_all_RP.txt', '_target_regressionInfo.txt']
+        for root, dirs, files in os.walk(marge_output_path):
+            for file in files:
+                for file_type in marge_suffix_type:
+                    if file_type in str(file):
+                        src_file = os.path.join(root, file)
+                        dest_file = os.path.join(user_path, 'download/' + file)
+                        shutil.copyfile(src_file, dest_file)
+
+            
+
 if __name__ == '__main__':
     main()
     
