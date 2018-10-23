@@ -57,7 +57,7 @@ def init_project_path(user_key):
 
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
-    utils.send_sqs_message(user_key)
+    # utils.send_sqs_message(user_key)
 
     return user_path
 
@@ -115,6 +115,20 @@ def generate_results(user_data):
     config_results(results, user_data)
     results['done'] = True
 
+    logger.info("Generate results: log for user to check procedure...")
+    user_path = user_data['user_path']
+    proc_log = 'mb_pipe.log'
+    src_log = os.path.join(user_path, 'log/'+proc_log)
+    results['proc_log'] = ""
+    if os.path.exists(src_log):
+        # dest_file = os.path.join(user_path, 'download/'+proc_log)
+        # shutil.copyfile(src_log, dest_file)
+        dest_file_url = '/log/%s___%s' % (user_data['user_key'], proc_log)
+        logger.info('Generate results: add log to results, show it in result_demonstration...')
+        results['proc_log'] = dest_file_url
+    else:
+        logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
+
     # dataType: ChIP-seq, Geneset, Both
     # prediction_type: rp, cis, tf, eh
     # assembly: hg38, mm10
@@ -138,20 +152,6 @@ def generate_results(user_data):
     results.update(bart_file_results)
     results.update(bart_chart_results)
     results.update(bart_table_results)
-
-    logger.info("Generate results: log for user to check procedure...")
-    user_path = user_data['user_path']
-    proc_log = 'mb_pipe.log'
-    src_log = os.path.join(user_path, 'log/'+proc_log)
-    results['proc_log'] = ""
-    if os.path.exists(src_log):
-        # dest_file = os.path.join(user_path, 'download/'+proc_log)
-        # shutil.copyfile(src_log, dest_file)
-        dest_file_url = '/log/%s___%s' % (user_data['user_key'], proc_log)
-        logger.info('Generate results: add log to results, show it in result_demonstration...')
-        results['proc_log'] = dest_file_url
-    else:
-        logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
 
     return results  
 
