@@ -60,10 +60,6 @@ def index():
             # docker user path
             user_path = do_process.init_project_path(user_key)
 
-            # send e-mail to user
-            if username != '':
-                do_process.send_user_key(username, user_key)
-
             # record user data
             user_data = {}
             user_data['user_email'] = username
@@ -147,6 +143,10 @@ def index():
     return render_template('index.html')
     # return render_template('get_data_config.html')
 
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route('/result', methods=['GET', 'POST'])
 def get_result():

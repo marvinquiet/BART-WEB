@@ -6,6 +6,7 @@ import shutil
 import json
 import yaml
 
+
 import utils
 import marge_bart
 from utils import model_logger as logger
@@ -18,6 +19,7 @@ def generate_user_key(username, jobname):
 
     import time
     tstamp = time.time()
+    user_mail = username
 
     if username == '' and jobname == '':
         logger.info("Init project: user does not input e-mail or jobname...")
@@ -31,13 +33,13 @@ def generate_user_key(username, jobname):
     key = username + '_' + str(tstamp)
 
     logger.info("Init project: user key is {}...".format(key))
-    return key
     
-# send user key to user e-mail
-def send_user_key(username, user_key):
-    logger.info("Init project: send e-mail to {} for {}".format(username, user_key))
-
-    pass
+    # send key to user's e-mail
+    if username != "":
+        logger.info("Init project: send e-mail to {} for {}".format(user_mail, key))
+        utils.send_user_key(user_mail, key)
+        
+    return key
 
 
 def init_project_path(user_key):
@@ -46,7 +48,7 @@ def init_project_path(user_key):
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     user_upload_path = os.path.join(user_path, 'upload')
     user_download_path = os.path.join(user_path, 'download')
-    user_log_path = os.path.join(user_path, 'log/mb_pipe.log')
+    user_log_path = os.path.join(user_path, 'log')
     bart_output_path = os.path.join(user_download_path, 'bart_output')
 
     utils.create_dir(user_path)
@@ -54,6 +56,12 @@ def init_project_path(user_key):
     utils.create_dir(user_download_path)
     utils.create_dir(user_log_path)
     utils.create_dir(bart_output_path)
+
+    # create the log file in docker
+    user_log_file_path = os.path.join(user_log_path, 'mb_pipe.log')
+    if not os.path.exists(user_log_file_path):
+        with open(user_log_file_path, 'w'): pass 
+    
 
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
@@ -99,11 +107,6 @@ def config_results(results, user_data):
     results['user_conf']['Job_key'] = user_data['user_key']
     results['user_conf']['Species'] = user_data['assembly']
     results['user_conf']['Input_data_type'] = user_data['dataType']
-    # if user_data['gene_exp_type'] != "":
-    #     results['user_conf']['GeneExpressionType'] = user_data['gene_exp_type']
-    # if user_data['gene_id_type'] != "":
-    #     results['user_conf']['GeneIdType'] = user_data['gene_id_type']
-
     results['user_conf']['Input_data'] = ""
     for index, file_path in enumerate(user_data['files']):
         results['user_conf']['Input_data'] += str(file_path.split('/')[-1])

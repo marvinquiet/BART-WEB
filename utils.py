@@ -4,7 +4,13 @@ import os
 import shutil
 import logging
 import boto3
+# for sending key to user
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from logging.handlers import RotatingFileHandler
+
 
 def create_dir(directory):
     try:
@@ -35,6 +41,39 @@ def send_sqs_message(directory):
             'DataType': 'String'
         }
     })
+
+
+# send user key to user e-mail
+def send_user_key(user_mail, user_key):
+    MY_ADDRESS = "zanglab.service@gmail.com"
+    PASSWORD = "ZangLab2018"
+
+    msg = MIMEMultipart()
+    msg['From'] = MY_ADDRESS
+    msg['To'] = user_mail
+    msg['Subject'] = "BART key"
+    # better change to a file template later
+    message = '''
+Hi there,
+
+Thank you for using BART! 
+
+Here is your key: {}
+
+And the link to your result: {}
+
+There are some agreements and conditions of using BART:
+1. public use
+2. citation
+3. ...
+'''.format(user_key, 'http://bartweb.uvasomrc.io/result?user_key='+user_key)
+    msg.attach(MIMEText(message, 'plain'))
+    
+    server = smtplib.SMTP_SSL("smtp.gmail.com")
+    server.login(MY_ADDRESS, PASSWORD)
+    msg = msg.as_string()
+    server.sendmail(MY_ADDRESS, user_mail, msg)
+
 
 ################################
 # Conf to edit
