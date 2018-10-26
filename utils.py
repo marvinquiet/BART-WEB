@@ -70,9 +70,18 @@ There are some agreements and conditions of using BART:
     msg.attach(MIMEText(message, 'plain'))
     
     server = smtplib.SMTP_SSL("smtp.gmail.com")
-    server.login(MY_ADDRESS, PASSWORD)
-    msg = msg.as_string()
-    server.sendmail(MY_ADDRESS, user_mail, msg)
+    try:
+        server.login(MY_ADDRESS, PASSWORD)
+        msg = msg.as_string()
+        server.sendmail(MY_ADDRESS, user_mail, msg)
+    except smtplib.SMTPAuthenticationError:
+        return False, "username of password is wrong"
+    except:
+        return False, "errors in sending key to e-mail..."
+    finally:
+        server.quit()  # finally close the connection with server
+
+    return True, "send e-mail to user successfully..."
 
 
 ################################

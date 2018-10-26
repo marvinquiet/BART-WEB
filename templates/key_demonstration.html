@@ -90,10 +90,16 @@
       function pop_up_func() {
           var btn = document.getElementById('get_result');
           var key = prompt("Please enter the key.", btn.value);
-          console.log(key);
-          if (key == null || key == "") {
+          if (key == "") {
               alert("You need to enter your key.");
-          } else {
+              event.preventDefault();
+              event.stopPropagation();
+
+              btn.value = key;
+          } else if (key == null){
+
+          }
+          else {
               btn.value = key;
           }
       }

@@ -37,7 +37,11 @@ def generate_user_key(username, jobname):
     # send key to user's e-mail
     if username != "":
         logger.info("Init project: send e-mail to {} for {}".format(user_mail, key))
-        utils.send_user_key(user_mail, key)
+        send_flag, send_msg = utils.send_user_key(user_mail, key)
+        if send_flag:
+            logger.info("Init project: " + send_msg)
+        else:
+            logger.error("Init project:" + send_msg)
         
     return key
 
@@ -62,10 +66,9 @@ def init_project_path(user_key):
     if not os.path.exists(user_log_file_path):
         with open(user_log_file_path, 'w'): pass 
     
-
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
-    utils.send_sqs_message(user_key)
+    # utils.send_sqs_message(user_key)
 
     return user_path
 
