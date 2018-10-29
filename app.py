@@ -156,9 +156,9 @@ def show_key():
 
             if do_process.is_user_key_exists(user_key):
                 logger.info("Retrieve result: user exists.")
-
                 return redirect(url_for('get_result', user_key=user_key))
             else:
+                err_msg = "Job does not exist, make sure you enter the right key."
                 return render_template('key_demonstration.html', key=request.args['key'])
     else:
         return render_template('key_demonstration.html', key=user_key)

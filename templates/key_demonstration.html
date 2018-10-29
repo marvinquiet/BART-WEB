@@ -94,10 +94,9 @@
               alert("You need to enter your key.");
               event.preventDefault();
               event.stopPropagation();
-
-              btn.value = key;
           } else if (key == null){
-
+              event.preventDefault();
+              event.stopPropagation();
           }
           else {
               btn.value = key;

@@ -35,3 +35,8 @@ html {
   code {
     font-size: 80%;
   }
+
+  #nav a:hover{
+    background-color: #44597F;
+    background-image: none; 
+  }

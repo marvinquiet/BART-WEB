@@ -15,7 +15,9 @@
 
           <!-- Home -->
           <li class="nav-item active">
-            <a class="nav-link" >Result</a>
+            <form method=post enctype=multipart/form-data id="resultForm" novalidate></form>
+                <a class="nav-link" href onclick="pop_up_func()">Result</a>
+            </form>
           </li>
   
           <!-- About -->
@@ -37,4 +39,21 @@
       </div>
     </nav>
   </header>
+<!--   
+  <script type="text/javascript">
+    function pop_up_func() {
+        $("#myModal").modal();
+        var btn = document.getElementById('get_result');
+        var key = prompt("Please enter the key.", "");
+        if (key == "") {
+            alert("You need to enter your key.");
+        }
+        else if (key == null){
+
+        } 
+        else {
+            btn.value = key;
+        }
+    }
+  </script> -->
 {% endblock %}

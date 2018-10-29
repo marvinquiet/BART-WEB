@@ -199,7 +199,7 @@ def do_marge_bart(user_data):
         fopen.write('''#!/bin/bash
 #SBATCH -n 1
 #SBATCH --mem=100000
-#SBATCH -t 48:00:00
+#SBATCH -t 3:00:00
 #SBATCH -p standard
 #SBATCH -A zanglab
 source ~/.bashrc
