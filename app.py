@@ -93,6 +93,27 @@ def index():
                             fopen.write(gene)
                     user_data['files'].append(gene_list_file)
 
+            if request.form['dataType'] == 'ChIP-seq' or \
+                (request.form['dataType'] == 'Geneset' and request.form['geneType'] == 'geneFile'):	
+                # process what user has uploaded	
+                if 'uploadFiles' not in request.files:	
+                    flash('Please choose a file')	
+                    return redirect(request.url)	
+                files = request.files.getlist('uploadFiles')	
+                # if user does not select file, browser also	
+                # submit an empty part without filename	
+                for file in files:	
+                    if file.filename == '':	
+                        flash('One of the files does not have a legal file name.')	
+                        return redirect(request.url)	
+                    # make sure the suffix of filename in [.txt, .bam, .bed] 	
+                    if file and allowed_file(file.filename, allowed_extensions):	
+                        filename = secure_filename(file.filename)	
+                        upload_path = os.path.join(user_path, 'upload')	
+                        filename_abs_path = os.path.join(upload_path, filename)	
+                        file.save(filename_abs_path)	
+                        user_data['files'].append(filename) # only save file name, since the uploaded path is always the same
+
             do_process.init_user_config(user_path, user_data)
             marge_bart.do_marge_bart(user_data)
             # post key 
