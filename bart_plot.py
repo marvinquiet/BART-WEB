@@ -135,7 +135,7 @@ def main():
         for bart_file in files:
             if bart_auc_ext in bart_file:
                 bart_auc_file = os.path.join(root, bart_file)
-                user_file_name = bart_file.strip(bart_auc_ext)
+                user_file_name = bart_file.replace(bart_auc_ext, '')
                 auc_result_dict[user_file_name] = {}
                 auc_result_dict[user_file_name]['auc'] = bart_auc_file
 
@@ -144,7 +144,7 @@ def main():
         for bart_file in files:
             if bart_res_ext in bart_file:
                 bart_result_file = os.path.join(root, bart_file)
-                user_file_name = bart_file.strip(bart_res_ext)
+                user_file_name = bart_file.replace(bart_res_ext, '')
                 if user_file_name not in auc_result_dict:
                     auc_result_dict[user_file_name] = {}
                     # something definitely went wrong if no _auc.txt files!

@@ -6,6 +6,12 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <script type="text/JavaScript">
+      function AutoRefresh( t ) {
+        setTimeout("location.reload(true);", t);
+      }
+   </script>
+
     <title>BART result</title>
 
     <!-- jQuery -->
@@ -24,7 +30,7 @@
 
   </head>
 
-  <body class="bg-light">
+  <body class="bg-light" onload="JavaScript:AutoRefresh(600000);">
   {% include "header.html" %}
     <div class="container">
       <div class="row">
@@ -39,20 +45,6 @@
             <div id="procLog" class="col-md-12 mb-3" hidden>
               <h5 class="mb-3">Processing log</h5>
               <textarea id="procLogText" class="form-control" name="procLogText" rows="10" disabled></textarea>
-                <!-- <h5 class="mb-3">PROCEDURE LOG</h5> -->
-                <!-- {% for log in results['proc_log'] %}
-                  <a href="{{ log[1] }}" download> {{ log[0] }}</a> <br />
-                {% endfor %} -->
-                <!-- <div id="procLogTextDiv" class="card-deck mb-3" hidden>
-                  <div class="card mb-4 shadow-sm">
-                    <div class="card-header">
-                      <h4 class="my-0 font-weight-normal">Processing log</h4>
-                    </div>
-                    <div id="procLogText" class="card-body">
-    
-                    </div>
-                  </div>
-                </div> -->
             </div>
 
           <div id="userConfig" class="col-md-12 mb-3">

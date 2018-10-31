@@ -13,10 +13,11 @@
             <a class="nav-link" href="/">Home</a>
           </li>
 
-          <!-- Home -->
+          <!-- Result -->
           <li class="nav-item active">
-            <form method=post enctype=multipart/form-data id="resultForm" novalidate></form>
-                <a class="nav-link" href onclick="pop_up_func()">Result</a>
+            <form class="nav-item active" id="navbarForm" method=post enctype=multipart/form-data>
+                <input class="form-control" type="hidden" id="navbar_input" name="navbar_button" value="" />
+                <a class="nav-link" href="#" onclick="navbar_pop()">Result</a>
             </form>
           </li>
   
@@ -39,21 +40,24 @@
       </div>
     </nav>
   </header>
-<!--   
+  
   <script type="text/javascript">
-    function pop_up_func() {
-        $("#myModal").modal();
-        var btn = document.getElementById('get_result');
+    function navbar_pop() {
+        var navbarResult = document.getElementById('navbar_input');
         var key = prompt("Please enter the key.", "");
         if (key == "") {
-            alert("You need to enter your key.");
+          navbarResult.value = "";
+          alert("You need to enter your key.");
         }
         else if (key == null){
 
         } 
         else {
-            btn.value = key;
+          console.log(key)
+          navbarResult.value = key;
+          document.getElementById('navbarForm').submit();
         }
+        
     }
-  </script> -->
+  </script>
 {% endblock %}

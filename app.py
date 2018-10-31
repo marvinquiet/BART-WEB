@@ -15,43 +15,11 @@ PROJECT_DIR = os.path.dirname(__file__)
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# @app.route('/', methods=['GET', 'POST'])
-# def index():
-#     if request.method == 'POST':
-#         # predict data button
-#         if request.form['index_submit'] == 'predict_data':
-#             return redirect(url_for('get_config'))
-#         # retrieve result button
-#         else:
-#             user_key = request.form['index_submit']
-
-#             # when key is null, refresh the website
-#             if user_key == "":
-#                 return render_template('index.html')
-
-#             logger.info("Retrieve result: for " + user_key)
-
-#             if do_process.is_user_key_exists(user_key):
-#                 logger.info("Retrieve result: user exists.")
-
-#                 return redirect(url_for('get_result', user_key=user_key))
-#             else:
-#                 logger.error("Retrieve result: did not find the result.")
-
-#                 err_msg = "The key does not exist, make sure you enter the right key"
-#                 return redirect(url_for('error_page', msg=err_msg))
-#     return render_template('index.html')
-
-
-# @app.route('/config-data', methods=['GET', 'POST'])
-# def get_config():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # # when "Predict your own data" button is clicked
-        # if request.form['start_prediction'] == 'start_prediction':
-        # submit
-        if request.form['index_submit'] == 'predict_data':
+        # submit job button
+        if 'submit_button' in request.form:
             # fetch user name and generate unique project path
             username = request.form['username']
             jobname = request.form['jobname']
@@ -118,11 +86,10 @@ def index():
             marge_bart.do_marge_bart(user_data)
             # post key 
             return redirect(url_for('show_key', key=user_key))
-        
-        # get result
-        else:
-            user_key = request.form['index_submit']
 
+        # get result button
+        if 'result_button' in request.form:
+            user_key = request.form['result_button']
             # when key is null, refresh the website
             if user_key == "":
                 return render_template('index.html')
@@ -138,53 +105,119 @@ def index():
 
                 err_msg = "Job does not exist, make sure you enter the right key."
                 return redirect(url_for('error_page', msg=err_msg))
+
+        # navbar result button
+        if 'navbar_button' in request.form:
+            logger.info("Retrieve result...")
+            user_key = request.form['navbar_button']  
+
+            if do_process.is_user_key_exists(user_key):
+                logger.info("Retrieve result: user exists.")
+                return redirect(url_for('get_result', user_key=user_key))
+            else:
+                logger.error("Retrieve result: did not find the result.")
+                err_msg = "Job does not exist, make sure you enter the right key."
+                return redirect(url_for('error_page', msg=err_msg))
     return render_template('index.html')
-    # return render_template('get_data_config.html')
 
-
-@app.route('/about')
+@app.route('/about', methods=['GET', 'POST'])
 def about():
+    if request.method == 'POST':
+        # navbar result button
+        if 'navbar_button' in request.form:
+            logger.info("Retrieve result...")
+            user_key = request.form['navbar_button']  
+
+            if do_process.is_user_key_exists(user_key):
+                logger.info("Retrieve result: user exists.")
+                return redirect(url_for('get_result', user_key=user_key))
+            else:
+                logger.error("Retrieve result: did not find the result.")
+                err_msg = "Job does not exist, make sure you enter the right key."
+                return redirect(url_for('error_page', msg=err_msg))
+
     return render_template('about.html')
 
-@app.route('/help')
+@app.route('/help', methods=['GET', 'POST'])
 def help():
+    if request.method == 'POST':
+        # navbar result button
+        if 'navbar_button' in request.form:
+            logger.info("Retrieve result...")
+            user_key = request.form['navbar_button']  
+
+            if do_process.is_user_key_exists(user_key):
+                logger.info("Retrieve result: user exists.")
+                return redirect(url_for('get_result', user_key=user_key))
+            else:
+                logger.error("Retrieve result: did not find the result.")
+                err_msg = "Job does not exist, make sure you enter the right key."
+                return redirect(url_for('error_page', msg=err_msg))
+
     return render_template('help.html')
 
 @app.route('/result', methods=['GET', 'POST'])
 def get_result():
-    user_key = request.args['user_key']
-    user_data = do_process.get_user_data(user_key)
+    if request.method == 'POST':
+        # navbar result button
+        if 'navbar_button' in request.form:
+            logger.info("Retrieve result...")
+            user_key = request.form['navbar_button']  
 
-    logger.info('Get result: for ' + user_key)
-    logger.info(user_data)
+            if do_process.is_user_key_exists(user_key):
+                logger.info("Retrieve result: user exists.")
+                return redirect(url_for('get_result', user_key=user_key))
+            else:
+                logger.error("Retrieve result: did not find the result.")
+                err_msg = "Job does not exist, make sure you enter the right key."
+                return redirect(url_for('error_page', msg=err_msg))
 
-    results = do_process.generate_results(user_data)
-    return render_template('result_demonstration.html', results=results)
+    else:
+        user_key = request.args['user_key']
+        user_data = do_process.get_user_data(user_key)
+
+        logger.info('Get result: for ' + user_key)
+        logger.info(user_data)
+
+        results = do_process.generate_results(user_data)
+        return render_template('result_demonstration.html', results=results)
 
 
 @app.route('/key', methods=['GET', 'POST'])
 def show_key():
     user_key = request.args['key']
     if request.method == 'POST':
-        if request.form['index_submit']:
-            user_key = request.form['index_submit']
-
+        if 'result_button' in request.form:
+            user_key = request.form['result_button']
             # when key is null, refresh the website
             if user_key == "":
                 return render_template('key_demonstration.html', key=request.args['key'])
 
             logger.info("Retrieve result: for " + user_key)
+            if do_process.is_user_key_exists(user_key):
+                logger.info("Retrieve result: user exists.")
+                return redirect(url_for('get_result', user_key=user_key))
+            else:
+                logger.error("Retrieve result: did not find the result.")
+                err_msg = "Job does not exist, make sure you enter the right key."
+                return render_template('key_demonstration.html', key=request.args['key'])
+
+        # navbar result button
+        if 'navbar_button' in request.form:
+            logger.info("Retrieve result...")
+            user_key = request.form['navbar_button']  
 
             if do_process.is_user_key_exists(user_key):
                 logger.info("Retrieve result: user exists.")
                 return redirect(url_for('get_result', user_key=user_key))
             else:
+                logger.error("Retrieve result: did not find the result.")
                 err_msg = "Job does not exist, make sure you enter the right key."
-                return render_template('key_demonstration.html', key=request.args['key'])
-    else:
-        return render_template('key_demonstration.html', key=user_key)
+                return redirect(url_for('error_page', msg=err_msg))
+    
+    return render_template('key_demonstration.html', key=user_key)
 
-@app.route('/error')
+@app.route('/error', methods=['GET', 'POST'])
 def error_page():
     err_msg = request.args['msg']
     return render_template('error.html', msg=err_msg)
