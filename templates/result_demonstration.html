@@ -123,7 +123,7 @@
               document.getElementById("procLogText").innerHTML = xmlhttp.responseText;
             }
           }
-          xmlhttp.open("GET", file, true);
+          xmlhttp.open("GET", file + "?id=" + Math.random(), true);  // make the output up-to-date
           xmlhttp.send();
       }
 
