@@ -197,9 +197,10 @@ def do_marge_bart(user_data):
 
     with open(slurm_file, 'w') as fopen:
         fopen.write('''#!/bin/bash
-#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -n 4
 #SBATCH --mem=100000
-#SBATCH -t 3:00:00
+#SBATCH -t 4:00:00
 #SBATCH -p standard
 #SBATCH -A zanglab
 source ~/.bashrc

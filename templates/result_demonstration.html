@@ -115,12 +115,16 @@
           
           // load processing log
           var logTextDiv = document.getElementById("procLog");
+          var logTextArea = document.getElementById("procLogText");
           logTextDiv.removeAttribute("hidden");
           var file = myResult.proc_log;
           var xmlhttp = new XMLHttpRequest();
           xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-              document.getElementById("procLogText").innerHTML = xmlhttp.responseText;
+              logTextArea.innerHTML = xmlhttp.responseText;
+              setInterval(function(){
+                logTextArea.scrollTop = logTextArea.scrollHeight;
+              }, 1000);
             }
           }
           xmlhttp.open("GET", file + "?id=" + Math.random(), true);  // make the output up-to-date
