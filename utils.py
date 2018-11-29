@@ -56,7 +56,7 @@ def send_user_key(user_mail, user_key):
     message = '''
 Hi there,
 
-Thank you for using BART! 
+Thank you for using BART!
 
 Here is your key: {}
 
