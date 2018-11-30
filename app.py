@@ -36,7 +36,7 @@ def index():
             user_data['dataType'] = request.form['dataType']
             user_data['assembly'] = request.form['species']
             user_data['files'] = []
-        
+
             # process input data
             if user_data['dataType'] == "ChIP-seq":
                 allowed_extensions = set(['bam', 'bed'])

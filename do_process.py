@@ -33,7 +33,7 @@ def generate_user_key(username, jobname):
     key = username + '_' + str(tstamp)
 
     logger.info("Init project: user key is {}...".format(key))
-    
+
     # send key to user's e-mail
     if username != "":
         logger.info("Init project: send e-mail to {} for {}".format(user_mail, key))
@@ -42,7 +42,6 @@ def generate_user_key(username, jobname):
             logger.info("Init project: " + send_msg)
         else:
             logger.error("Init project:" + send_msg)
-        
     return key
 
 
@@ -64,8 +63,8 @@ def init_project_path(user_key):
     # create the log file in docker
     user_log_file_path = os.path.join(user_log_path, 'mb_pipe.log')
     if not os.path.exists(user_log_file_path):
-        with open(user_log_file_path, 'w'): pass 
-    
+        with open(user_log_file_path, 'w'): pass
+
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
     utils.send_sqs_message(user_key)
