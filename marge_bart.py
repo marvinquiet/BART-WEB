@@ -271,39 +271,46 @@ def main():
     user_data = do_process.get_user_data(user_key)
     user_path = user_data['user_path']
     logger.info("Job Finish: clean up the data for {}...".format(user_key))
-    if 'status' in user_data and user_data['status'] == 'Error':
-        logger.error("Job Finish: user {} job error, check log!".format(user_key))
-        return
-
     logger.info("Job Check: whether job succeeded... ")
+    # check whether the marge or bart path exists
+    if user_data['marge']:
+        if is_marge_done(user_path):
+            user_data['status'] = 'Done'
+        else:
+            user_data['status'] = 'Error'
+
+    if user_data['bart']:
+        if is_bart_done(user_path):
+            user_data['status'] = 'Done'
+        else:
+            user_data['status'] = 'Error'
+
     logger.info("Job Finish: change user.config path to docker... ")
     logger.info("Job Finish: change user.config status to Done... ")
     new_user_path = user_path.replace(SLURM_PROJECT_DIR, DOCKER_DIR)
     user_data['user_path'] = new_user_path
-    user_data['status'] = 'Done'
     do_process.init_user_config(user_path, user_data)
 
-    # delete user in queue
+    # delete user in queue, change the status of user in queue
     usercase_dir = os.path.dirname(user_path)
     user_queue_file = os.path.join(usercase_dir, 'user_queue.yaml')
-    with open(user_queue_file, 'r') as fqueue:
-        queue_data = yaml.load(fqueue)
+    # with open(user_queue_file, 'r') as fqueue:
+    #     queue_data = yaml.load(fqueue)
 
-    logger.info("Job Finish: delete user in queue... ")
-    if queue_data and user_key in queue_data: # delete the user whose job is done
-        logger.info("Job Finish: Delete {} successfully...".format(user_key))
-        del queue_data[user_key]
+    # logger.info("Job Finish: delete user in queue... ")
+    # if queue_data and user_key in queue_data: # delete the user whose job is done
+    #     logger.info("Job Finish: Delete {} successfully...".format(user_key))
+    #     del queue_data[user_key]
 
-        with open(user_queue_file, 'w') as fqueue:
-            logger.info("Job Finish: save to user queue... ")
-            if len(queue_data) > 0:
-                yaml.dump(queue_data, fqueue, default_flow_style=False)
-    else:
-        logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
+    #     with open(user_queue_file, 'w') as fqueue:
+    #         logger.info("Job Finish: save to user queue... ")
+    #         if len(queue_data) > 0:
+    #             yaml.dump(queue_data, fqueue, default_flow_style=False)
+    # else:
+    #     logger.error('Job Finish: User {} not in queue! Please check!'.format(user_key))
 
 
     # move marge results to download
-    
     if user_data['marge']:
         logger.info('Job Finish: move marge result to download...')
         import shutil
@@ -317,8 +324,6 @@ def main():
                         src_file = os.path.join(root, file)
                         dest_file = os.path.join(user_path, 'download/' + file)
                         shutil.copyfile(src_file, dest_file)
-
-            
 
 if __name__ == '__main__':
     main()

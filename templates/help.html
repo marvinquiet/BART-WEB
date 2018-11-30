@@ -21,18 +21,21 @@
   {% include "header.html" %}
     <div class="container">
         <div class="py-3">
-            <h2>Help page</h2>
-            <h4><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h4>
+            <h3><font color="#002F6C">How to use BART</font></h3>
+            <h5>
+                There are only 3 steps using it:
+            </h5>
+            <p>
+               1. Is your data from human or mouse?
+               <br>
+               2. Are you going to upload an official gene symbol list or a mapped reads data file?
+               <br>
+               3. Upload your data and submit the job! Record the job key, and retrieve your result later.
+            </p>
+            
         </div>
 
-        <footer class="my-5 pt-5 text-muted text-center text-small">
-            <p class="mb-1">&copy; 2017-2018 Chongzhi Zang Lab at the University of Virginia</p>
-            <ul class="list-inline">
-            <li class="list-inline-item"><a href="#">Privacy</a></li>
-            <li class="list-inline-item"><a href="#">Terms</a></li>
-            <li class="list-inline-item"><a href="#">Support</a></li>
-            </ul>
-        </footer>
+        {% include "footer.html" %}
     </div>
 
     <!-- Bootstrap core JavaScript

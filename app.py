@@ -9,7 +9,6 @@ import marge_bart
 from utils import model_logger as logger
 
 PROJECT_DIR = os.path.dirname(__file__)
-# ALLOWED_EXTENSIONS = set(['txt', 'bam', '.bed'])
 
 # related to flask app
 app = Flask(__name__)

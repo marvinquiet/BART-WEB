@@ -122,6 +122,10 @@ def main():
     import do_process
     user_data = do_process.get_user_data(user_key)
     user_path = user_data['user_path']
+    
+    # if no need to run bart
+    if not user_data['bart']:
+        return
 
     bart_result_file = ''
     bart_auc_file = ''

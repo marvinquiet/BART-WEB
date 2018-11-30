@@ -46,7 +46,7 @@ def main():
     jobs = []
     logger.info("Pipeline Marge: execute marge... ")
     for i in range(repeat_times):
-        time.sleep(30)
+        # time.sleep(30) 
         marge_output_dir = os.path.join(user_path, 'marge_{}'.format(i))
         p = multiprocessing.Process(target=marge_bart.exe_marge, args=(marge_output_dir, ))
         jobs.append(p)
@@ -103,8 +103,8 @@ def main():
     logger.info("Pipeline Marge: copy marge_data to download directory...")
 
     # if bart
-    logger.info(user_data)
     if bart_flag:
+        logger.info("Pipeline Bart: Start executing bart...")
         marge_bart.exe_bart_geneset(user_data)
 
 
