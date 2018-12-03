@@ -17,5 +17,6 @@ bart/
 marge/
 
 testdata/
-
 log/
+
+conf.yaml

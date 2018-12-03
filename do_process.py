@@ -6,7 +6,6 @@ import shutil
 import json
 import yaml
 
-
 import utils
 import marge_bart
 from utils import model_logger as logger
@@ -19,7 +18,6 @@ def generate_user_key(username, jobname):
 
     import time
     tstamp = time.time()
-    user_mail = username
 
     if username == '' and jobname == '':
         logger.info("Init project: user does not input e-mail or jobname...")
@@ -33,17 +31,7 @@ def generate_user_key(username, jobname):
     key = username + '_' + str(tstamp)
 
     logger.info("Init project: user key is {}...".format(key))
-
-    # send key to user's e-mail
-    if username != "":
-        logger.info("Init project: send e-mail to {} for {}".format(user_mail, key))
-        send_flag, send_msg = utils.send_user_key(user_mail, key)
-        if send_flag:
-            logger.info("Init project: " + send_msg)
-        else:
-            logger.error("Init project:" + send_msg)
     return key
-
 
 def init_project_path(user_key):
     logger.info("Init project: init project path for {}...".format(user_key))
@@ -59,11 +47,6 @@ def init_project_path(user_key):
     utils.create_dir(user_download_path)
     utils.create_dir(user_log_path)
     utils.create_dir(bart_output_path)
-
-    # create the log file in docker
-    user_log_file_path = os.path.join(user_log_path, 'mb_pipe.log')
-    if not os.path.exists(user_log_file_path):
-        with open(user_log_file_path, 'w'): pass
 
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
@@ -109,21 +92,21 @@ def config_results(results, user_data):
     results['user_conf']['Job_key'] = user_data['user_key']
     results['user_conf']['Species'] = user_data['assembly']
     results['user_conf']['Input_data_type'] = user_data['dataType']
+    # if user_data['gene_exp_type'] != "":
+    #     results['user_conf']['GeneExpressionType'] = user_data['gene_exp_type']
+    # if user_data['gene_id_type'] != "":
+    #     results['user_conf']['GeneIdType'] = user_data['gene_id_type']
+
     results['user_conf']['Input_data'] = ""
     for index, file_path in enumerate(user_data['files']):
         results['user_conf']['Input_data'] += str(file_path.split('/')[-1])
         if index != len(user_data['files'])-1:
             results['user_conf']['Input_data'] += ', '
-
+        
 def generate_results(user_data):
     results = {}
     config_results(results, user_data)
     results['done'] = True
-
-    # slurm project dir
-    SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/bart'   # hard-code path 
-    DOCKER_DIR = '/var/www/apache-flask'
-    docker_user_path = user_data['user_path'].replace(SLURM_PROJECT_DIR, DOCKER_DIR)
 
     # dataType: ChIP-seq, Geneset, Both
     # prediction_type: rp, cis, tf, eh
@@ -133,17 +116,6 @@ def generate_results(user_data):
     logger.info("Generate results: generate result for {}...".format(user_data['user_key']))
     if user_data['marge'] and not marge_bart.is_marge_done(user_data['user_path']):
         results['done'] = False
-
-        logger.info("Generate results: log for user to check procedure...")
-        proc_log = 'mb_pipe.log'
-        src_log = os.path.join(docker_user_path, 'log/'+proc_log)
-        results['proc_log'] = ""
-        if os.path.exists(src_log):
-            dest_file_url = '/log/%s___%s' % (user_data['user_key'], proc_log)
-            logger.info('Generate results: add log to results, show it in result_demonstration...')
-            results['proc_log'] = dest_file_url
-        else:
-            logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
         return results
 
     logger.info("Generate results: generate marge file results...")
@@ -152,18 +124,6 @@ def generate_results(user_data):
 
     if user_data['bart'] and not marge_bart.is_bart_done(user_data['user_path']):
         results['done'] = False
-
-        # oh disgusting, I am repeating myself....
-        logger.info("Generate results: log for user to check procedure...")
-        proc_log = 'mb_pipe.log'
-        src_log = os.path.join(docker_user_path, 'log/'+proc_log)
-        results['proc_log'] = ""
-        if os.path.exists(src_log):
-            dest_file_url = '/log/%s___%s' % (user_data['user_key'], proc_log)
-            logger.info('Generate results: add log to results, show it in result_demonstration...')
-            results['proc_log'] = dest_file_url
-        else:
-            logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
         return results
 
     logger.info("Generate results: generate bart file results...")
@@ -171,6 +131,20 @@ def generate_results(user_data):
     results.update(bart_file_results)
     results.update(bart_chart_results)
     results.update(bart_table_results)
+
+    logger.info("Generate results: log for user to check procedure...")
+    user_path = user_data['user_path']
+    proc_log = 'mb_pipe.log'
+    src_log = os.path.join(user_path, 'log/'+proc_log)
+    results['proc_log'] = []
+    if os.path.exists(src_log):
+        # dest_file = os.path.join(user_path, 'download/'+proc_log)
+        # shutil.copyfile(src_log, dest_file)
+        # dest_file_url = '/download/%s___%s' % (user_data['user_key'], proc_log)
+        logger.info('Generate results: add log to results, show it in result_demonstration...')
+        results['proc_log'].append(src_log)
+    else:
+        logger.error("Generate results: mb_pipe.log does not exist in {}/log/mb_pipe.log ! ".format(user_data['user_key']))
 
     return results  
 
@@ -201,6 +175,9 @@ def generate_marge_file_results(user_data):
         for file in files:
             for file_type in marge_suffix_type:
                 if file_type in str(file):
+                    # src_file = os.path.join(root, file)
+                    # dest_file = os.path.join(user_path, 'download/' + file)
+                    # shutil.copyfile(src_file, dest_file)
                     dest_file_url = '/download/%s___%s' % (user_data['user_key'], file)
                     marge_file_results['marge_result_files'].append((file, dest_file_url))
 
@@ -252,6 +229,9 @@ def generate_bart_file_results(user_data):
                     bart_file_results['bart_result_files'].append((bart_file, dest_file_url))
                     # bart table results for demonstration
                     bart_table_results['bartResult'] = parse_bart_results(src_file)
+
+                    # just finding chart files in bart_output/plot
+                    # bart_chart_results['bart_chart_files'] = plot_top_tf(bart_df, bart_output_dir, AUCs)
         
     return bart_file_results, bart_chart_results, bart_table_results
 

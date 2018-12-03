@@ -11,7 +11,12 @@
 
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
-    
+
+    <!-- First-time use -->
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs-rtl.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs-rtl.min.css" rel="stylesheet"> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/introjs.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='sticky-footer-navbar.css') }}" rel="stylesheet">
@@ -30,8 +35,8 @@
       <!-- <img class="mx-auto mb-4" src="{{ url_for('static', filename='how_marge_bart_works.png') }}" alt="" width="800"> -->
       <div class="row">
         <div class="col-md-12 order-md-1">
-          <h1>Sorry for the inconvenience, we are currently under service maintenance. Please try it later.</h1>
-          <br>
+          <!-- <h1>Sorry for the inconvenience, we are currently under service maintenance. Please try it later.</h1>
+          <br> -->
 
           <h2 >BART</h2>
           <h5 ><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h5>
@@ -44,11 +49,13 @@
       <hr class="mb-3">
 
       <div class="row">
-        <div class="col-md-8 order-md-1">
+        <div class="col-md-12 order-md-1">
           <form method=post enctype=multipart/form-data id="resultForm" novalidate>
             <h4 style="display:inline-block; vertical-align: middle;">Run BART here</span></h4>
             <button id="get_result" class="btn btn-link" type="submit" name="result_button" onclick="pop_up_func()">get result here</button>
           </form>
+
+          <button class="btn btn-link" href="javascript:void(0);" onclick="javascript:introJs().start();">Show me how to use</button>
 
           <!-- result Modal -->
           <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -74,9 +81,9 @@
           <form class="needs-validation" method=post enctype=multipart/form-data novalidate>
             <div class="row">
               <div class="col-md-2 mb-3">
-                <p class="mb-3" id="assembly"><b>Species:</b></p>
+                <p class="mb-3" id="assembly" ><b>Species:</b></p>
               </div>
-              <div class="col-md-10 mb-3">
+              <div class="col-md-10 mb-3" data-step="1" data-intro="Choose your species first.">
                 <div class="custom-control custom-radio">
                   <input id="human" name="species" value="hg38" type="radio" class="custom-control-input" checked required>
                   <label class="custom-control-label" for="human">Human (hg38)</label>
@@ -93,7 +100,7 @@
               <div class="col-md-2 mb-3">
                 <p class="mb-3" id="assembly"><b>Input data type:</b></p>
               </div>
-              <div class="col-md-10 mb-3">
+              <div class="col-md-10 mb-3" data-step="2" data-intro="And choose the data type you are going to upload.">
                 <div class="custom-control custom-radio">
                   <input type="radio" id="genelist" name="dataType" value="Geneset" class="custom-control-input" checked required>
                   <label class="custom-control-label" for="genelist">Genelist <img src="{{ url_for('static', filename='question-mark.svg') }}" style="width:16px; vertical-align:middle" title="Genelist better contains more than 100 genes."/> </label>
@@ -110,8 +117,8 @@
               <div class="col-md-2">
                 <p class="mb-3" id="assembly"><b>Input:</b></p>
               </div>
-              <div class="col-md-10">
-                <div class="row">
+              <div class="col-md-10" data-step="3" data-intro="Upload your data here!">
+                <div class="row" >
                   <div class="col-md-2">
                     <div id="geneFileRadio" class="custom-control custom-radio">
                       <input type="radio" id="geneFile" name="geneType" value="geneFile" class="custom-control-input" checked required>
@@ -168,7 +175,7 @@
               <div class="col-md-2 mb-3">
               </div>
               <div class="col-md-2 mb-3">
-                <button class="btn btn-primary btn-lg btn-block btn-sm" type="submit" name="submit_button" value="predict_data">Submit</button>
+                <button data-step="4" data-intro="Let's submit!" data-disable-interaction="1" class="btn btn-primary btn-lg btn-block btn-sm" type="submit" name="submit_button" value="predict_data">Submit</button>
               </div>
               <div class="col-md-2 mb-3">
                 <button id="reset" class="btn btn-secondary btn-lg btn-block btn-sm" type="button" name="reset" value="reset" onClick="window.location.reload()">Reset</button>
@@ -195,7 +202,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='holder.min.js') }}"></script>
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/intro.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/2.9.3/intro.min.js"></script>
 
     
     <script type="text/javascript">

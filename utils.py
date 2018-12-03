@@ -44,17 +44,19 @@ def send_sqs_message(directory):
 
 
 # send user key to user e-mail
-def send_user_key(user_mail, user_key):
+def send_user_key(user_mail, user_key, email_type):
     MY_ADDRESS = "zanglab.service@gmail.com"
     PASSWORD = "ZangLab2018"
 
     msg = MIMEMultipart()
     msg['From'] = MY_ADDRESS
     msg['To'] = user_mail
-    msg['Subject'] = "BART key"
-    # better change to a file template later
-    message = '''
-Hi there,
+
+    if email_type == 'Submit':
+        msg['Subject'] = "BART key"
+        # better change to a file template later
+        message = '''
+Hi,
 
 Thank you for using BART!
 
@@ -67,6 +69,26 @@ There are some agreements and conditions of using BART:
 2. citation
 3. ...
 '''.format(user_key, 'http://bartweb.uvasomrc.io/result?user_key='+user_key)
+    elif email_type == 'Done':
+        msg['Subject'] = "BART result"
+        message = '''
+Congratulations! Your job has finished successfuly!
+
+Please visit this link: {}
+'''.format('http://bartweb.uvasomrc.io/result?user_key='+user_key)
+    elif email_type == 'Error':
+        msg['Subject'] = "BART error"
+        message = '''
+Unfortunately, your job ends with errors.
+
+Please check whether you chose the correct species or uploaded the required format file.
+
+Or please contact us at wm9tr@virginia.edu with your key: {}
+
+'''.format(user_key)
+    else:
+        pass
+
     msg.attach(MIMEText(message, 'plain'))
     
     server = smtplib.SMTP_SSL("smtp.gmail.com")
