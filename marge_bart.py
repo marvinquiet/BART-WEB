@@ -24,7 +24,7 @@ MARGE_REPEAT_TIMES = 3
 SLURM_PROJECT_DIR = '' 
 DOCKER_DIR = ''
 # change to absolute path
-with open(os.path.join(PROJECT_DIR, 'conf.yaml'), 'r') as fyaml:
+with open(os.path.join(PROJECT_DIR, 'usercase/conf.yaml'), 'r') as fyaml:
     try: 
         conf_data = yaml.load(fyaml)
         BART_DIR = conf_data['BART']['project_path']
