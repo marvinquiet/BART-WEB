@@ -21,3 +21,6 @@ UCSC_tools:
     bedGraphToBigWig: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bedGraphToBigWig
     bigWigAverageOverBed: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bigWigAverageOverBed
     bigWigSummary: /Users/marvin/Projects/flask_playground/MARGE/marge_ucsc_tools/bigWigSummary
+
+SLURM_path: /Users/marvin/Projects/flask_playground
+DOCKER_path: /Users/marvin/Projects/flask_playground
