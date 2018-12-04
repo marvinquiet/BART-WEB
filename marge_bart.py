@@ -176,7 +176,7 @@ def is_bart_done(user_path):
         res_file_path = os.path.join(user_path, 'download/bart_output/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
         if not os.path.exists(res_file_path):
             return False
-    
+
     return True
 
 
@@ -198,7 +198,7 @@ def do_marge_bart(user_data):
 
     with open(slurm_file, 'w') as fopen:
         fopen.write('''#!/bin/bash
-#SBATCH -n 1
+#SBATCH -N 1
 #SBATCH -n 4
 #SBATCH --mem=100000
 #SBATCH -t 4:00:00
@@ -317,7 +317,7 @@ def main():
 
 
     # move marge results to download
-    
+
     if user_data['marge']:
         logger.info('Job Finish: move marge result to download...')
         import shutil

@@ -43,8 +43,8 @@ def stat_plot(stat, tfs, ID, bart_output_dir):
     figname1 = plotdir+os.sep+'{}_avg_z_p_boxplot'.format(ID)
     plt.savefig(figname1, bbox_inches='tight', pad_inches=0.5)
     plt.close()    
-    
-    
+
+
     #Cumulative Fraction plot
     background = []
     for tf in tfs:
@@ -87,7 +87,7 @@ def plot_top_tf(bart_table_df, bart_output_dir, AUCs):
 
     # which needs to be plot
     tf_intersection = list(set.intersection(*sets))
-    
+
     # get tfs with all AUCs
     tfs = {}
     for tf_key in AUCs.keys():
@@ -118,11 +118,11 @@ def main():
     # get argv
     script_name = sys.argv[0]  
     user_key = sys.argv[1] # user_key is needed
-    
+
     import do_process
     user_data = do_process.get_user_data(user_key)
     user_path = user_data['user_path']
-    
+
     # if no need to run bart
     if not user_data['bart']:
         return

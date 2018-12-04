@@ -14,7 +14,7 @@ def send_mail():
         # iterate the user path
         if not os.path.isdir(user_path):
             continue
-        
+
         user_data = do_process.get_user_data(userkey)
         if 'status' not in user_data: # not yet processing
             continue

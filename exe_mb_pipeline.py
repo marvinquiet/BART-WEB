@@ -72,7 +72,7 @@ def main():
             if not os.path.exists(regression_score_file):
                 logger.error("Pipeline Marge: {} does not exist".format(regression_score_file))
                 continue
-            
+
             with open(regression_score_file, 'r') as fopen:
                 for line in fopen:
                     if 'AUC = ' in line:
@@ -110,4 +110,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

@@ -56,41 +56,36 @@ def send_user_key(user_mail, user_key, email_type):
         msg['Subject'] = "BART key"
         # better change to a file template later
         message = '''
-Hi,
+Hi there,
 
-Thank you for using BART!
+Thank you for using BART web!
 
 Here is your key: {}
 
-And the link to your result: {}
-
-There are some agreements and conditions of using BART:
-1. public use
-2. citation
-3. ...
+When the job is done, you can ge the results through this link: {}
 '''.format(user_key, 'http://bartweb.uvasomrc.io/result?user_key='+user_key)
     elif email_type == 'Done':
         msg['Subject'] = "BART result"
         message = '''
-Congratulations! Your job has finished successfuly!
+Congratulations! Your BART job is done!
 
-Please visit this link: {}
+Please get the results through this link: {}
 '''.format('http://bartweb.uvasomrc.io/result?user_key='+user_key)
     elif email_type == 'Error':
         msg['Subject'] = "BART error"
         message = '''
-Unfortunately, your job ends with errors.
+Unfortunately, your BART job ends with errors.
 
 Please check whether you chose the correct species or uploaded the required format file.
 
-Or please contact us at wm9tr@virginia.edu with your key: {}
+Or reach us at wm9tr@virginia.edu with your key: {}
 
 '''.format(user_key)
     else:
         pass
 
     msg.attach(MIMEText(message, 'plain'))
-    
+
     server = smtplib.SMTP_SSL("smtp.gmail.com")
     try:
         server.login(MY_ADDRESS, PASSWORD)

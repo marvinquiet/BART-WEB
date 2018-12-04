@@ -119,11 +119,7 @@ def generate_results(user_data):
     results = {}
     config_results(results, user_data)
     results['done'] = True
-
-    # slurm project dir	
-    SLURM_PROJECT_DIR = '/sfs/qumulo/qproject/bart'   # hard-code path 	
-    DOCKER_DIR = '/var/www/apache-flask'
-    docker_user_path = user_data['user_path'].replace(SLURM_PROJECT_DIR, DOCKER_DIR)
+    docker_user_path = user_data['user_path'].replace(marge_bart.SLURM_PROJECT_DIR, marge_bart.DOCKER_DIR)
 
     # dataType: ChIP-seq, Geneset, Both
     # prediction_type: rp, cis, tf, eh
