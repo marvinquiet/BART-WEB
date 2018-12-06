@@ -102,7 +102,12 @@
               }
           }
       } else {
-          document.getElementById("resultOutput").innerHTML = "Your job is still being processed...";
+          if ("error" in myResult) {
+            document.getElementById("resultOutput").innerHTML = "Your job ends with error! <br>\
+            Please check whether you chose the right species or uploaded the correct file.";
+          } else {
+            document.getElementById("resultOutput").innerHTML = "Your job is still being processed...";
+          }
           var brTag = document.createElement("br");
           document.getElementById("resultOutputDiv").appendChild(brTag);
           
@@ -117,7 +122,7 @@
               logTextArea.innerHTML = xmlhttp.responseText;
               setInterval(function(){
                 logTextArea.scrollTop = logTextArea.scrollHeight;
-              }, 5000);
+              }, 3000);
             }
           }
           xmlhttp.open("GET", file + "?id=" + Math.random(), true);  // make the output up-to-date

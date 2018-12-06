@@ -130,6 +130,9 @@ def generate_results(user_data):
     if user_data['marge'] and not marge_bart.is_marge_done(user_data['user_path']):
         results['done'] = False
 
+        if 'status' in user_data and (user_data['status'] == 'Error' or user_data['status'] == 'Sent'):
+            results['error'] = True
+
         logger.info("Generate results: log for user to check procedure...")	
         proc_log = 'mb_pipe.log'	
         src_log = os.path.join(docker_user_path, 'log/'+proc_log)	
@@ -148,6 +151,9 @@ def generate_results(user_data):
 
     if user_data['bart'] and not marge_bart.is_bart_done(user_data['user_path']):
         results['done'] = False
+
+        if 'status' in user_data and (user_data['status'] == 'Error' or user_data['status'] == 'Sent'):
+            results['error'] = True
 
         # oh disgusting, I am repeating myself....	
         logger.info("Generate results: log for user to check procedure...")	
