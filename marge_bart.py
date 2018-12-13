@@ -229,7 +229,7 @@ source ~/.bashrc
             for input_file in user_data['files']:
                 input_file_path = os.path.join(slurm_user_path, 'upload/' + input_file)
                 if input_file.endswith(".bam"):
-                    cmd = 'bart profile -i ' + input_file_path + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '  > ' + exe_log_path + ' 2>&1 && \\ \n'
+                    cmd = 'bart profile -i ' + input_file_path + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '/bart_output > ' + exe_log_path + ' 2>&1 && \\ \n'
                     logger.info("Write slurm: " + cmd)
                     fopen.write(cmd)
 
