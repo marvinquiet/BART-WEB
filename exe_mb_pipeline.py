@@ -68,9 +68,13 @@ def main():
             filename = os.path.basename(upload_file)
             filename, file_ext = os.path.splitext(filename)
             regression_score_file = os.path.join(marge_output_dir, 'margeoutput/regression/{}_target_regressionInfo.txt'.format(filename))
-
             if not os.path.exists(regression_score_file):
                 logger.error("Pipeline Marge: {} does not exist".format(regression_score_file))
+                continue
+
+            enhancer_prediction_file = os.path.join(marge_output_dir, 'margeoutput/cisRegions/{}_enhancer_prediction.txt'.format(filename))
+            if not os.path.exists(enhancer_prediction_file) or os.stat(enhancer_prediction_file).st_size == 0:
+                logger.error("Pipeline Marge: {} does not exist".format(enhancer_prediction_file))
                 continue
 
             with open(regression_score_file, 'r') as fopen:

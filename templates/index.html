@@ -263,7 +263,7 @@
                     reader.onload = function() {
                       var fileLength = reader.result.split("\n").length;
                       if (fileLength < 100) {
-                        if (!confirm("The uploaded gene list contains less than 100 genes. The result might not be optimal. Would you like to continue?")) {
+                        if (!confirm("The uploaded gene list contains less than 100 genes. This may cause error or the result may not be optimal. Would you like to continue?")) {
                           event.preventDefault();
                           event.stopPropagation();
                         }
@@ -279,7 +279,7 @@
                   if ( dataElement.value != "") {
                     var dataLength = dataElement.value.split("\n").length;
                     if (dataLength < 100) {
-                      if (!confirm("The uploaded gene list contains less than 100 genes. The result might not be optimal. Would you like to continue?")) {
+                      if (!confirm("The uploaded gene list contains less than 100 genes. This may cause error or the result may not be optimal. Would you like to continue?")) {
                         event.preventDefault();
                         event.stopPropagation();
                       }

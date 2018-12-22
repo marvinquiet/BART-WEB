@@ -6,12 +6,6 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <script type="text/JavaScript">
-      function AutoRefresh( t ) {
-        setTimeout("location.reload(true);", t);
-      }
-   </script>
-
     <title>BART result</title>
 
     <!-- jQuery -->
@@ -30,7 +24,7 @@
 
   </head>
 
-  <body class="bg-light" onload="JavaScript:AutoRefresh(200000);">
+  <body class="bg-light">
   {% include "header.html" %}
     <div class="container">
       <div class="row">
@@ -48,9 +42,9 @@
             </div>
 
           <div id="userConfig" class="col-md-12 mb-3">
-            <h5 class="mb-3">Config</h5>
+            <h5 class="mb-3">Configurations</h5>
             {% for key, value in results['user_conf'].items() %}
-              <p> {{ key }}:{{ value }} </p>
+              <p> {{ key }}: {{ value }} </p>
             {% endfor %}
           </div>
 
@@ -72,11 +66,11 @@
       // if the procedure ran and finished, show RESULTS part
       // Otherwise, show "Your result is still being processed"
       if (myResult.done) {
-          document.getElementById("resultOutput").innerHTML = "BART Transctriptional Factors";
+          document.getElementById("resultOutput").innerHTML = "BART result";
 
           document.getElementById("resultOutputDiv").appendChild(document.createElement("br"));
           var pTag = document.createElement("p");
-          pTag.innerHTML = "<b>Download results as file:</b>";
+          pTag.innerHTML = "<b>Download result files</b>";
           document.getElementById("resultOutputDiv").appendChild(pTag);
 
 
@@ -107,6 +101,19 @@
             Please check whether you chose the right species or uploaded the correct file.";
           } else {
             document.getElementById("resultOutput").innerHTML = "Your job is still being processed...";
+            // refresh for result
+            var time = new Date().getTime();
+            $(document.body).bind("mousemove keypress", function(e) {
+                time = new Date().getTime();
+            });
+            function refresh() {
+                if(new Date().getTime() - time >= 20000) 
+                    window.location.reload(true);
+                else 
+                    setTimeout(refresh, 20000);
+            }
+
+            setTimeout(refresh, 20000);
           }
           var brTag = document.createElement("br");
           document.getElementById("resultOutputDiv").appendChild(brTag);
@@ -122,7 +129,7 @@
               logTextArea.innerHTML = xmlhttp.responseText;
               setInterval(function(){
                 logTextArea.scrollTop = logTextArea.scrollHeight;
-              }, 3000);
+              }, 10000);
             }
           }
           xmlhttp.open("GET", file + "?id=" + Math.random(), true);  // make the output up-to-date
@@ -147,11 +154,11 @@
                 var value = cell.getValue();
                 return "<span style='cursor:pointer; color: blue; text-decoration:underline;' >" + value + "</span>";
             }},
-            {title: "TF-Score", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
-            {title: "P-Value", field: "p_value", align:"center", sorter: "number"},
-            {title: "Z-Score", field: "z_score", align:"center", sorter: "number"},
-            {title: "AUC", field: "max_auc", align:"center", sorter: "number"},
-            {title: "R-Rank", field: "r_rank", align:"center", sorter: "number"},
+            {title: "Test statistic", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc"},
+            {title: "P-value", field: "p_value", align:"center", sorter: "number"},
+            {title: "Z-score", field: "z_score", align:"center", sorter: "number"},
+            {title: "max AUC", field: "max_auc", align:"center", sorter: "number"},
+            {title: "Relative rank", field: "r_rank", align:"center", sorter: "number"},
           ],
 
           // rowClick:function(e, row){ 
