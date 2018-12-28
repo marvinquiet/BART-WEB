@@ -107,13 +107,13 @@
                 time = new Date().getTime();
             });
             function refresh() {
-                if(new Date().getTime() - time >= 20000) 
+                if(new Date().getTime() - time >= 60000) 
                     window.location.reload(true);
                 else 
-                    setTimeout(refresh, 20000);
+                    setTimeout(refresh, 60000);
             }
 
-            setTimeout(refresh, 20000);
+            setTimeout(refresh, 60000);
           }
           var brTag = document.createElement("br");
           document.getElementById("resultOutputDiv").appendChild(brTag);
@@ -129,7 +129,7 @@
               logTextArea.innerHTML = xmlhttp.responseText;
               setInterval(function(){
                 logTextArea.scrollTop = logTextArea.scrollHeight;
-              }, 10000);
+              }, 20000);
             }
           }
           xmlhttp.open("GET", file + "?id=" + Math.random(), true);  // make the output up-to-date
