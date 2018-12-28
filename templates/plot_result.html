@@ -25,7 +25,7 @@
           <p id="roc">Cumulative Distribution Plot</p>
         </div>
         <div class="col-md-6 mb-3">
-          <p id="rankScore">Irwin-Hall Rank Dot Plot</p>
+          <p id="rankScore">Ranked Dot Plot</p>
         </div>
 
       </div>
@@ -40,14 +40,14 @@
         rankP.appendChild(document.createElement("br"))
         var imgTag = document.createElement("img");
         imgTag.setAttribute("src", plotResult.dist_plot);
-        imgTag.setAttribute("width", "330")
+        imgTag.setAttribute("width", "300")
         imgTag.setAttribute("height", "300")
         imgTag.setAttribute("alt", "")
         rankP.appendChild(imgTag)
         rankP.appendChild(document.createElement("br"))
         // add download tag
         var aTag = document.createElement("a");
-        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Irwin-Hall Rank Dot Plot");
+        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
         aTag.appendChild(aText);
         var aHref = document.createAttribute("href");
         aHref.value = plotResult.dist_plot;
