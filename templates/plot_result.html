@@ -22,10 +22,10 @@
       <h3 id="resultTitle" class="mb-3"></h4>
       <div class="row">
         <div class="col-md-6 mb-3">
-          <p id="roc">Cumulative Distribution</p>
+          <p id="roc">Cumulative Distribution Plot</p>
         </div>
         <div class="col-md-6 mb-3">
-          <p id="rankScore">Rank Score</p>
+          <p id="rankScore">Irwin-Hall Rank Dot Plot</p>
         </div>
 
       </div>
@@ -47,7 +47,7 @@
         rankP.appendChild(document.createElement("br"))
         // add download tag
         var aTag = document.createElement("a");
-        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Rank Score");
+        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Irwin-Hall Rank Dot Plot");
         aTag.appendChild(aText);
         var aHref = document.createAttribute("href");
         aHref.value = plotResult.dist_plot;
@@ -67,7 +67,7 @@
         rocP.appendChild(document.createElement("br"))
         // add download tag
         var aTag = document.createElement("a");
-        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " ROC");
+        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
         aTag.appendChild(aText);
         var aHref = document.createAttribute("href");
         aHref.value = plotResult.auc_plot;

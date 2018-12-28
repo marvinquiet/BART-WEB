@@ -53,7 +53,7 @@ def index():
                 # if using genelist, save to file
                 if request.form.get('uploadList', None):
                     gene_list = request.form['uploadList']
-                    gene_list_file = 'genelist_by_user.txt'
+                    gene_list_file = 'genelist.txt'
                     gene_list_file_path = os.path.join(user_path, 'upload/' + gene_list_file)
                     with open(gene_list_file_path, 'w') as fopen:
                         for gene in gene_list:
@@ -226,7 +226,7 @@ def bart_plot_result(userkey_tfname):
     user_key, tf_name = userkey_tfname.split('___')
     # where plots locate
     # plot_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key + '/download/bart_output/plot')
-    distribution_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_avg_z_p_boxplot.png'
+    distribution_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_ranked_dot.png'
     auc_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_cumulative_distribution.png'
     plot_results = {}
     plot_results['user_key'] = user_key
