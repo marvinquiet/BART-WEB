@@ -126,15 +126,12 @@ def generate_results(user_data):
     # assembly: hg38, mm10
     # gene_exp_type: Gene_Only, Gene_Response
     # gene_id_type: GeneSymbol, RefSeq
-    logger.info("Generate results: generate result for {}...".format(user_data['user_key']))
-    logger.info(user_data['marge'])
-    logger.info(marge_bart.is_marge_done(user_data['user_path']))
-    logger.info(marge_bart.is_marge_files_exist_in_download(user_data['user_path']))    
-    
+    logger.info("Generate results: generate result for {}...".format(user_data['user_key'])) 
+
     # if marge, and marge not in marge_data 
     if user_data['marge'] \
-        and not marge_bart.is_marge_done(user_data['user_path']) \
-        and not marge_bart.is_marge_files_exist_in_download(user_data['user_path']):
+        and not marge_bart.is_marge_done(docker_user_path) \
+        and not marge_bart.is_marge_files_exist_in_download(docker_user_path):
         results['done'] = False
 
         if 'status' in user_data and (user_data['status'] == 'Error' or user_data['status'] == 'Sent'):
@@ -156,15 +153,15 @@ def generate_results(user_data):
 
     # make sure the marge file could be shown on the result page
     marge_file_dict = {}
-    if marge_bart.is_marge_done(user_data['user_path']):
+    if marge_bart.is_marge_done(docker_user_path):
         marge_file_dict = generate_marge_file_results(user_data, 'marge_data/margeoutput')
 
-    if marge_bart.is_marge_files_exist_in_download(user_data['user_path']):
+    if marge_bart.is_marge_files_exist_in_download(docker_user_path):
         marge_file_dict = generate_marge_file_results(user_data, 'download')
 
     results.update(marge_file_dict)
 
-    if user_data['bart'] and not marge_bart.is_bart_done(user_data['user_path']):
+    if user_data['bart'] and not marge_bart.is_bart_done(docker_user_path):
         results['done'] = False
 
         if 'status' in user_data and (user_data['status'] == 'Error' or user_data['status'] == 'Sent'):
@@ -190,9 +187,9 @@ def generate_results(user_data):
     results.update(bart_table_results)
 
     logger.info("Generate results: log for user to check procedure...")
-    user_path = user_data['user_path']
+    # user_path = user_data['user_path']
     proc_log = 'mb_pipe.log'
-    src_log = os.path.join(user_path, 'log/'+proc_log)
+    src_log = os.path.join(docker_user_path, 'log/'+proc_log)
     results['proc_log'] = []
     if os.path.exists(src_log):
         # dest_file = os.path.join(user_path, 'download/'+proc_log)
