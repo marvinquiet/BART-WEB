@@ -20,6 +20,7 @@
   <body class="bg-light">
     <div class="container">
       <h3 id="resultTitle" class="mb-3"></h4>
+      <p id="resultFlag">The plots are being generated, please come later. </p>
       <div class="row">
         <div class="col-md-6 mb-3">
           <p id="roc">Cumulative Distribution Plot</p>
@@ -27,56 +28,144 @@
         <div class="col-md-6 mb-3">
           <p id="rankScore">Ranked Dot Plot</p>
         </div>
-
       </div>
     </div>
+
+        
+    <script type="text/javascript">
+      function fileExists(file_url) {
+        var http = new XMLHttpRequest();
+        http.open('HEAD', file_url, false);
+        http.send();
+        
+        return http.status != 404;
+      }
+    </script>
 
     <script type="text/javascript">
         var plotResult = {{ plotResults|tojson }};
         document.getElementById("resultTitle").innerHTML = plotResult.tf_name + " Plot";
         
-        // add rank score image tag
-        var rankP = document.getElementById("rankScore")
-        rankP.appendChild(document.createElement("br"))
-        var imgTag = document.createElement("img");
-        imgTag.setAttribute("src", plotResult.dist_plot);
-        imgTag.setAttribute("width", "300")
-        imgTag.setAttribute("height", "300")
-        imgTag.setAttribute("alt", "")
-        rankP.appendChild(imgTag)
-        rankP.appendChild(document.createElement("br"))
-        // add download tag
-        var aTag = document.createElement("a");
-        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
-        aTag.appendChild(aText);
-        var aHref = document.createAttribute("href");
-        aHref.value = plotResult.dist_plot;
-        aTag.setAttributeNode(aHref);
-        aTag.setAttributeNode(document.createAttribute("download"));
-        rankP.appendChild(aTag);
+        var plotFlag = document.getElementById("resultFlag"); // words whether the plots are generated
 
-        // add roc image tag
-        var rocP = document.getElementById("roc")
-        rocP.appendChild(document.createElement("br"))
-        imgTag = document.createElement("img");
-        imgTag.setAttribute("src", plotResult.auc_plot);
-        imgTag.setAttribute("width", "300")
-        imgTag.setAttribute("height", "300")
-        imgTag.setAttribute("alt", "")
-        rocP.appendChild(imgTag)
-        rocP.appendChild(document.createElement("br"))
-        // add download tag
-        var aTag = document.createElement("a");
-        var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
-        aTag.appendChild(aText);
-        var aHref = document.createAttribute("href");
-        aHref.value = plotResult.auc_plot;
-        aTag.setAttributeNode(aHref);
-        aTag.setAttributeNode(document.createAttribute("download"));
-        rocP.appendChild(aTag);
+        var rankP = document.getElementById("rankScore");  // rank attribute
+        var rocP = document.getElementById("roc"); // cumulative distribution attribute
 
+        if (fileExists(plotResult.dist_plot) && fileExists(plotResult.auc_plot)) {
+          plotFlag.style.display = "none";
+          rankP.style.display = "block";
+          rocP.style.display = "block";
+
+          // add rank score image tag
+          rankP.appendChild(document.createElement("br"));
+          var imgTag = document.createElement("img");
+          imgTag.setAttribute("src", plotResult.dist_plot);
+          imgTag.setAttribute("width", "300");
+          imgTag.setAttribute("height", "300");
+          imgTag.setAttribute("alt", "");
+          rankP.appendChild(imgTag);
+          rankP.appendChild(document.createElement("br"));
+          // add download tag
+          var aTag = document.createElement("a");
+          var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
+          aTag.appendChild(aText);
+          var aHref = document.createAttribute("href");
+          aHref.value = plotResult.dist_plot;
+          aTag.setAttributeNode(aHref);
+          aTag.setAttributeNode(document.createAttribute("download"));
+          rankP.appendChild(aTag);
+
+          // add roc image tag
+          rocP.appendChild(document.createElement("br"));
+          imgTag = document.createElement("img");
+          imgTag.setAttribute("src", plotResult.auc_plot);
+          imgTag.setAttribute("width", "300");
+          imgTag.setAttribute("height", "300");
+          imgTag.setAttribute("alt", "");
+          rocP.appendChild(imgTag);
+          rocP.appendChild(document.createElement("br"));
+          // add download tag
+          var aTag = document.createElement("a");
+          var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
+          aTag.appendChild(aText);
+          var aHref = document.createAttribute("href");
+          aHref.value = plotResult.auc_plot;
+          aTag.setAttributeNode(aHref);
+          aTag.setAttributeNode(document.createAttribute("download"));
+          rocP.appendChild(aTag);
+        } else {
+          plotFlag.style.display = "block";
+          rankP.style.display = "none";
+          rocP.style.display = "none";
+        }
+
+        // $.get(plotResult.dist_plot)
+        //   .done(function() { 
+        //     rankP.style.display = "visible";
+        //     plotFlag.style.display = "hidden";
+
+        //     // add rank score image tag
+        //     rankP.appendChild(document.createElement("br"));
+        //     var imgTag = document.createElement("img");
+        //     imgTag.setAttribute("src", plotResult.dist_plot);
+        //     imgTag.setAttribute("width", "300");
+        //     imgTag.setAttribute("height", "300");
+        //     imgTag.setAttribute("alt", "");
+        //     rankP.appendChild(imgTag);
+        //     rankP.appendChild(document.createElement("br"));
+        //     // add download tag
+        //     var aTag = document.createElement("a");
+        //     var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
+        //     aTag.appendChild(aText);
+        //     var aHref = document.createAttribute("href");
+        //     aHref.value = plotResult.dist_plot;
+        //     aTag.setAttributeNode(aHref);
+        //     aTag.setAttributeNode(document.createAttribute("download"));
+        //     rankP.appendChild(aTag);
+
+        //   }).fail(function() { 
+        //     // Image doesn't exist - do something else.
+        //     rankP.style.visibility = "hidden";
+        //     plotFlag.style.display = "visible";
+
+        // })
+        
+        
+        // $.get(plotResult.auc_plot)
+        //   .done(function() { 
+        //     rocP.style.display = "visible";
+        //     plotFlag.style.display = "hidden";
+        //     // add roc image tag
+            
+        //     rocP.appendChild(document.createElement("br"));
+        //     imgTag = document.createElement("img");
+        //     imgTag.setAttribute("src", plotResult.auc_plot);
+        //     imgTag.setAttribute("width", "300");
+        //     imgTag.setAttribute("height", "300");
+        //     imgTag.setAttribute("alt", "");
+        //     rocP.appendChild(imgTag);
+        //     rocP.appendChild(document.createElement("br"));
+        //     // add download tag
+        //     var aTag = document.createElement("a");
+        //     var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
+        //     aTag.appendChild(aText);
+        //     var aHref = document.createAttribute("href");
+        //     aHref.value = plotResult.auc_plot;
+        //     aTag.setAttributeNode(aHref);
+        //     aTag.setAttributeNode(document.createAttribute("download"));
+        //     rocP.appendChild(aTag);
+
+        //   }).fail(function() { 
+        //     // Image doesn't exist - do something else.
+        //     rocP.style.display = "hidden";
+        //     plotFlag.style.display = "visible";
+
+        // })
+        
     </script>
-    
+
+
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
