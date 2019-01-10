@@ -127,6 +127,9 @@ def generate_results(user_data):
     # gene_exp_type: Gene_Only, Gene_Response
     # gene_id_type: GeneSymbol, RefSeq
     logger.info("Generate results: generate result for {}...".format(user_data['user_key']))
+    logger.info(user_data['marge'])
+    logger.info(marge_bart.is_marge_done(user_data['user_path']))
+    logger.info(marge_bart.is_marge_files_exist_in_download(user_data['user_path']))    
     
     # if marge, and marge not in marge_data 
     if user_data['marge'] \
@@ -155,6 +158,7 @@ def generate_results(user_data):
     marge_file_dict = {}
     if marge_bart.is_marge_done(user_data['user_path']):
         marge_file_dict = generate_marge_file_results(user_data, 'marge_data/margeoutput')
+
     if marge_bart.is_marge_files_exist_in_download(user_data['user_path']):
         marge_file_dict = generate_marge_file_results(user_data, 'download')
 
