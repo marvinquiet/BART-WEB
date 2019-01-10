@@ -110,20 +110,7 @@ def exe_marge(marge_output_dir):
 
 def is_marge_done(user_path):
     snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
-    download_dir = os.path.join(user_path, 'download')
-
-    # whether marge related files have been moved to download dir, if so, then return True
-    eh_flag = False
-    regress_flag = False
-    for marge_file in os.listdir(download_dir):
-        if '_enhancer_prediction.txt' in str(marge_file):
-            eh_flag = True
-        if '_regressionInfo.txt' in str(marge_file):
-            regress_flag = True
     
-    if eh_flag and regress_flag:
-        return True
-
     # when job is still underprocessing
     if not os.path.exists(snakemake_log_dir):
         return False
@@ -136,6 +123,21 @@ def is_marge_done(user_path):
                     if ('(100%) done') not in flog.read():
                         return False
     return True
+
+# whether the marge results exsit in download directory
+def is_marge_files_exist_in_download(user_path):
+    download_dir = os.path.join(user_path, 'download')
+
+    # whether marge related files have been moved to download dir, if so, then return True
+    eh_flag = False
+    regress_flag = False
+    for marge_file in os.listdir(download_dir):
+        if '_enhancer_prediction.txt' in str(marge_file):
+            eh_flag = True
+        if '_regressionInfo.txt' in str(marge_file):
+            regress_flag = True
+
+    return (eh_flag and regress_flag)
 
 def get_enhancer_prediction(user_path):
     # marge output file path
