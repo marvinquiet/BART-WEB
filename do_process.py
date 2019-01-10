@@ -150,7 +150,14 @@ def generate_results(user_data):
         return results
 
     logger.info("Generate results: generate marge file results...")
-    marge_file_dict = generate_marge_file_results(user_data)
+
+    # make sure the marge file could be shown on the result page
+    marge_file_dict = {}
+    if marge_bart.is_marge_done(user_data['user_path']):
+        marge_file_dict = generate_marge_file_results(user_data, 'marge_data/margeoutput')
+    if marge_bart.is_marge_files_exist_in_download(user_data['user_path']):
+        marge_file_dict = generate_marge_file_results(user_data, 'download')
+
     results.update(marge_file_dict)
 
     if user_data['bart'] and not marge_bart.is_bart_done(user_data['user_path']):
@@ -195,7 +202,7 @@ def generate_results(user_data):
     return results  
 
 
-def generate_marge_file_results(user_data):
+def generate_marge_file_results(user_data, marge_data_path):
     '''
     If marge is done processing, generate marge results file for user to download.
 
@@ -216,7 +223,8 @@ def generate_marge_file_results(user_data):
     user_path = user_data['user_path']
     # marge output file path
     # marge_output_path = os.path.join(user_path, 'marge_data/margeoutput')
-    marge_output_path = os.path.join(user_path, 'download')
+
+    marge_output_path = os.path.join(user_path, marge_data_path)
     marge_suffix_type = ['_enhancer_prediction.txt', '_all_relativeRP.txt', '_Strength.txt', '_all_RP.txt', '_target_regressionInfo.txt']
     for root, dirs, files in os.walk(marge_output_path):
         for file in files:
