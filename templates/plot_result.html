@@ -15,23 +15,33 @@
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- D3 Plot -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <script src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
+	  <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+
   </head>
 
   <body class="bg-light">
     <div class="container">
       <h3 id="resultTitle" class="mb-3"></h4>
-      <p id="resultFlag">The plots are being generated, please come later. </p>
+      <!-- <p id="resultFlag">The plots are being generated, please come later. </p> -->
       <div class="row">
         <div class="col-md-6 mb-3">
           <p id="roc">Cumulative Distribution Plot</p>
+          <svg id="cumulative" width="300" height="300"></svg>
+          <button id="cumulativeButton">download as PNG</button>
         </div>
+
         <div class="col-md-6 mb-3">
           <p id="rankScore">Ranked Dot Plot</p>
+          <svg id="rankdot" width="300" height="300"></svg>
+          <button id="rankdotButton">download as PNG</button>
         </div>
       </div>
     </div>
 
-        
     <script type="text/javascript">
       function fileExists(file_url) {
         var http = new XMLHttpRequest();
@@ -43,61 +53,350 @@
     </script>
 
     <script type="text/javascript">
+        // =============test d3.js below===============
         var plotResult = {{ plotResults|tojson }};
         document.getElementById("resultTitle").innerHTML = plotResult.tf_name + " Plot";
         
-        var plotFlag = document.getElementById("resultFlag"); // words whether the plots are generated
+        // Set the dimensions of the canvas / graph
+        var margin = { top: 10, right: 10, bottom: 50, left: 50 }
+            , width = 300
+            , height = 300;
 
-        var rankP = document.getElementById("rankScore");  // rank attribute
-        var rocP = document.getElementById("roc"); // cumulative distribution attribute
+        // draw cumulative distribution plot
+        var lineData = plotResult.cumulative_data;
+        // Set the ranges
+        var xCumulative = d3.scaleLinear()
+            .domain([0, 1])
+            .range([margin.left, width - margin.right]);
+        var yCumulative = d3.scaleLinear()
+            .domain([0, 1])
+            .range([height - margin.bottom, margin.top]);
 
-        if (fileExists(plotResult.dist_plot) && fileExists(plotResult.auc_plot)) {
-          plotFlag.style.display = "none";
-          rankP.style.display = "block";
-          rocP.style.display = "block";
+        // Define the axes
+        var xCumulativeAxis = d3.axisBottom()
+            .scale(xCumulative)
+            .ticks(3);
+        var yCumulativeAxis = d3.axisLeft()
+            .scale(yCumulative)
+            .ticks(3);
 
-          // add rank score image tag
-          rankP.appendChild(document.createElement("br"));
-          var imgTag = document.createElement("img");
-          imgTag.setAttribute("src", plotResult.dist_plot);
-          imgTag.setAttribute("width", "300");
-          imgTag.setAttribute("height", "300");
-          imgTag.setAttribute("alt", "");
-          rankP.appendChild(imgTag);
-          rankP.appendChild(document.createElement("br"));
-          // add download tag
-          var aTag = document.createElement("a");
-          var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
-          aTag.appendChild(aText);
-          var aHref = document.createAttribute("href");
-          aHref.value = plotResult.dist_plot;
-          aTag.setAttributeNode(aHref);
-          aTag.setAttributeNode(document.createAttribute("download"));
-          rankP.appendChild(aTag);
+        // background line and TF line
+        var lineBG = d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return xCumulative(d.x); })
+            .y(function(d) { return yCumulative(d.bgY); });
+        var lineTF = d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return xCumulative(d.x); })
+            .y(function(d) { return yCumulative(d.tfY); });
 
-          // add roc image tag
-          rocP.appendChild(document.createElement("br"));
-          imgTag = document.createElement("img");
-          imgTag.setAttribute("src", plotResult.auc_plot);
-          imgTag.setAttribute("width", "300");
-          imgTag.setAttribute("height", "300");
-          imgTag.setAttribute("alt", "");
-          rocP.appendChild(imgTag);
-          rocP.appendChild(document.createElement("br"));
-          // add download tag
-          var aTag = document.createElement("a");
-          var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
-          aTag.appendChild(aText);
-          var aHref = document.createAttribute("href");
-          aHref.value = plotResult.auc_plot;
-          aTag.setAttributeNode(aHref);
-          aTag.setAttributeNode(document.createAttribute("download"));
-          rocP.appendChild(aTag);
-        } else {
-          plotFlag.style.display = "block";
-          rankP.style.display = "none";
-          rocP.style.display = "none";
+        var cumulative = d3.select('#cumulative');
+        cumulative.append('path')
+            .data([lineData])
+            .attr("class", "line")
+            .attr("d", lineBG)
+            .attr("fill", "none")
+            .attr("stroke", "grey")
+            .attr("stroke-width", 2);
+        cumulative.append('path')
+            .data([lineData])
+            .attr("class", "line")
+            .attr("d", lineTF)
+            .attr("fill", "none")
+            .attr("stroke", "red")
+            .attr("stroke-width", 2);
+        cumulative.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + (height - margin.bottom) + ')')
+            .call(xCumulativeAxis);
+        cumulative.append("text")
+          .attr("transform",
+                "translate(" + ((width - margin.right + margin.left)/2) + " ," +
+                              (height - 10) + ")")
+          .style("text-anchor", "middle")
+          .text("AUC");
+        cumulative.append('g')
+            .attr('class', 'y axis')
+            .attr('transform', 'translate(' + (margin.left) + ',0)')
+            .call(yCumulativeAxis);
+        cumulative.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0)
+            .attr("x",0 - ((height - margin.bottom + margin.top) / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Cumulative Fraction");
+
+        // add legend
+        var cumulative_color_hash = {  0 : ["ALL", "grey"],
+              1 : [plotResult.tf_name, "red"],
+        };
+        for (var i = 0; i < Object.keys(cumulative_color_hash).length; i++) {
+            cumulative.append("line")
+                    .attr("x1", margin.left + 10)
+                    .attr("y1", i*25 + 15)
+                    .attr("x2", margin.left + 35)
+                    .attr("y2", i*25 + 15)
+                    .attr("stroke-width", 2)
+                    .attr("stroke", cumulative_color_hash[String(i)][1]);
+
+            cumulative.append("text")
+                    .attr("x", margin.left + 40)
+                    .attr("y", i*25 + 20)
+                    .attr("height",10)
+                    .attr("width",20)
+                    .style("fill", cumulative_color_hash[String(i)][1])
+                    .text(cumulative_color_hash[String(i)][0]);
         }
+
+        // Set-up the export button
+        d3.select('#cumulativeButton').on('click', function(){
+          var svgString = getSVGString(cumulative.node());
+          svgString2Image( svgString, width, height, 'png', save ); // passes Blob and filesize String to the callback
+
+          function save( dataBlob, filesize ){
+            saveAs( dataBlob, 'cumulative_fraction.png' ); // FileSaver.js function
+          }
+        });
+
+        // draw rankdot plot
+        var rankdotData = plotResult.rankdot_data;
+        var rankdotTF = plotResult.rankdot_TF;
+        // Set the ranges
+        var xRankdot = d3.scaleLinear()
+            .domain([-20, rankdotData.length + 20])
+            .range([margin.left, width - margin.right]);
+        var yRankdot = d3.scaleLinear()
+            .domain([0, d3.max(rankdotData, function(d) { return d.rank_y; }) + 0.3 ])
+            .range([height - margin.bottom, margin.top]);
+
+        // Define the axes
+        var xRankdotAxis = d3.axisBottom()
+            .scale(xRankdot)
+            .tickValues([1,rankdotData.length]);
+        var yRankdotAxis = d3.axisLeft()
+            .scale(yRankdot)
+            .ticks(3);
+
+        var rankdot = d3.select('#rankdot');
+        // Add the scatterplot
+        rankdot.selectAll("dot")
+            .data(rankdotData)
+            .enter().append("circle")
+            .attr("stroke", "grey")
+            .attr("fill", "grey")
+            .attr("r", 2)
+            .attr("cx", function(d) { return xRankdot(d.rank_x); })
+            .attr("cy", function(d) { return yRankdot(d.rank_y); });
+
+        rankdot.selectAll("dot")
+            .data(rankdotTF)
+            .enter().append("circle")
+            .attr("stroke", "red")
+            .attr("fill", "red")
+            .attr("r", 5)
+            .attr("cx", function(d) { return xRankdot(d.rank_x); })
+            .attr("cy", function(d) { return yRankdot(d.rank_y); });
+
+        rankdot.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + (height - margin.bottom) + ')')
+            .call(xRankdotAxis);
+        rankdot.append("text")  
+          .attr("transform",
+                "translate(" + ((width - margin.right + margin.left)/2) + " ," +
+                              (height - 10) + ")")
+          .style("text-anchor", "middle")
+          .text("TF Rank");
+        rankdot.append('g')
+            .attr('class', 'y axis')
+            .attr('transform', 'translate(' + (margin.left) + ',0)')
+            .call(yRankdotAxis);
+        rankdot.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0)
+            .attr("x",0 - ((height - margin.bottom + margin.top) / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("-log10 (p)");
+
+        // add legend
+        var rankdot_color_hash = {  0 : ["Others", "grey"],
+              1 : [plotResult.tf_name, "red"],
+        };
+        for (var i = 0; i < Object.keys(rankdot_color_hash).length; i++) {
+            rankdot.append("circle")
+                    .attr("cx", width - margin.right - 60)
+                    .attr("cy", i*25 + 15)
+                    .attr("r",2)
+                    .attr("stroke", rankdot_color_hash[String(i)][1])
+                    .style("fill", rankdot_color_hash[String(i)][1]);
+
+            rankdot.append("text")
+                    .attr("x", width - margin.right - 50)
+                    .attr("y", i*25 + 20)
+                    .attr("height",10)
+                    .attr("width",20)
+                    .style("fill", rankdot_color_hash[String(i)][1])
+                    .text(rankdot_color_hash[String(i)][0]);
+        }
+
+        // Set-up the export button
+        d3.select('#rankdotButton').on('click', function(){
+          var svgString = getSVGString(rankdot.node());
+          svgString2Image( svgString, width, height, 'png', save ); // passes Blob and filesize String to the callback
+
+          function save( dataBlob, filesize ){
+            saveAs( dataBlob, 'cumulative_fraction.png' ); // FileSaver.js function
+          }
+        });
+
+        // for downloading pictures
+        function getSVGString( svgNode ) {
+            svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+            var cssStyleText = getCSSStyles( svgNode );
+            appendCSS( cssStyleText, svgNode );
+
+            var serializer = new XMLSerializer();
+            var svgString = serializer.serializeToString(svgNode);
+            svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
+            svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
+
+            return svgString;
+
+            function getCSSStyles( parentElement ) {
+              var selectorTextArr = [];
+
+              // Add Parent element Id and Classes to the list
+              selectorTextArr.push( '#'+parentElement.id );
+              for (var c = 0; c < parentElement.classList.length; c++)
+                  if ( !contains('.'+parentElement.classList[c], selectorTextArr) )
+                    selectorTextArr.push( '.'+parentElement.classList[c] );
+
+              // Add Children element Ids and Classes to the list
+              var nodes = parentElement.getElementsByTagName("*");
+              for (var i = 0; i < nodes.length; i++) {
+                var id = nodes[i].id;
+                if ( !contains('#'+id, selectorTextArr) )
+                  selectorTextArr.push( '#'+id );
+
+                var classes = nodes[i].classList;
+                for (var c = 0; c < classes.length; c++)
+                  if ( !contains('.'+classes[c], selectorTextArr) )
+                    selectorTextArr.push( '.'+classes[c] );
+              }
+
+              // Extract CSS Rules
+              var extractedCSSText = "";
+              for (var i = 0; i < document.styleSheets.length; i++) {
+                var s = document.styleSheets[i];
+                try {
+                    if(!s.cssRules) continue;
+                } catch( e ) {
+                      if(e.name !== 'SecurityError') throw e; // for Firefox
+                      continue;
+                    }
+                var cssRules = s.cssRules;
+                for (var r = 0; r < cssRules.length; r++) {
+                  if ( contains( cssRules[r].selectorText, selectorTextArr ) )
+                    extractedCSSText += cssRules[r].cssText;
+                }
+              }
+              return extractedCSSText;
+
+              function contains(str,arr) {
+                return arr.indexOf( str ) === -1 ? false : true;
+              }
+
+            }
+
+            function appendCSS( cssText, element ) {
+              var styleElement = document.createElement("style");
+              styleElement.setAttribute("type","text/css"); 
+              styleElement.innerHTML = cssText;
+              var refNode = element.hasChildNodes() ? element.children[0] : null;
+              element.insertBefore( styleElement, refNode );
+            }
+          }
+
+          function svgString2Image( svgString, width, height, format, callback ) {
+            var format = format ? format : 'png';
+            var imgsrc = 'data:image/svg+xml;base64,'+ btoa( unescape( encodeURIComponent( svgString ) ) ); // Convert SVG string to data URL
+            var canvas = document.createElement("canvas");
+            var context = canvas.getContext("2d");
+
+            canvas.width = width;
+            canvas.height = height;
+
+            var image = new Image();
+            image.onload = function() {
+              context.clearRect ( 0, 0, width, height );
+              context.drawImage(image, 0, 0, width, height);
+
+              canvas.toBlob( function(blob) {
+                var filesize = Math.round( blob.length/1024 ) + ' KB';
+                if ( callback ) callback( blob, filesize );
+              });
+            };
+            image.src = imgsrc;
+          }
+
+        //=============test end========================
+        // var plotResult = {{ plotResults|tojson }};
+        // document.getElementById("resultTitle").innerHTML = plotResult.tf_name + " Plot";
+
+        // var plotFlag = document.getElementById("resultFlag"); // words whether the plots are generated
+
+        // var rankP = document.getElementById("rankScore");  // rank attribute
+        // var rocP = document.getElementById("roc"); // cumulative distribution attribute
+
+        // if (fileExists(plotResult.dist_plot) && fileExists(plotResult.auc_plot)) {
+        //   plotFlag.style.display = "none";
+        //   rankP.style.display = "block";
+        //   rocP.style.display = "block";
+
+        //   // add rank score image tag
+        //   rankP.appendChild(document.createElement("br"));
+        //   var imgTag = document.createElement("img");
+        //   imgTag.setAttribute("src", plotResult.dist_plot);
+        //   imgTag.setAttribute("width", "300");
+        //   imgTag.setAttribute("height", "300");
+        //   imgTag.setAttribute("alt", "");
+        //   rankP.appendChild(imgTag);
+        //   rankP.appendChild(document.createElement("br"));
+        //   // add download tag
+        //   var aTag = document.createElement("a");
+        //   var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
+        //   aTag.appendChild(aText);
+        //   var aHref = document.createAttribute("href");
+        //   aHref.value = plotResult.dist_plot;
+        //   aTag.setAttributeNode(aHref);
+        //   aTag.setAttributeNode(document.createAttribute("download"));
+        //   rankP.appendChild(aTag);
+
+        //   // add roc image tag
+        //   rocP.appendChild(document.createElement("br"));
+        //   imgTag = document.createElement("img");
+        //   imgTag.setAttribute("src", plotResult.auc_plot);
+        //   imgTag.setAttribute("width", "300");
+        //   imgTag.setAttribute("height", "300");
+        //   imgTag.setAttribute("alt", "");
+        //   rocP.appendChild(imgTag);
+        //   rocP.appendChild(document.createElement("br"));
+        //   // add download tag
+        //   var aTag = document.createElement("a");
+        //   var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
+        //   aTag.appendChild(aText);
+        //   var aHref = document.createAttribute("href");
+        //   aHref.value = plotResult.auc_plot;
+        //   aTag.setAttributeNode(aHref);
+        //   aTag.setAttributeNode(document.createAttribute("download"));
+        //   rocP.appendChild(aTag);
+        // } else {
+        //   plotFlag.style.display = "block";
+        //   rankP.style.display = "none";
+        //   rocP.style.display = "none";
+        // }
 
         // $.get(plotResult.dist_plot)
         //   .done(function() { 

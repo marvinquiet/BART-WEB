@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+import numpy as np
+import pandas as pd
+import scipy
+from scipy import special
 from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory, session)
 from werkzeug.utils import secure_filename
 
@@ -221,19 +225,116 @@ def error_page():
     err_msg = request.args['msg']
     return render_template('error.html', msg=err_msg)
 
+# Irwin-Hall Distribution for plot
+def factorial(n):
+    value = 1.0
+    while n>1:
+        value*=n
+        n-=1
+    return value
+
+def logfac(n):
+    if n<20:
+        return np.log(factorial(n))
+    else:
+        return n*np.log(n)-n+(np.log(n*(1+4*n*(1+2*n)))/6.0)+(np.log(np.pi))/2.0
+
+def irwin_hall_cdf(x,n):
+    # pval = returned_value for down regulated
+    # pval = 1 - returned_value for up regulated
+    value,k = 0,0
+    while k<=np.floor(x):
+        value +=(-1)**k*(special.binom(n,k))*(x-k)**n
+        k+=1
+    return value/(np.exp(logfac(n)))
+
 @app.route('/plot/<userkey_tfname>')
 def bart_plot_result(userkey_tfname):
     user_key, tf_name = userkey_tfname.split('___')
+    # =========test d3.js below=============
+    # use user_key to retrieve plot related results
+    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
+    bart_output_dir = os.path.join(user_path, 'download/bart_output')
+
+    # _auc.txt and _bart_result.txt files
+    bart_auc_ext = '_auc.txt'
+    bart_res_ext = '_bart_results.txt'
+
+    AUCs = {}
+    tfs = {}
+    bart_df = {}
+    bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank']
+    for root, dirs, files in os.walk(bart_output_dir):
+        for bart_file in files:
+            if bart_res_ext in bart_file:
+                bart_result_file = os.path.join(root, bart_file)
+                bart_df = pd.read_csv(bart_result_file, sep='\t', names=bart_title[1:], index_col=0, skiprows=1)
+            if bart_auc_ext in bart_file:
+                bart_auc_file = os.path.join(root, bart_file)
+                with open(bart_auc_file, 'r') as fopen:
+                    for line in fopen:
+                        tf_key, auc_equation = line.strip().split('\t')
+                        auc = float(auc_equation.replace(' ', '').split('=')[1])
+                        AUCs[tf_key] = auc
+
+                for tf_key in AUCs.keys():
+                    tf = tf_key.split('_')[0]
+                    auc = AUCs[tf_key]
+                    if tf not in tfs:
+                        tfs[tf] = [auc]
+                    else:
+                        tfs[tf].append(auc)
+    plot_results = {}
+    plot_results['tf_name'] = tf_name
+
+    # generate cumulative data
+    cumulative_data = {}
+    background = []
+    for tf in tfs:
+        background.extend(tfs[tf])
+    target = tfs[tf_name]
+    background = sorted(background)
+    dx = 0.01
+    x = np.arange(0,1,dx)
+    by,ty = [],[]
+    for xi in x:
+        by.append(sum(i< xi for i in background )/len(background))
+        ty.append(sum(i< xi for i in target )/len(target))
+
+    cumulative_data['x'] = list(x)
+    cumulative_data['bgY'] = by
+    cumulative_data['tfY'] = ty
+    cumulative_data = [dict(zip(cumulative_data,t)) for t in zip(*cumulative_data.values())]
+    plot_results['cumulative_data'] = cumulative_data
+
+    # rankdot data
+    rankdot_data = []
+    rankdot_pair = {}
+    col = 'r_rank'
+    for tf_id in bart_df.index:
+        rankdot_pair['rank_x'] = list(bart_df.index).index(tf_id)+1
+        rankdot_pair['rank_y'] = -1*np.log10(irwin_hall_cdf(3*bart_df.loc[tf_id][col],3))
+        rankdot_data.append(rankdot_pair)
+        rankdot_pair = {}
+    plot_results['rankdot_data'] = rankdot_data
+
+    rankdot_pair['rank_x'] = list(bart_df.index).index(tf_name)+1
+    rankdot_pair['rank_y'] = -1*np.log10(irwin_hall_cdf(3*bart_df.loc[tf_name][col],3))
+    plot_results['rankdot_TF'] = [rankdot_pair]
+
+    return render_template('plot_result.html', plotResults=plot_results)
+    #============test end========================
+
     # where plots locate
     # plot_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key + '/download/bart_output/plot')
-    distribution_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_ranked_dot.png'
-    auc_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_cumulative_distribution.png'
-    plot_results = {}
-    plot_results['user_key'] = user_key
-    plot_results['tf_name'] = tf_name
-    plot_results['auc_plot'] = auc_plot
-    plot_results['dist_plot'] = distribution_plot
-    return render_template('plot_result.html', plotResults=plot_results)
+    # distribution_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_ranked_dot.png'
+    # auc_plot = '/download/bart_output/plot/' + user_key + '___' + tf_name + '_cumulative_distribution.png'
+    # plot_results = {}
+    # plot_results['user_key'] = user_key
+    # plot_results['tf_name'] = tf_name
+    # plot_results['auc_plot'] = auc_plot
+    # plot_results['dist_plot'] = distribution_plot
+    # return render_template('plot_result.html', plotResults=plot_results)
 
 @app.route('/log/<userkey_filename>')
 def download_log_file(userkey_filename):

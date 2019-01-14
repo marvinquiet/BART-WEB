@@ -261,14 +261,14 @@ source ~/.bashrc
                     fopen.write(cmd)
 
         # change back the user.config to what Docker could recognize
-        cmd = 'python3 ' + marge_bart_script + ' ' + user_key + ' >> ' + exe_log_path + ' 2>&1 && \\ \n'
+        cmd = 'python3 ' + marge_bart_script + ' ' + user_key + ' >> ' + exe_log_path + ' 2>&1 \n'
         logger.info("Write slurm: " + cmd)
         fopen.write(cmd)
 
         # plot 
-        cmd = 'python3 ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n'
-        logger.info("Write slurm: " + cmd)
-        fopen.write(cmd)
+        # cmd = 'python3 ' + bart_plot_file + ' ' + user_key +  '  >> ' + exe_log_path + ' 2>&1\n'
+        # logger.info("Write slurm: " + cmd)
+        # fopen.write(cmd)
         
 # ============== UNIT TEST ===============
 def test_is_marge_done():
