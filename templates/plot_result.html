@@ -69,7 +69,7 @@
             .domain([0, 1])
             .range([margin.left, width - margin.right]);
         var yCumulative = d3.scaleLinear()
-            .domain([0, 1])
+            .domain([-0.05, 1.05])
             .range([height - margin.bottom, margin.top]);
 
         // Define the axes
@@ -91,6 +91,31 @@
             .y(function(d) { return yCumulative(d.tfY); });
 
         var cumulative = d3.select('#cumulative');
+        // add background
+        cumulative.append("rect") // background color
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("fill", "white");
+
+        cumulative.append("line") // plot border
+            .attr("x1", margin.left)
+            .attr("x2", width-margin.right)
+            .attr("y1", margin.top+0.5)
+            .attr("y2", margin.top+0.5)
+            .style("fill", "none")
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+        
+        cumulative.append("line") // plot border
+            .attr("x1", width-margin.right+0.5)
+            .attr("x2", width-margin.right+0.5)
+            .attr("y1", margin.top)
+            .attr("y2", height-margin.bottom)
+            .style("fill", "none")
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+
+        // add line
         cumulative.append('path')
             .data([lineData])
             .attr("class", "line")
@@ -128,21 +153,22 @@
             .text("Cumulative Fraction");
 
         // add legend
-        var cumulative_color_hash = {  0 : ["ALL", "grey"],
-              1 : [plotResult.tf_name, "red"],
+        var cumulative_color_hash = {  
+              0 : [plotResult.tf_name, "red"],
+              1 : ["Background", "grey"],
         };
         for (var i = 0; i < Object.keys(cumulative_color_hash).length; i++) {
             cumulative.append("line")
                     .attr("x1", margin.left + 10)
-                    .attr("y1", i*25 + 15)
+                    .attr("y1", i*25 + 25)
                     .attr("x2", margin.left + 35)
-                    .attr("y2", i*25 + 15)
+                    .attr("y2", i*25 + 25)
                     .attr("stroke-width", 2)
                     .attr("stroke", cumulative_color_hash[String(i)][1]);
 
             cumulative.append("text")
                     .attr("x", margin.left + 40)
-                    .attr("y", i*25 + 20)
+                    .attr("y", i*25 + 30)
                     .attr("height",10)
                     .attr("width",20)
                     .style("fill", cumulative_color_hash[String(i)][1])
@@ -152,7 +178,7 @@
         // Set-up the export button
         d3.select('#cumulativeButton').on('click', function(){
           var svgString = getSVGString(cumulative.node());
-          svgString2Image( svgString, width, height, 'png', save ); // passes Blob and filesize String to the callback
+          svgString2Image( svgString, width*3, height*3, 'png', save ); // passes Blob and filesize String to the callback
 
           function save( dataBlob, filesize ){
             saveAs( dataBlob, 'cumulative_fraction.png' ); // FileSaver.js function
@@ -164,10 +190,10 @@
         var rankdotTF = plotResult.rankdot_TF;
         // Set the ranges
         var xRankdot = d3.scaleLinear()
-            .domain([-20, rankdotData.length + 20])
+            .domain([-30, rankdotData.length + 20])
             .range([margin.left, width - margin.right]);
         var yRankdot = d3.scaleLinear()
-            .domain([0, d3.max(rankdotData, function(d) { return d.rank_y; }) + 0.3 ])
+            .domain([-0.2, d3.max(rankdotData, function(d) { return d.rank_y; }) + 0.2 ])
             .range([height - margin.bottom, margin.top]);
 
         // Define the axes
@@ -177,9 +203,30 @@
         var yRankdotAxis = d3.axisLeft()
             .scale(yRankdot)
             .ticks(3);
-          
 
         var rankdot = d3.select('#rankdot');
+        rankdot.append("rect")
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .attr("fill", "white");
+
+        rankdot.append("line") // plot border
+            .attr("x1", margin.left)
+            .attr("x2", width-margin.right)
+            .attr("y1", margin.top+0.5)
+            .attr("y2", margin.top+0.5)
+            .style("fill", "none")
+            .style("stroke", "black")
+            .style("stroke-width", 1);
+        
+        rankdot.append("line") // plot border
+            .attr("x1", width-margin.right+0.5)
+            .attr("x2", width-margin.right+0.5)
+            .attr("y1", margin.top)
+            .attr("y2", height-margin.bottom)
+            .style("fill", "none")
+            .style("stroke", "black")
+            .style("stroke-width", 1);
 
         // add the tooltip area to the webpage
         var tooltip = d3.select("body").append("div")
@@ -198,10 +245,9 @@
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html(d["tf_name"] + "<br/> (" + d.rank_x
-                + ", " + d.rank_y + ")")
-                    .style("left", (d3.event.pageX + 5) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                tooltip.html(d["tf_name"]) // Others hover text
+                    .style("left", (d3.event.pageX + 10) + "px")
+                    .style("top", (d3.event.pageY - 13) + "px");
             })
             .on("mouseout", function(d) {
                 tooltip.transition()
@@ -221,10 +267,9 @@
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html(plotResult.tf_name + "<br/> (" + d.rank_x
-                + ", " + d.rank_y + ")")
-                    .style("left", (d3.event.pageX + 5) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                tooltip.html(plotResult.tf_name) // TF hover text
+                    .style("left", (d3.event.pageX + 10) + "px")
+                    .style("top", (d3.event.pageY - 13) + "px");
             })
             .on("mouseout", function(d) {
                 tooltip.transition()
@@ -255,20 +300,30 @@
             .text("-log10 (p)");
 
         // add legend
-        var rankdot_color_hash = {  0 : ["Others", "grey"],
-              1 : [plotResult.tf_name, "red"],
+        var rankdot_color_hash = {  
+              0 : [plotResult.tf_name, "red"],
+              1 : ["Others", "grey"],
         };
         for (var i = 0; i < Object.keys(rankdot_color_hash).length; i++) {
-            rankdot.append("circle")
-                    .attr("cx", width - margin.right - 60)
-                    .attr("cy", i*25 + 15)
-                    .attr("r",2)
-                    .attr("stroke", rankdot_color_hash[String(i)][1])
-                    .style("fill", rankdot_color_hash[String(i)][1]);
+            if (i == 0) {
+                rankdot.append("circle")
+                        .attr("cx", width - margin.right - 70)
+                        .attr("cy", i*25 + 25)
+                        .attr("r",5)
+                        .attr("stroke", rankdot_color_hash[String(i)][1])
+                        .style("fill", rankdot_color_hash[String(i)][1]);
+            } else {
+                rankdot.append("circle")
+                          .attr("cx", width - margin.right - 70)
+                          .attr("cy", i*25 + 25)
+                          .attr("r",2)
+                          .attr("stroke", rankdot_color_hash[String(i)][1])
+                          .style("fill", rankdot_color_hash[String(i)][1]);
+            }
 
             rankdot.append("text")
-                    .attr("x", width - margin.right - 50)
-                    .attr("y", i*25 + 20)
+                    .attr("x", width - margin.right - 60)
+                    .attr("y", i*25 + 30)
                     .attr("height",10)
                     .attr("width",20)
                     .style("fill", rankdot_color_hash[String(i)][1])
@@ -278,7 +333,7 @@
         // Set-up the export button
         d3.select('#rankdotButton').on('click', function(){
           var svgString = getSVGString(rankdot.node());
-          svgString2Image( svgString, width, height, 'png', save ); // passes Blob and filesize String to the callback
+          svgString2Image( svgString, width*3, height*3, 'png', save ); // passes Blob and filesize String to the callback
 
           function save( dataBlob, filesize ){
             saveAs( dataBlob, 'cumulative_fraction.png' ); // FileSaver.js function

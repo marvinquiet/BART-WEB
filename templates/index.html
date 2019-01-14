@@ -49,14 +49,20 @@
       <hr class="mb-3">
 
       <div class="row">
-        <div class="col-md-12 order-md-1">
+        <div class="col-md-4 order-md-1">
           <form method=post enctype=multipart/form-data id="resultForm" novalidate>
             <h4 style="display:inline-block; vertical-align: middle;">Run BART here</span></h4>
             <button id="get_result" class="btn btn-link" type="submit" name="result_button" onclick="pop_up_func()">get result here</button>
           </form>
+        </div>
 
-          <button class="btn btn-link" href="javascript:void(0);" onclick="javascript:introJs().start();">Show me how to use</button>
-
+        <div class="col-md-8 order-md-1">
+            <button class="btn btn-link" href="javascript:void(0);" onclick="javascript:introJs().start();">Show me how to use</button>
+        </div>
+      </div>
+      
+      <div class="row">
+          <div class="col-md-12 order-md-1">
           <!-- result Modal -->
           <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
