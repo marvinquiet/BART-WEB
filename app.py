@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import os
 import json
 import numpy as np
@@ -7,6 +8,7 @@ import scipy
 from scipy import special
 from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory, session)
 from werkzeug.utils import secure_filename
+
 
 import do_process
 import marge_bart
@@ -297,6 +299,7 @@ def bart_plot_result(userkey_tfname):
     dx = 0.01
     x = np.arange(0,1,dx)
     by,ty = [],[]
+    
     for xi in x:
         by.append(sum(i< xi for i in background )/len(background))
         ty.append(sum(i< xi for i in target )/len(target))
@@ -312,6 +315,7 @@ def bart_plot_result(userkey_tfname):
     rankdot_pair = {}
     col = 'r_rank'
     for tf_id in bart_df.index:
+        rankdot_pair['tf_name'] = tf_id
         rankdot_pair['rank_x'] = list(bart_df.index).index(tf_id)+1
         rankdot_pair['rank_y'] = -1*np.log10(irwin_hall_cdf(3*bart_df.loc[tf_id][col],3))
         rankdot_data.append(rankdot_pair)

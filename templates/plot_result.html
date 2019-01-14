@@ -177,8 +177,14 @@
         var yRankdotAxis = d3.axisLeft()
             .scale(yRankdot)
             .ticks(3);
+          
 
         var rankdot = d3.select('#rankdot');
+
+        // add the tooltip area to the webpage
+        var tooltip = d3.select("body").append("div")
+              .attr("class", "tooltip")
+              .style("opacity", 0);
         // Add the scatterplot
         rankdot.selectAll("dot")
             .data(rankdotData)
@@ -187,7 +193,21 @@
             .attr("fill", "grey")
             .attr("r", 2)
             .attr("cx", function(d) { return xRankdot(d.rank_x); })
-            .attr("cy", function(d) { return yRankdot(d.rank_y); });
+            .attr("cy", function(d) { return yRankdot(d.rank_y); })
+            .on("mouseover", function(d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(d["tf_name"] + "<br/> (" + d.rank_x
+                + ", " + d.rank_y + ")")
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", function(d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });
 
         rankdot.selectAll("dot")
             .data(rankdotTF)
@@ -196,7 +216,21 @@
             .attr("fill", "red")
             .attr("r", 5)
             .attr("cx", function(d) { return xRankdot(d.rank_x); })
-            .attr("cy", function(d) { return yRankdot(d.rank_y); });
+            .attr("cy", function(d) { return yRankdot(d.rank_y); })
+            .on("mouseover", function(d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(plotResult.tf_name + "<br/> (" + d.rank_x
+                + ", " + d.rank_y + ")")
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+            })
+            .on("mouseout", function(d) {
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            });;
 
         rankdot.append('g')
             .attr('class', 'x axis')
