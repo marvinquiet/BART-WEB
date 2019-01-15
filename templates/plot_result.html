@@ -181,7 +181,7 @@
           svgString2Image( svgString, width*3, height*3, 'png', save ); // passes Blob and filesize String to the callback
 
           function save( dataBlob, filesize ){
-            saveAs( dataBlob, 'cumulative_fraction.png' ); // FileSaver.js function
+            saveAs( dataBlob, plotResult.tf_name + '_cumulative_fraction.png' ); // FileSaver.js function
           }
         });
 
@@ -336,7 +336,7 @@
           svgString2Image( svgString, width*3, height*3, 'png', save ); // passes Blob and filesize String to the callback
 
           function save( dataBlob, filesize ){
-            saveAs( dataBlob, 'cumulative_fraction.png' ); // FileSaver.js function
+            saveAs( dataBlob, plotResult.tf_name + '_ranked_dot.png' ); // FileSaver.js function
           }
         });
 
