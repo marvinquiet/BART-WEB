@@ -63,14 +63,14 @@ Thank you for using BART web!
 Here is your key: {}
 
 When the job is done, you can ge the results through this link: {}
-'''.format(user_key, 'http://bartweb.uvasomrc.io/result?user_key='+user_key)
+'''.format(user_key, 'http://bartweb.org/result?user_key='+user_key)
     elif email_type == 'Done':
         msg['Subject'] = "BART result"
         message = '''
 Congratulations! Your BART job is done!
 
 Please get the results through this link: {}
-'''.format('http://bartweb.uvasomrc.io/result?user_key='+user_key)
+'''.format('http://bartweb.org/result?user_key='+user_key)
     elif email_type == 'Error':
         msg['Subject'] = "BART error"
         message = '''
