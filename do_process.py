@@ -295,13 +295,20 @@ def generate_bart_file_results(user_data):
 # for showing table
 def parse_bart_results(bart_result_file):
     # tf_name, tf_score, p_value, z_score, max_auc, r_rank -> definition in result_demonstration.html
-    bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank'] 
+    
+    bart_title = []
     bart_result = []
     with open(bart_result_file, 'r') as fopen:
-        next(fopen) # skip first line
-        for line in fopen:
-            line = line.strip()
+        title_line = fopen.readline().strip()
+        if 'irwin_hall_pvalue' in title_line: # add Irwi-Hall P-value
+            bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank', 'i_p_value']
+        else:
+            bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank']
+
+        line = fopen.readline().strip()
+        while line:
             bart_result.append(dict(zip(bart_title, line.split('\t'))))
+            line = fopen.readline().strip()
     return bart_result
             
 

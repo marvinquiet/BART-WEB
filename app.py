@@ -265,11 +265,18 @@ def bart_plot_result(userkey_tfname):
     AUCs = {}
     tfs = {}
     bart_df = {}
-    bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank']
+    bart_title = []
     for root, dirs, files in os.walk(bart_output_dir):
         for bart_file in files:
             if bart_res_ext in bart_file:
                 bart_result_file = os.path.join(root, bart_file)
+                # parse the value with the title
+                with open(bart_result_file, 'r') as fopen:
+                    line = fopen.readline().strip()
+                    if 'irwin_hall_pvalue' in line: # add Irwi-Hall P-value
+                        bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank', 'i_p_value']
+                    else:
+                        bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank']
                 bart_df = pd.read_csv(bart_result_file, sep='\t', names=bart_title[1:], index_col=0, skiprows=1)
             if bart_auc_ext in bart_file:
                 bart_auc_file = os.path.join(root, bart_file)

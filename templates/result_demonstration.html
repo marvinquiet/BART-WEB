@@ -13,8 +13,11 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
 
     <!-- tabulator -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/css/tabulator.min.css" rel="stylesheet">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/js/tabulator.min.js"></script>
+    <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.3/js/tabulator.min.js"></script> -->
+    <!-- tabulator new version -->
+    <link href="https://unpkg.com/tabulator-tables@4.0.5/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.0.5/dist/js/tabulator.min.js"></script>
     
     <!-- Bootstrap core CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
@@ -138,32 +141,37 @@
 
       // if bart ran and finished, show the results in the table
       if (('bartResult' in myResult) && (myResult.bartResult.length >= 0)) {
-          $('#bart-result').tabulator({
+          var table = new Tabulator('#bart-result', {
+            height: 608,
+            layout:"fitColumns",
+            columns:[
+              // use hover toolkits for each column
+              // click TF name, trigger plot window
+              {title: "TF", field: "tf_name", align:"center", width: 120, headerTooltip:"Transcription Factor names",
+              cellClick:function(e, cell){
+                  //e - the click event object
+                  //cell - cell componen;
+                  var cellObject = cell._cell;
+                  PopupCenter("/plot/" + myResult.user_conf.Job_key + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
+              },
+              formatter:function(cell, formatterParams){
+                  var value = cell.getValue();
+                  return "<span style='cursor:pointer; color: blue; text-decoration:underline;' >" + value + "</span>";
+              }},
+              {title: "Wilcoxon Test statistic", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc", headerTooltip: "Wilcoxon Rank-Sum Test Statistic score"},
+              {title: "Wilcoxon P-value", field: "p_value", align:"center", sorter: "number", headerTooltip: "Wilcoxon Rank-Sum Test Statistic P-value"},
+              {title: "Z-score", field: "z_score", align:"center", sorter: "number", headerTooltip: "Background test deviation Z-score"},
+              {title: "max AUC", field: "max_auc", align:"center", sorter: "number", headerTooltip: "Maximum AUC score for TF datasets"},
+              {title: "Relative rank", field: "r_rank", align:"center", sorter: "number", headerTooltip: "Average rank for P-value, Z-score, and max AUC, then divided by the number of TF we have"},
+              // {title: "Irwin-Hall P-value", field: "i_p_value", align:"center", sorter: "number", headerTooltip: "Irwin-Hall test on relative rank"},
+            ],
+          });
           
-          height: 608,
-          layout: "fitColumns",
-          columns:[
-            // use hover toolkits for each column
-            // click TF name, trigger plot window
-            {title: "TF", field: "tf_name", align:"center", width: 120, headerTooltip:"Transcription Factor names",
-            cellClick:function(e, cell){
-                //e - the click event object
-                //cell - cell componen;
-                var cellObject = cell.cell;
-                PopupCenter("/plot/" + myResult.user_conf.Job_key + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
-            },
-            formatter:function(cell, formatterParams){
-                var value = cell.getValue();
-                return "<span style='cursor:pointer; color: blue; text-decoration:underline;' >" + value + "</span>";
-            }},
-            {title: "Test statistic", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc", headerTooltip: "Wilcoxon Rank-Sum Test Statistic score"},
-            {title: "P-value", field: "p_value", align:"center", sorter: "number", headerTooltip: "Wilcoxon Rank-Sum Test Statistic P-value"},
-            {title: "Z-score", field: "z_score", align:"center", sorter: "number", headerTooltip: "Background test deviation Z-score"},
-            {title: "max AUC", field: "max_auc", align:"center", sorter: "number", headerTooltip: "Maximum AUC score for TF datasets"},
-            {title: "Relative rank", field: "r_rank", align:"center", sorter: "number", headerTooltip: "Average rank for P-value, Z-score, and max AUC, then divided by the number of TF we have"},
-          ],
-      });
-          $("#bart-result").tabulator("setData", myResult.bartResult);
+          if ('i_p_value' in myResult.bartResult[0]) {
+              table.addColumn({title: "Irwin-Hall P-value", field: "i_p_value", align:"center", sorter: "number", headerTooltip: "Irwin-Hall test on the relative rank"}, false, "r_rank");
+          }
+          table.setData(myResult.bartResult)
+          // $("#bart-result").tabulator("setData", myResult.bartResult);
       }
 
       function PopupCenter(url, title, w, h) {  
