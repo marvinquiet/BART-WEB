@@ -86,6 +86,11 @@ def get_user_data(user_key):
 
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     config_file = os.path.join(user_path, 'user.config')
+
+    # handle non-existing exception
+    if not os.path.exists(config_file):
+        return None
+
     with open(config_file, 'r') as fopen:
         user_data = yaml.load(fopen)
 
