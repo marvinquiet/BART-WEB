@@ -159,20 +159,58 @@
                   var value = cell.getValue();
                   return "<span style='cursor:pointer; color: blue; text-decoration:underline;' >" + value + "</span>";
               }},
-              {title: "Wilcoxon Test statistic", field: "tf_score", align:"center", sorter: "number", headerSortStartingDir: "asc", headerTooltip: "Wilcoxon Rank-Sum Test Statistic score"},
-              {title: "Wilcoxon P-value", field: "p_value", align:"center", sorter: "number", headerTooltip: "Wilcoxon Rank-Sum Test Statistic P-value"},
-              {title: "Z-score", field: "z_score", align:"center", sorter: "number", headerTooltip: "Background test deviation Z-score"},
-              {title: "max AUC", field: "max_auc", align:"center", sorter: "number", headerTooltip: "Maximum AUC score for TF datasets"},
-              {title: "Relative rank", field: "r_rank", align:"center", sorter: "number", headerTooltip: "Average rank for P-value, Z-score, and max AUC, then divided by the number of TF we have"},
-              // {title: "Irwin-Hall P-value", field: "i_p_value", align:"center", sorter: "number", headerTooltip: "Irwin-Hall test on relative rank"},
+              {title: "Wilcoxon Test statistic", 
+                  field: "tf_score", 
+                  align:"center", 
+                  sorter: "number", 
+                  headerSortStartingDir: "asc", 
+                  headerTooltip: "Wilcoxon rank-sum test comparing the set of association scores from one TF with all the association scores. Higher the test score is, more likely the TF regulates the input."
+              },
+              {title: "Wilcoxon P-value", 
+                  field: "p_value", 
+                  align:"center", 
+                  sorter: "number", 
+                  headerTooltip: "One-sided P-value of the Wilcoxon rank-sum test. Smaller P-value is, more siginificant the TF regulates the input."
+              },
+              {title: "Z-score", 
+                  field: "z_score", 
+                  align:"center", 
+                  sorter: "number", 
+                  headerTooltip: "Z-score indicates the deviation of the TF Wilcoxon test score from its background model, which is generated from MSigDB gene sets and H3K27ac profiles. The background model contains the Wilcoxon test score for each TF and each profile. "
+              },
+              {title: "max AUC", 
+                  field: "max_auc", 
+                  align:"center", 
+                  sorter: "number", 
+                  headerTooltip: "Maximum association score of each TF in its datasets indicating the specific binding pattern of one dataset has the highest correlation with the input."
+              },
+              {title: "Relative rank", 
+                  field: "r_rank", 
+                  align:"center", 
+                  sorter: "number", 
+                  headerTooltip: "Average the rank from Wilcoxon P-value, Z-score, and max association score and then divide the absolute rank by the total TF numbers."
+              },
             ],
           });
           
           if ('i_p_value' in myResult.bartResult[0]) {
-              table.addColumn({title: "Irwin-Hall P-value", field: "i_p_value", align:"center", sorter: "number", headerTooltip: "Irwin-Hall test on the relative rank"}, false, "r_rank");
+              table.addColumn({title: "Irwin-Hall P-value", 
+                                  field: "i_p_value", 
+                                  align:"center", 
+                                  sorter: "number", 
+                                  headerTooltip: "Irwin-Hall P-value indicates the rank significance. Irwin-Hall describes a probability distribution for a random variable defined as the sum of a number of independent random variables, each having a uniform distribution. Smaller the P-value is, more significant the rank is.",
+                                  formatter:function(cell, formatterParams, onRendered){
+                                      var cell_value = cell.getValue();
+                                      if (cell_value < 0.05 ) {
+                                          return "<span style='font-weight:bold;'>" + cell_value + "*</span>";
+                                      }
+                                      else {
+                                          return cell_value;
+                                      }
+                                  },
+                              }, false, "r_rank");
           }
           table.setData(myResult.bartResult)
-          // $("#bart-result").tabulator("setData", myResult.bartResult);
       }
 
       function PopupCenter(url, title, w, h) {  

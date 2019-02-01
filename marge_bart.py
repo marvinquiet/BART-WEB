@@ -109,7 +109,7 @@ def exe_marge(marge_output_dir):
 
 
 def is_marge_done(user_path):
-    snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')
+    snakemake_log_dir = os.path.join(user_path, 'marge_data/.snakemake/log')  # for snakemake version 5.1.4
     
     # when job is still underprocessing
     if not os.path.exists(snakemake_log_dir):
