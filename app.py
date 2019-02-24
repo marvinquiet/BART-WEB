@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
 import os
 import yaml
 from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory, session)
