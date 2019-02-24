@@ -42,7 +42,7 @@
           <h2 >BART</h2>
           <h5 ><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h5>
           <p>This web server is to perform BART, a bioinformatics tool for predicting functional factors (including transcription factors and chromatin regulators) that bind at cis-regulatory regions to regulate gene expression in the human or mouse genomes, taking a query gene list or a ChIP-seq dataset as input.</p>
-          <p>The current version is BART 2.0, which uses 7,053 human ChIP-seq datasets and 5,038 mouse ChIP-seq datasets from the public domain (collected in Cistrome Data Browser) to make the prediction.</p>
+          <p>The current version is BART 2.0, which uses over 7,000 human ChIP-seq datasets and over 5,000 mouse ChIP-seq datasets from the public domain (collected in Cistrome Data Browser) to make the prediction.</p>
           <img class="mb-3" src="{{ url_for('static', filename='bart_web.png') }}" alt="" width="600">
         </div>
       </div>
@@ -108,13 +108,39 @@
                 <p class="mb-3" id="assembly"><b>Input data type:</b></p>
               </div>
               <div class="col-md-10 mb-3" data-step="2" data-intro="And choose the data type you are going to upload.">
-                <div class="custom-control custom-radio">
-                  <input type="radio" id="genelist" name="dataType" value="Geneset" class="custom-control-input" checked required>
-                  <label class="custom-control-label" for="genelist">Genelist <img src="{{ url_for('static', filename='question-mark.svg') }}" style="width:16px; vertical-align:middle" title="Genelist better contains more than 100 genes."/> </label>
+                <div class="row">
+                  <div class="col-md-2 mb-3">
+                    <div class="custom-control custom-radio">
+                      <input type="radio" id="genelist" name="dataType" value="Geneset" class="custom-control-input" checked required>
+                      <label class="custom-control-label" for="genelist">Genelist</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                      <a href="/sample/genelist" download>
+                        <button class="btn btn-lg btn-secondary btn-outline-primary btn-sm" type="button">Download hg38 gene list sample</button>
+                      </a>
+                      <img src="{{ url_for('static', filename='question-mark.svg') }}" style="width:16px; vertical-align:middle" title="This sample gene list file contains down-regulated genes upon shRNA knock-down of POU5F1 in human embryonic stem cell line H1. You can download it, upload by yourself and submit your job, or refer to the pre-run result."/>
+                  </div>
+                  <!-- <div class="col-md-5 mb-3">
+                      <a class="nav-link" target="_new" href="/sample_result/genelist">Pre-run Result for gene list sample</a>
+                  </div> -->
                 </div>
-                <div class="custom-control custom-radio">
-                  <input type="radio" id="ChIP-seq" name="dataType" value="ChIP-seq" class="custom-control-input" required>
-                  <label class="custom-control-label" for="ChIP-seq">ChIP-seq data <img src="{{ url_for('static', filename='question-mark.svg') }}" style="width:16px; vertical-align:middle" title="ChIP-seq mapping reads"/></label>
+                <div class="row">
+                  <div class="col-md-2 mb-3">
+                    <div class="custom-control custom-radio">
+                      <input type="radio" id="ChIP-seq" name="dataType" value="ChIP-seq" class="custom-control-input" required>
+                      <label class="custom-control-label" for="ChIP-seq">ChIP-seq data</label>
+                    </div>
+                  </div>
+                  <!-- <div class="col-md-4 mb-3">
+                      <a href="/sample/ChIPdata" download>
+                        <button class="btn btn-lg btn-secondary btn-outline-primary btn-sm" type="button">Download hg38 ChIP-seq sample</button>
+                      </a>
+                      <img src="{{ url_for('static', filename='question-mark.svg') }}" style="width:16px; vertical-align:middle" title="This sample ChIP-seq data contains ..."/>
+                  </div>
+                  <div class="col-md-5 mb-3">
+                      <a class="nav-link" target="_new" href="/sample_result/ChIPdata">Pre-run Result for ChIP-seq sample</a>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -245,13 +271,15 @@
                 event.preventDefault();
                 event.stopPropagation();
 
-                if (document.getElementById('geneFile').checked) { 
-                  var fileElement = document.getElementById('uploadFiles');
-                  console.log(fileElement.value);
-                  if ( fileElement.value == "") {
-                    alert('Please upload your genelist file.');
-                  } 
+                // check whether gene list button was checked and whether there is value under this condition
+                if (document.getElementById('genelist').checked && document.getElementById('geneFile').checked) { 
+                    var fileElement = document.getElementById('uploadFiles');
+                    console.log(fileElement.value);
+                    if ( fileElement.value == "") {
+                      alert('Please upload your genelist file.');
+                    } 
                 }
+
                 if (document.getElementById('ChIP-seq').checked && document.getElementById('uploadFiles').value == "") {
                   alert('Please upload your ChIP-seq reads file.');
                 }
@@ -259,7 +287,7 @@
                 form.classList.add('was-validated');
 
                 // check user uploaded gene counts in file
-                if (document.getElementById('geneFile').checked) { 
+                if (document.getElementById('genelist').checked && document.getElementById('geneFile').checked) { 
                   var fileElement = document.getElementById('uploadFiles');
                   console.log(fileElement.value);
                   if ( fileElement.value == "") {
@@ -293,6 +321,8 @@
                     }
                   }
                 }
+
+
 
               }
             }, false);

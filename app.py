@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 import os
-import json
-import numpy as np
-import pandas as pd
-import scipy
-from scipy import special
+import yaml
 from flask import (Flask, flash, request, redirect, url_for, render_template, send_from_directory, session)
 from werkzeug.utils import secure_filename
-
 
 import do_process
 import marge_bart
@@ -125,8 +120,8 @@ def index():
                 return redirect(url_for('error_page', msg=err_msg))
     return render_template('index.html')
 
-@app.route('/about', methods=['GET', 'POST'])
-def about():
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
     if request.method == 'POST':
         # navbar result button
         if 'navbar_button' in request.form:
@@ -141,7 +136,7 @@ def about():
                 err_msg = "Job does not exist, make sure you enter the right key."
                 return redirect(url_for('error_page', msg=err_msg))
 
-    return render_template('about.html')
+    return render_template('contact.html')
 
 @app.route('/help', methods=['GET', 'POST'])
 def help():
@@ -185,8 +180,8 @@ def get_result():
         logger.info(user_data)
 
         results = do_process.generate_results(user_data)
+        results['sample'] = False
         return render_template('result_demonstration.html', results=results)
-
 
 @app.route('/key', methods=['GET', 'POST'])
 def show_key():
@@ -227,29 +222,6 @@ def error_page():
     err_msg = request.args['msg']
     return render_template('error.html', msg=err_msg)
 
-# Irwin-Hall Distribution for plot
-def factorial(n):
-    value = 1.0
-    while n>1:
-        value*=n
-        n-=1
-    return value
-
-def logfac(n):
-    if n<20:
-        return np.log(factorial(n))
-    else:
-        return n*np.log(n)-n+(np.log(n*(1+4*n*(1+2*n)))/6.0)+(np.log(np.pi))/2.0
-
-def irwin_hall_cdf(x,n):
-    # pval = returned_value for down regulated
-    # pval = 1 - returned_value for up regulated
-    value,k = 0,0
-    while k<=np.floor(x):
-        value +=(-1)**k*(special.binom(n,k))*(x-k)**n
-        k+=1
-    return value/(np.exp(logfac(n)))
-
 @app.route('/plot/<userkey_tfname>')
 def bart_plot_result(userkey_tfname):
     user_key, tf_name = userkey_tfname.split('___')
@@ -258,82 +230,9 @@ def bart_plot_result(userkey_tfname):
     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
     bart_output_dir = os.path.join(user_path, 'download/bart_output')
 
-    # _auc.txt and _bart_result.txt files
-    bart_auc_ext = '_auc.txt'
-    bart_res_ext = '_bart_results.txt'
-
-    AUCs = {}
-    tfs = {}
-    bart_df = {}
-    bart_title = []
-    for root, dirs, files in os.walk(bart_output_dir):
-        for bart_file in files:
-            if bart_res_ext in bart_file:
-                bart_result_file = os.path.join(root, bart_file)
-                # parse the value with the title
-                with open(bart_result_file, 'r') as fopen:
-                    line = fopen.readline().strip()
-                    if 'irwin_hall_pvalue' in line: # add Irwi-Hall P-value
-                        bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank', 'i_p_value']
-                    else:
-                        bart_title = ['tf_name', 'tf_score', 'p_value', 'z_score', 'max_auc', 'r_rank']
-                bart_df = pd.read_csv(bart_result_file, sep='\t', names=bart_title[1:], index_col=0, skiprows=1)
-            if bart_auc_ext in bart_file:
-                bart_auc_file = os.path.join(root, bart_file)
-                with open(bart_auc_file, 'r') as fopen:
-                    for line in fopen:
-                        tf_key, auc_equation = line.strip().split('\t')
-                        auc = float(auc_equation.replace(' ', '').split('=')[1])
-                        AUCs[tf_key] = auc
-
-                for tf_key in AUCs.keys():
-                    tf = tf_key.split('_')[0]
-                    auc = AUCs[tf_key]
-                    if tf not in tfs:
-                        tfs[tf] = [auc]
-                    else:
-                        tfs[tf].append(auc)
-    plot_results = {}
-    plot_results['tf_name'] = tf_name
-
-    # generate cumulative data
-    cumulative_data = {}
-    background = []
-    for tf in tfs:
-        background.extend(tfs[tf])
-    target = tfs[tf_name]
-    background = sorted(background)
-    dx = 0.01
-    x = np.arange(0,1,dx)
-    by,ty = [],[]
-    
-    for xi in x:
-        by.append(sum(i< xi for i in background )/len(background))
-        ty.append(sum(i< xi for i in target )/len(target))
-
-    cumulative_data['x'] = list(x)
-    cumulative_data['bgY'] = by
-    cumulative_data['tfY'] = ty
-    cumulative_data = [dict(zip(cumulative_data,t)) for t in zip(*cumulative_data.values())]
-    plot_results['cumulative_data'] = cumulative_data
-
-    # rankdot data
-    rankdot_data = []
-    rankdot_pair = {}
-    col = 'r_rank'
-    for tf_id in bart_df.index:
-        rankdot_pair['tf_name'] = tf_id
-        rankdot_pair['rank_x'] = list(bart_df.index).index(tf_id)+1
-        rankdot_pair['rank_y'] = -1*np.log10(irwin_hall_cdf(3*bart_df.loc[tf_id][col],3))
-        rankdot_data.append(rankdot_pair)
-        rankdot_pair = {}
-    plot_results['rankdot_data'] = rankdot_data
-
-    rankdot_pair['rank_x'] = list(bart_df.index).index(tf_name)+1
-    rankdot_pair['rank_y'] = -1*np.log10(irwin_hall_cdf(3*bart_df.loc[tf_name][col],3))
-    plot_results['rankdot_TF'] = [rankdot_pair]
-
+    plot_results = do_process.generate_plot_results(bart_output_dir, tf_name)
     return render_template('plot_result.html', plotResults=plot_results)
+
     #============test end========================
 
     # where plots locate
@@ -361,7 +260,6 @@ def download_marge_file(userkey_filename):
     download_path = os.path.join(user_path, 'download')
     return send_from_directory(download_path, filename)
 
-
 @app.route('/download/bart_output/<userkey_filename>')
 def download_bart_res_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
@@ -369,11 +267,83 @@ def download_bart_res_file(userkey_filename):
     download_path = os.path.join(user_path, 'download/bart_output')
     return send_from_directory(download_path, filename)
 
-@app.route('/download/bart_output/plot/<userkey_filename>')
-def download_bart_chart_file(userkey_filename):
+# @app.route('/download/bart_output/plot/<userkey_filename>')
+# def download_bart_chart_file(userkey_filename):
+#     user_key, filename = userkey_filename.split('___')
+#     user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
+#     download_path = os.path.join(user_path, 'download/bart_output/plot')
+#     return send_from_directory(download_path, filename)
+
+
+# ===== for genelist/ChIPdata sample =====
+
+# download sample data
+@app.route('/sample/<sample_type>')
+def download_sample_file(sample_type):
+    sample_path = ""
+    sample_name = ""
+    if sample_type == 'genelist':
+        sample_name = "genelist.txt"
+        sample_path = os.path.join(PROJECT_DIR, 'sample/genelist/upload')
+    elif sample_type == 'ChIPdata':
+        sample_name = "ChIPseq.txt"
+        sample_path = os.path.join(PROJECT_DIR, 'sample/ChIPdata/upload')
+
+    return send_from_directory(sample_path, sample_name)
+
+# sample result
+@app.route('/sample_result/<sample_type>')
+def sample_result(sample_type):
+    config_file = os.path.join(PROJECT_DIR, 'sample/' + sample_type + '/user.config')
+    if not os.path.exists(config_file):
+        return None
+
+    user_data = {}
+    with open(config_file, 'r') as fopen:
+        user_data = yaml.load(fopen)
+
+    if user_data:
+        results = do_process.generate_results(user_data)
+        if 'marge_result_files' in results:
+            marge_result_list = []
+            for marge_res_file in results['marge_result_files']:
+                filename, file_url = marge_res_file
+                marge_result_list.append((filename, file_url.replace('download', 'sample_download')))
+            results['marge_result_files'] = marge_result_list
+
+        if 'bart_result_files' in results:
+            bart_result_list = []
+            for bart_res_file in results['bart_result_files']:
+                filename, file_url = bart_res_file
+                bart_result_list.append((filename, file_url.replace('download', 'sample_download')))
+            results['bart_result_files'] = bart_result_list
+
+    results['sample'] = True
+    results['sample_type'] = sample_type
+    return render_template('result_demonstration.html', results=results)
+
+# show sample plot result
+@app.route('/sample_plot/<sample_type>/<tf_name>')
+def bart_sample_plot_result(sample_type, tf_name):
+    user_path = os.path.join(PROJECT_DIR, 'sample/' + sample_type)
+    bart_output_dir = os.path.join(user_path, 'download/bart_output')
+
+    plot_results = do_process.generate_plot_results(bart_output_dir, tf_name)
+    return render_template('plot_result.html', plotResults=plot_results)
+
+# download sample result files
+@app.route('/sample_download/<userkey_filename>')
+def download_sample_marge_file(userkey_filename):
     user_key, filename = userkey_filename.split('___')
-    user_path = os.path.join(PROJECT_DIR, 'usercase/' + user_key)
-    download_path = os.path.join(user_path, 'download/bart_output/plot')
+    user_path = os.path.join(PROJECT_DIR, 'sample/' + user_key)
+    download_path = os.path.join(user_path, 'download')
+    return send_from_directory(download_path, filename)
+
+@app.route('/sample_download/bart_output/<userkey_filename>')
+def download_sample_bart_res_file(userkey_filename):
+    user_key, filename = userkey_filename.split('___')
+    user_path = os.path.join(PROJECT_DIR, 'sample/' + user_key)
+    download_path = os.path.join(user_path, 'download/bart_output')
     return send_from_directory(download_path, filename)
 
 

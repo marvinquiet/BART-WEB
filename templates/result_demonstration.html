@@ -66,6 +66,7 @@
 
     <script type="text/javascript">
       var myResult = {{ results|tojson }};
+      var sampleFlag = myResult.sample;
 
       // if the procedure ran and finished, show RESULTS part
       // Otherwise, show "Your result is still being processed"
@@ -76,7 +77,6 @@
           var pTag = document.createElement("p");
           pTag.innerHTML = "<b>Download result files</b>";
           document.getElementById("resultOutputDiv").appendChild(pTag);
-
 
           // document.getElementById("stopPrediction").style.display = 'none';
           var margeResultFiles = myResult.marge_result_files;
@@ -153,7 +153,12 @@
                   //e - the click event object
                   //cell - cell componen;
                   var cellObject = cell._cell;
-                  PopupCenter("/plot/" + myResult.user_conf.Job_key + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
+                  if (sampleFlag == true) {
+                      sample_type = myResult.sample_type;
+                      PopupCenter("/sample_plot/" + sample_type + '/' + cellObject.value, "BART Plot Result", '900', '500'); 
+                  } else {
+                      PopupCenter("/plot/" + myResult.user_conf.Job_key + "___" + cellObject.value, "BART Plot Result", '900', '500'); 
+                  }
               },
               formatter:function(cell, formatterParams){
                   var value = cell.getValue();
@@ -201,8 +206,8 @@
                                   headerTooltip: "Irwin-Hall P-value indicates the rank significance. Irwin-Hall describes a probability distribution for a random variable defined as the sum of a number of independent random variables, each having a uniform distribution. Smaller the P-value is, more significant the rank is.",
                                   formatter:function(cell, formatterParams, onRendered){
                                       var cell_value = cell.getValue();
-                                      if (cell_value < 0.05 ) {
-                                          return "<span style='font-weight:bold;'>" + cell_value + "*</span>";
+                                      if (cell_value < 0.01 ) {
+                                          return "<span style='font-weight:bold;'>" + cell_value + "</span>";
                                       }
                                       else {
                                           return cell_value;

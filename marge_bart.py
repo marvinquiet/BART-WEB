@@ -196,9 +196,11 @@ def exe_bart_geneset(user_data):
         # subprocess.call(cmd, cwd=bart_output_path)
 
 
-def is_bart_done(user_path):
-    user_key = os.path.basename(user_path)
-    user_data = do_process.get_user_data(user_key)
+# def is_bart_done(user_path):
+def is_bart_done(user_data):
+    # user_key = os.path.basename(user_path)
+    # user_data = do_process.get_user_data(user_key)
+    user_path = user_data['user_path'].replace(SLURM_PROJECT_DIR, DOCKER_DIR)
     for user_file in user_data['files']:
         uploaded_file = os.path.basename(user_file).split('.')[0] # path/to/user/upload/filename.bam(txt)
         res_file_path = os.path.join(user_path, 'download/bart_output/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
