@@ -170,8 +170,8 @@ def generate_results(user_data):
 
     results.update(marge_file_dict)
 
-    # if user_data['bart'] and not marge_bart.is_bart_done(docker_user_path):
-    if user_data['bart'] and not marge_bart.is_bart_done(user_data):
+    if user_data['bart'] and not marge_bart.is_bart_done(docker_user_path):
+    # if user_data['bart'] and not marge_bart.is_bart_done(user_data):
         results['done'] = False
 
         if 'status' in user_data and (user_data['status'] == 'Error' or user_data['status'] == 'Sent'):

@@ -196,18 +196,33 @@ def exe_bart_geneset(user_data):
         # subprocess.call(cmd, cwd=bart_output_path)
 
 
-# def is_bart_done(user_path):
-def is_bart_done(user_data):
+def is_bart_done(user_path):
+# def is_bart_done(user_data):
     # user_key = os.path.basename(user_path)
     # user_data = do_process.get_user_data(user_key)
-    user_path = user_data['user_path'].replace(SLURM_PROJECT_DIR, DOCKER_DIR)
-    for user_file in user_data['files']:
-        uploaded_file = os.path.basename(user_file).split('.')[0] # path/to/user/upload/filename.bam(txt)
-        res_file_path = os.path.join(user_path, 'download/bart_output/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
-        if not os.path.exists(res_file_path):
-            return False
 
-    return True
+    auc_flag = False
+    res_flag = False
+    result_dir = os.path.join(user_path, 'download/bart_output/')
+    if not os.path.exists(result_dir):
+        return False
+
+    for res_file in os.listdir(result_dir):
+        if '_auc.txt' in res_file:
+            auc_flag = True
+        if '_bart_results.txt' in res_file:
+            res_flag = True
+    return (auc_flag and res_flag)
+
+
+
+    # for user_file in user_data['files']:
+    #     uploaded_file = os.path.basename(user_file).split('.')[0] # path/to/user/upload/filename.bam(txt)
+    #     res_file_path = os.path.join(user_path, 'download/bart_output/' + uploaded_file + '_bart_results.txt') # path/to/user/download/filename_bart_results.txt
+    #     if not os.path.exists(res_file_path):
+    #         return False
+
+    # return True
 
 
 # ========= MARGE BART PIPELINE =========
@@ -230,7 +245,7 @@ def do_marge_bart(user_data):
         fopen.write('''#!/bin/bash
 #SBATCH -N 1
 #SBATCH -n 12
-#SBATCH -t 24:00:00
+#SBATCH -t 12:00:00
 #SBATCH -p standard
 #SBATCH -A zanglab
 source ~/.bashrc
