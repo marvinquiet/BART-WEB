@@ -138,7 +138,6 @@ def generate_results(user_data):
     logger.info("Generate results: generate result for {}...".format(user_data['user_key'])) 
 
     # if marge, and marge not in marge_data 
-
     if user_data['marge'] \
         and not marge_bart.is_marge_done(docker_user_path) \
         and not marge_bart.is_marge_files_exist_in_download(docker_user_path):

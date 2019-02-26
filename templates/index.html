@@ -267,57 +267,106 @@
                 event.preventDefault();
                 event.stopPropagation();
 
+                var count = 0;
+                var alertStr = "";
+
                 // check whether gene list button was checked and whether there is value under this condition
                 if (document.getElementById('genelist').checked && document.getElementById('geneFile').checked) { 
                     var fileElement = document.getElementById('uploadFiles');
-                    console.log(fileElement.value);
                     if ( fileElement.value == "") {
-                      alert('Please upload your genelist file.');
+                      count += 1;
+                      alertStr = alertStr.concat('Please upload your genelist file.\n');
+                      // alert('Please upload your genelist file.');
+                    } 
+                }
+
+                if (document.getElementById('genelist').checked && document.getElementById('geneData').checked) { 
+                    var dataElement = document.getElementById('uploadList');
+                    if ( dataElement.value == "") {
+                      count += 1;
+                      alertStr = alertStr.concat('Please paste your genelist data.\n');
+                      // alert('Please paste your genelist data.');
                     } 
                 }
 
                 if (document.getElementById('ChIP-seq').checked && document.getElementById('uploadFiles').value == "") {
-                  alert('Please upload your ChIP-seq reads file.');
+                  count += 1;
+                  alertStr = alertStr.concat('Please upload your ChIP-seq reads file.\n');
+                  // alert('Please upload your ChIP-seq reads file.');
                 }
+
+                // if e-mail name is not null, check and alert
+                var emailText = document.getElementById('username').value;
+                if (emailText != "" && !emailText.includes('@')) {
+                  count += 1;
+                  alertStr = alertStr.concat('Please leave a correct email address.');
+                  // alert('Please input a correct email address.')
+                }
+                
+                if ( count > 0) {
+                    alert(alertStr);
+                }
+
               } else {
+                // console.log('Check validity true');
                 form.classList.add('was-validated');
 
                 // check user uploaded gene counts in file
                 if (document.getElementById('genelist').checked && document.getElementById('geneFile').checked) { 
                   var fileElement = document.getElementById('uploadFiles');
-                  console.log(fileElement.value);
-                  if ( fileElement.value == "") {
-                    alert('Please upload your genelist file.');
-                  } else {
-                    var fileObject = fileElement.files[0];
-                    var reader = new FileReader();
-                    reader.onload = function() {
-                      var fileLength = reader.result.split("\n").length;
-                      if (fileLength < 100) {
-                        if (!confirm("The uploaded gene list contains less than 100 genes. This may cause error or the result may not be optimal. Would you like to continue?")) {
-                          event.preventDefault();
-                          event.stopPropagation();
-                        }
-                      }
-                    };
-                    reader.readAsText(fileObject);
-                  }
-                }
-                
-                // check user uploaded gene counts in textarea
-                if (document.getElementById('geneData').checked) { 
-                  var dataElement = document.getElementById('uploadList');
-                  if ( dataElement.value != "") {
-                    var dataLength = dataElement.value.split("\n").length;
-                    if (dataLength < 100) {
+                  var fileObject = fileElement.files[0];
+                  var reader = new FileReader();
+                  reader.onload = function() {
+                    var fileLength = reader.result.split("\n").length;
+                    if (fileLength < 100) {
                       if (!confirm("The uploaded gene list contains less than 100 genes. This may cause error or the result may not be optimal. Would you like to continue?")) {
                         event.preventDefault();
                         event.stopPropagation();
                       }
                     }
+                  };
+                  reader.readAsText(fileObject);
+                }
+                
+                // check user uploaded gene counts in textarea
+                if (document.getElementById('genelist').checked && document.getElementById('geneData').checked) { 
+                  var dataElement = document.getElementById('uploadList');
+                  var dataLength = dataElement.value.split("\n").length;
+                  if (dataLength < 100) {
+                    if (!confirm("The uploaded gene list contains less than 100 genes. This may cause error or the result may not be optimal. Would you like to continue?")) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
                   }
                 }
 
+                // check jobname
+                var jobname = document.getElementById('jobname').value;
+                // console.log(jobname);
+                if (jobname != "") {
+                    var count = 0;
+                    var alertStr = ""
+                    if (jobname.length > 15) {
+                      count += 1;
+                      alertStr = alertStr.concat('Please shorten your job name to less than 15 characters.\n');
+                      
+                      // alert('Please shorten your job name to less than 15 characters.');
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+
+                    if ( /[^a-zA-Z0-9\-_/]/.test( jobname ) ) {
+                      count += 1;
+                      alertStr = alertStr.concat('Please only include alphanumeric characters, numbers, hyphens(-) and underscores(_). No whitespaces are allowed.')
+                      // alert('Please only include alphanumeric characters, numbers, hyphens(-) and underscore (_)');
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+
+                    if ( count > 0 ) {
+                      alert(alertStr);
+                    }
+                }
 
 
               }
