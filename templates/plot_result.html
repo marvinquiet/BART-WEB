@@ -29,15 +29,15 @@
       <!-- <p id="resultFlag">The plots are being generated, please come later. </p> -->
       <div class="row">
         <div class="col-md-6 mb-3">
-          <p id="roc">Cumulative Distribution Plot</p>
+          <p id="roc">AUC Cumulative Distribution</p>
           <svg id="cumulative" width="300" height="300"></svg>
-          <button id="cumulativeButton">download as PNG</button>
+          <button id="cumulativeButton">download PNG</button>
         </div>
 
         <div class="col-md-6 mb-3">
-          <p id="rankScore">Ranked Dot Plot</p>
+          <p id="rankScore">TF Prediction Ranks</p>
           <svg id="rankdot" width="300" height="300"></svg>
-          <button id="rankdotButton">download as PNG</button>
+          <button id="rankdotButton">download PNG</button>
         </div>
       </div>
     </div>
@@ -55,7 +55,7 @@
     <script type="text/javascript">
         // =============test d3.js below===============
         var plotResult = {{ plotResults|tojson }};
-        document.getElementById("resultTitle").innerHTML = plotResult.tf_name + " Plot";
+        document.getElementById("resultTitle").innerHTML = plotResult.tf_name + " Plots";
         
         // Set the dimensions of the canvas / graph
         var margin = { top: 10, right: 10, bottom: 50, left: 50 }
@@ -430,126 +430,6 @@
             image.src = imgsrc;
           }
 
-        //=============test end========================
-        // var plotResult = {{ plotResults|tojson }};
-        // document.getElementById("resultTitle").innerHTML = plotResult.tf_name + " Plot";
-
-        // var plotFlag = document.getElementById("resultFlag"); // words whether the plots are generated
-
-        // var rankP = document.getElementById("rankScore");  // rank attribute
-        // var rocP = document.getElementById("roc"); // cumulative distribution attribute
-
-        // if (fileExists(plotResult.dist_plot) && fileExists(plotResult.auc_plot)) {
-        //   plotFlag.style.display = "none";
-        //   rankP.style.display = "block";
-        //   rocP.style.display = "block";
-
-        //   // add rank score image tag
-        //   rankP.appendChild(document.createElement("br"));
-        //   var imgTag = document.createElement("img");
-        //   imgTag.setAttribute("src", plotResult.dist_plot);
-        //   imgTag.setAttribute("width", "300");
-        //   imgTag.setAttribute("height", "300");
-        //   imgTag.setAttribute("alt", "");
-        //   rankP.appendChild(imgTag);
-        //   rankP.appendChild(document.createElement("br"));
-        //   // add download tag
-        //   var aTag = document.createElement("a");
-        //   var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
-        //   aTag.appendChild(aText);
-        //   var aHref = document.createAttribute("href");
-        //   aHref.value = plotResult.dist_plot;
-        //   aTag.setAttributeNode(aHref);
-        //   aTag.setAttributeNode(document.createAttribute("download"));
-        //   rankP.appendChild(aTag);
-
-        //   // add roc image tag
-        //   rocP.appendChild(document.createElement("br"));
-        //   imgTag = document.createElement("img");
-        //   imgTag.setAttribute("src", plotResult.auc_plot);
-        //   imgTag.setAttribute("width", "300");
-        //   imgTag.setAttribute("height", "300");
-        //   imgTag.setAttribute("alt", "");
-        //   rocP.appendChild(imgTag);
-        //   rocP.appendChild(document.createElement("br"));
-        //   // add download tag
-        //   var aTag = document.createElement("a");
-        //   var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
-        //   aTag.appendChild(aText);
-        //   var aHref = document.createAttribute("href");
-        //   aHref.value = plotResult.auc_plot;
-        //   aTag.setAttributeNode(aHref);
-        //   aTag.setAttributeNode(document.createAttribute("download"));
-        //   rocP.appendChild(aTag);
-        // } else {
-        //   plotFlag.style.display = "block";
-        //   rankP.style.display = "none";
-        //   rocP.style.display = "none";
-        // }
-
-        // $.get(plotResult.dist_plot)
-        //   .done(function() { 
-        //     rankP.style.display = "visible";
-        //     plotFlag.style.display = "hidden";
-
-        //     // add rank score image tag
-        //     rankP.appendChild(document.createElement("br"));
-        //     var imgTag = document.createElement("img");
-        //     imgTag.setAttribute("src", plotResult.dist_plot);
-        //     imgTag.setAttribute("width", "300");
-        //     imgTag.setAttribute("height", "300");
-        //     imgTag.setAttribute("alt", "");
-        //     rankP.appendChild(imgTag);
-        //     rankP.appendChild(document.createElement("br"));
-        //     // add download tag
-        //     var aTag = document.createElement("a");
-        //     var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Ranked Dot Plot");
-        //     aTag.appendChild(aText);
-        //     var aHref = document.createAttribute("href");
-        //     aHref.value = plotResult.dist_plot;
-        //     aTag.setAttributeNode(aHref);
-        //     aTag.setAttributeNode(document.createAttribute("download"));
-        //     rankP.appendChild(aTag);
-
-        //   }).fail(function() { 
-        //     // Image doesn't exist - do something else.
-        //     rankP.style.visibility = "hidden";
-        //     plotFlag.style.display = "visible";
-
-        // })
-        
-        
-        // $.get(plotResult.auc_plot)
-        //   .done(function() { 
-        //     rocP.style.display = "visible";
-        //     plotFlag.style.display = "hidden";
-        //     // add roc image tag
-            
-        //     rocP.appendChild(document.createElement("br"));
-        //     imgTag = document.createElement("img");
-        //     imgTag.setAttribute("src", plotResult.auc_plot);
-        //     imgTag.setAttribute("width", "300");
-        //     imgTag.setAttribute("height", "300");
-        //     imgTag.setAttribute("alt", "");
-        //     rocP.appendChild(imgTag);
-        //     rocP.appendChild(document.createElement("br"));
-        //     // add download tag
-        //     var aTag = document.createElement("a");
-        //     var aText = document.createTextNode("Download image: " + plotResult.tf_name + " Cumulative Distribution Plot");
-        //     aTag.appendChild(aText);
-        //     var aHref = document.createAttribute("href");
-        //     aHref.value = plotResult.auc_plot;
-        //     aTag.setAttributeNode(aHref);
-        //     aTag.setAttributeNode(document.createAttribute("download"));
-        //     rocP.appendChild(aTag);
-
-        //   }).fail(function() { 
-        //     // Image doesn't exist - do something else.
-        //     rocP.style.display = "hidden";
-        //     plotFlag.style.display = "visible";
-
-        // })
-        
     </script>
 
 

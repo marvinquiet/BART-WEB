@@ -35,7 +35,8 @@
         <div class="col-md-12 order-md-1">
 
           <div id="resultOutputDiv" class="col-md-12 mb-3">
-            <h3 id="resultOutput" ></h4>
+            <h3 id="resultOutput" ></h3>
+            <p id="resultStorage" ></p>
             <!-- bart result table by tabulor -->
             <div id="bart-result"></div>
           </div>
@@ -72,6 +73,7 @@
       // Otherwise, show "Your result is still being processed"
       if (myResult.done) {
           document.getElementById("resultOutput").innerHTML = "BART result";
+          document.getElementById("resultStorage").innerHTML = "(The analysis result can be retrieved with the job key anytime within 180 days after the job submission.)";
 
           document.getElementById("resultOutputDiv").appendChild(document.createElement("br"));
           var pTag = document.createElement("p");
