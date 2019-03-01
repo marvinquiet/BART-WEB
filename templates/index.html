@@ -38,7 +38,7 @@
           <h2 >BART</h2>
           <h5 ><u>B</u>inding <u>A</u>nalysis for <u>R</u>egulation of <u>T</u>ranscription</h5>
           <p>This web server is to perform BART, a bioinformatics tool for predicting functional factors (including transcription factors and chromatin regulators) that bind at cis-regulatory regions to regulate gene expression in the human or mouse genomes, taking a query gene list or a ChIP-seq dataset as input.</p>
-          <p>The current version is BART 2.0, which uses over 7,000 human ChIP-seq datasets and over 5,000 mouse ChIP-seq datasets from the public domain (collected in Cistrome Data Browser) to make the prediction.</p>
+          <p>The current version is BART 1.1, which uses over 7,000 human ChIP-seq datasets and over 5,000 mouse ChIP-seq datasets from the public domain (collected in Cistrome Data Browser) to make the prediction.</p>
           <img class="mb-3" src="{{ url_for('static', filename='bart_web.png') }}" alt="" width="600">
         </div>
       </div>
@@ -49,7 +49,7 @@
         <div class="col-md-4 order-md-1">
           <form method=post enctype=multipart/form-data id="resultForm" novalidate>
             <h4 style="display:inline-block; vertical-align: middle;">Run BART here</span></h4>
-            <button id="get_result" class="btn btn-link" type="submit" name="result_button" onclick="pop_up_func()">get result here</button>
+            <button id="get_result" class="btn btn-link" type="submit" name="result_button" onclick="pop_up_func()">Get result here</button>
           </form>
         </div>
 

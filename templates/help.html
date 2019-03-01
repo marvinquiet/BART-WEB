@@ -26,26 +26,26 @@
           <p>BARTweb is an interactive web server to predict functional transcription factors that regulate a given gene list or associate with a genomic profile. It is a web interface to <a href='http://faculty.virginia.edu/zanglab/bart/index.htm'>BART Python package</a>. </p>
           <p>If you use BARTweb in your data analysis or publish the results of BARTweb, please cite the following publication(s) in the main text of your paper: </p>
           <ul>
-          <li>Wang,Z., Civelek,M., Miller,C.L., Sheffield,N.C., Guertin,M.J. and Zang,C. (2018) BART: a transcription factor prediction tool with query gene sets or epigenomic profiles. <em>Bioinformatics</em>, <strong>34</strong>, 2867–2869. DOI: <a href='https://doi.org/10.1093/bioinformatics/bty194' target="_new">10.1093/bioinformatics/bty194</a></li>
+          <li>Zhenjia Wang, Mete Civelek, Clint Miller, Nathan Sheffield, Michael J. Guertin, Chongzhi Zang.  BART: a transcription factor prediction tool with query gene sets or epigenomic profiles. <em>Bioinformatics</em>, <strong>34</strong>, 2867–2869 (2018). DOI: <a href='https://doi.org/10.1093/bioinformatics/bty194' target="_new">10.1093/bioinformatics/bty194</a></li>
 
           </ul>
           <p>If your analysis is from a gene list, please also cite the following paper:</p>
           <ul>
-          <li>Wang,S., Zang,C., Xiao,T., Fan,J., Mei,S., Qin,Q., Wu,Q., Li,X., Xu,K., He,H.H., <em>et al.</em> (2016) Modeling cis-regulation with a compendium of genome-wide histone H3K27ac profiles. <em>Genome Research</em>, <strong>26</strong>, 1417–1429. DOI: <a href='https://doi.org/10.1101/gr.201574.115' target="_new">10.1101/gr.201574.115</a></li>
+          <li>Su Wang, Chongzhi Zang, Tengfei Xiao, Jingyu Fan, Shenglin Mei, Qian Qin, Qiu Wu, Xujuan Li, Kexin Xu, Housheng Hansen He, Myles Brown, Clifford A. Meyer, X. Shirley Liu. Modeling cis-regulation with a compendium of genome-wide histone H3K27ac profiles. <em>Genome Research</em>, <strong>26</strong>, 1417–1429 (2016). DOI: <a href='https://doi.org/10.1101/gr.201574.115' target="_new">10.1101/gr.201574.115</a></li>
 
           </ul>
           <h3>Manual</h3>
-          <p><img src="{{ url_for('static', filename='bartweb_guidelines_2.png') }}" alt='bartweb_guidelines' referrerPolicy='no-referrer' width="1000"/></p>
+          <p><img src="{{ url_for('static', filename='bartweb_guidelines_3.png') }}" alt='bartweb_guidelines' referrerPolicy='no-referrer' width="1000"/></p>
           <h5>Submit a job</h5>
           <p>The first three options (species, data type and input data) are required. </p>
           <p><strong>Species</strong>: Currently, only human (hg38) and mouse (mm10) genomes are supported. </p>
-          <p><strong>Input data type</strong>: A gene list has to be official gene symbols in text format. ChIP-seq data can be mapped reads in BAM format. Please make sure your ChIP-seq data are mapped to the correct genome version (hg38 or mm10).</p>
+          <p><strong>Input data type</strong>: A gene list has to be official gene symbols in text format. ChIP-seq data can be mapped reads in both BAM and BED format. Please make sure your ChIP-seq data are mapped to the correct genome version (hg38 or mm10).</p>
           <p>If you leave an e-mail address, BARTweb will send you e-mail notifications about the job key, job status, and result URL.</p>
           <p>Once you press the Submit button, BARTweb will redirect you to the key demonstration page. </p>
           <br>
           <h5>After submitting a job,</h5>
           <h5>Copy your key or redirect to the result page</h5>
-          <p><img src="{{ url_for('static', filename='bartweb_key_page_2.png') }}" alt='bartweb_key_page_2' referrerPolicy='no-referrer' width="1000"/></p>
+          <p><img src="{{ url_for('static', filename='bartweb_key_page_3.png') }}" alt='bartweb_key_page_2' referrerPolicy='no-referrer' width="1000"/></p>
           <p>In Key page, you can either click the Copy Key button to copy your job key to the clipboard and paste it somewhere for your record or click the Get your result link to redirect you to the result page and wait until the job completes. </p>
           <p>Usually, a job will take 1-2 hours to run. You can always click the Result button on the navigation bar and use your key to get your result or the job status.</p>
           <br>
@@ -55,7 +55,7 @@
           <p>If your job is done successfully, the analysis result can be retrieved with the job key anytime within 180 days after the job submission. </p>
           <br>
           <h4>How to interpret BART result</h4>
-          <p><img src="{{ url_for('static', filename='bartweb_result_2.png') }}" alt='bartweb_result_2' referrerPolicy='no-referrer' width="1000"/></p>
+          <p><img src="{{ url_for('static', filename='bartweb_result_3.png') }}" alt='bartweb_result_2' referrerPolicy='no-referrer' width="1000"/></p>
           <br>
           <h5>Output 1: Transcription factor prediction table</h5>
           <p>We take this sub-table of our <a href='http://bartweb.org/sample_result/genelist'>pre-run result</a> as an example to illustrate.</p>
