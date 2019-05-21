@@ -53,7 +53,7 @@ def index():
                 # if using genelist, save to file
                 if request.form.get('uploadList', None):
                     gene_list = request.form['uploadList']
-                    gene_list_file = 'genelist.txt'
+                    gene_list_file = 'Geneset.txt'
                     gene_list_file_path = os.path.join(user_path, 'upload/' + gene_list_file)
                     with open(gene_list_file_path, 'w') as fopen:
                         for gene in gene_list:
@@ -74,10 +74,14 @@ def index():
                         flash('One of the files does not have a legal file name.')	
                         return redirect(request.url)	
                     # make sure the suffix of filename in [.txt, .bam, .bed] 	
-                    if file and allowed_file(file.filename, allowed_extensions):	
+                    if file and allowed_file(file.filename, allowed_extensions):
                         filename = secure_filename(file.filename)	
-                        upload_path = os.path.join(user_path, 'upload')	
-                        filename_abs_path = os.path.join(upload_path, filename)	
+                        upload_path = os.path.join(user_path, 'upload')
+                        ext = filename.split('.')[-1]
+                        if request.form['dataType'] == 'ChIP-seq':
+                            filename_abs_path = os.path.join(upload_path, "ChIP-seq."+ext)
+                        else:
+                            filename_abs_path = os.path.join(upload_path, "Geneset."+ext)
                         file.save(filename_abs_path)	
                         user_data['files'].append(filename) # only save file name, since the uploaded path is always the same
 
