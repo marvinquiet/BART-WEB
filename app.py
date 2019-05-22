@@ -78,12 +78,15 @@ def index():
                         filename = secure_filename(file.filename)	
                         upload_path = os.path.join(user_path, 'upload')
                         ext = filename.split('.')[-1]
+                        new_filename = ""
                         if request.form['dataType'] == 'ChIP-seq':
-                            filename_abs_path = os.path.join(upload_path, "ChIP-seq."+ext)
+                            new_filename = "ChIP-seq."+ext
+                            filename_abs_path = os.path.join(upload_path, new_filename)
                         else:
-                            filename_abs_path = os.path.join(upload_path, "Geneset."+ext)
+                            new_filename = "Geneset."+ext
+                            filename_abs_path = os.path.join(upload_path, new_filename)
                         file.save(filename_abs_path)	
-                        user_data['files'].append(filename) # only save file name, since the uploaded path is always the same
+                        user_data['files'].append(new_filename) # only save file name, since the uploaded path is always the same
 
             do_process.init_user_config(user_path, user_data)
             marge_bart.do_marge_bart(user_data)
