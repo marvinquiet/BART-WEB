@@ -70,7 +70,7 @@ def init_project_path(user_key):
 
     logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
-    utils.send_sqs_message(user_key)
+    #utils.send_sqs_message(user_key)
 
     return user_path
 
