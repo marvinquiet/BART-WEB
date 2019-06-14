@@ -16,12 +16,12 @@ def create_dir(directory):
     try:
         if not os.path.exists(directory):
             oldmask = os.umask(000)
-            os.makedirs(directory,0775)
+            os.makedirs(directory,0777)
             os.umask(oldmask)
         else:
             shutil.rmtree(directory)
             oldmask = os.umask(000)
-            os.makedirs(directory,0775)
+            os.makedirs(directory,0777)
             os.umask(oldmask)
 
     except OSError:
