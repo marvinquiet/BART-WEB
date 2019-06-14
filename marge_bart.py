@@ -275,7 +275,7 @@ source ~/.bashrc
                     cmd = 'bart profile -i ' + input_file_path + ' -f bed -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '/bart_output > ' + exe_log_path + ' 2>&1 && \\ \n'
                     logger.info("Write slurm: " + cmd)
                     fopen.write(cmd)
-
+        os.chmod(slurm_file,0o777)
         # change back the user.config to what Docker could recognize
         cmd = 'python3 ' + marge_bart_script + ' ' + user_key + ' >> ' + exe_log_path + ' 2>&1 \n'
         logger.info("Write slurm: " + cmd)
