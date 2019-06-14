@@ -68,9 +68,9 @@ def init_project_path(user_key):
     if not os.path.exists(user_log_file_path):	
         with open(user_log_file_path, 'w'): pass
 
-    logger.info("Init project: send user key to Amazon SQS...")
     logger.info("Init project: add user to user_queue.yaml...")
-    utils.send_sqs_message(user_key)
+    # utils.send_sqs_message(user_key)
+    # logger.info("Init project: send user key to Amazon SQS...")
 
     return user_path
 
