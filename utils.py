@@ -15,10 +15,10 @@ from logging.handlers import RotatingFileHandler
 def create_dir(directory):
     try:
         if not os.path.exists(directory):
-            os.makedirs(directory)
+            os.makedirs(directory，mode=0o0775)
         else:
             shutil.rmtree(directory)
-            os.makedirs(directory)
+            os.makedirs(directory，mode=0o0775)
 
     except OSError:
         print ('Error: Creating directory. ' +  directory)
