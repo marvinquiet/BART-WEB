@@ -37,7 +37,7 @@ def get_files_in_dir(proc_type, directory):
     return sample_files.strip()
 
 def send_sqs_message(directory):
-    sqs = boto3.resource('sqs', region_name='us-east-1',aws_access_key_id='AKIAIDNC6LPRYQ6OABCA',aws_secret_access_key ='VTjozrY6b8XhsrHcgK/yBHvdxmYuxltwSZQPS4zz')
+    sqs = boto3.resource('sqs', region_name='us-east-1',aws_access_key_id='AKIAIEVJNKDOYKXRH2DQ',aws_secret_access_key ='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')
     queue = sqs.get_queue_by_name(QueueName='BARTweb1')
     response = queue.send_message(MessageBody='BART submission', MessageAttributes={
         'submissionkey': {
