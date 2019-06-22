@@ -40,8 +40,7 @@ def get_files_in_dir(proc_type, directory):
 def send_sqs_message(directory):
     queue_info = os.path.join(PROJECT_DIR, 'usercase/queue_info.txt')
     with open(queue_info) as f1:
-    ID = f1.read().splitlines()
-
+        ID = f1.read().splitlines()
     sqs = boto3.resource('sqs', region_name='us-east-1',aws_access_key_id=ID[0],aws_secret_access_key =ID[1])
     queue = sqs.get_queue_by_name(QueueName='BARTweb1')
     response = queue.send_message(MessageBody='BART submission', MessageAttributes={
