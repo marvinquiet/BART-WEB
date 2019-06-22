@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 
 from logging.handlers import RotatingFileHandler
 
+PROJECT_DIR = os.path.dirname(__file__)
 
 def create_dir(directory):
     try:
@@ -37,9 +38,8 @@ def get_files_in_dir(proc_type, directory):
     return sample_files.strip()
 
 def send_sqs_message(directory):
-    abs_path = os.path.dirname(os.path.abspath(__file__))
-    log_dir_path = abs_path + '/log'
-    with open(os.path.join(log_dir_path,'queue_info.txt')) as f1:
+    queue_info = os.path.join(PROJECT_DIR, 'usercase/queue_info.txt')
+    with open(queue_info) as f1:
     ID = f1.read().splitlines()
 
     sqs = boto3.resource('sqs', region_name='us-east-1',aws_access_key_id=ID[0],aws_secret_access_key =ID[1])
