@@ -138,6 +138,7 @@ abs_path = os.path.dirname(os.path.abspath(__file__))
 log_dir_path = abs_path + '/log'
 if not os.path.exists(log_dir_path):
     os.makedirs(log_dir_path)
+os.chmod(log_dir_path, 0o777)
 
 ## Specific file handler
 fhr_model = RotatingFileHandler('%s/bart-web.log'%(log_dir_path), maxBytes=10*1024*1024, backupCount=3)

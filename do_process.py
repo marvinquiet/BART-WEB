@@ -67,6 +67,7 @@ def init_project_path(user_key):
     user_log_file_path = os.path.join(user_log_path, 'mb_pipe.log')	
     if not os.path.exists(user_log_file_path):	
         with open(user_log_file_path, 'w'): pass
+    os.chmod(user_log_file_path,0o777)
 
     logger.info("Init project: add user to user_queue.yaml...")
     utils.send_sqs_message(user_key)
