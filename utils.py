@@ -54,7 +54,7 @@ def send_sqs_message(directory):
 # send user key to user e-mail
 def send_user_key(user_mail, user_key, email_type):
     MY_ADDRESS = "zanglab.service@gmail.com"
-    PASSWORD = "ZangLab2018"
+    PASSWORD = "UYJzH9NjgN25f2i"
 
     msg = MIMEMultipart()
     msg['From'] = MY_ADDRESS
