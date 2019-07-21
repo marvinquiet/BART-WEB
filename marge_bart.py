@@ -167,12 +167,12 @@ def exe_bart_profile(user_data):
     bart_output_path = os.path.join(user_data['user_path'], 'download/bart_output')
     for input_file in user_data['files']:
         if input_file.endswith(".bam"):
-            cmd = "bart profile -i {} -f bam -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
+            cmd = "python3 /nv/vol190/zanglab/wm9tr/software/BART-v1.0.1-py3-full/bin/bart profile -i {} -f bam -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
             logger.info("Exe cmd: " + cmd)
             # subprocess.call(cmd, cwd=bart_output_path)
             subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bam", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
         elif input_file.endswith(".bed"):
-            cmd = "bart profile -i {} -f bed -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
+            cmd = "python3 /nv/vol190/zanglab/wm9tr/software/BART-v1.0.1-py3-full/bin/bart profile -i {} -f bed -s {} -p {} --outdir {}".format(input_file, user_data["assembly"], str(BART_CORE), bart_output_path)
             logger.info("Exe cmd: " + cmd)
             # subprocess.call(cmd, cwd=bart_output_path)
             subprocess.Popen(["bart", "profile", "-i", input_file, "-f", "bed", "-s", user_data["assembly"], "-p", str(BART_CORE), "--outdir", bart_output_path], cwd=bart_output_path)
@@ -268,11 +268,11 @@ source ~/.bashrc
             for input_file in user_data['files']:
                 input_file_path = os.path.join(slurm_user_path, 'upload/' + input_file)
                 if input_file.endswith(".bam"):
-                    cmd = 'bart profile -i ' + input_file_path + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '/bart_output > ' + exe_log_path + ' 2>&1 && \\ \n'
+                    cmd = 'python3 /nv/vol190/zanglab/wm9tr/software/BART-v1.0.1-py3-full/bin/bart profile -i ' + input_file_path + ' -f bam -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '/bart_output > ' + exe_log_path + ' 2>&1 && \\ \n'
                     logger.info("Write slurm: " + cmd)
                     fopen.write(cmd)
                 elif input_file.endswith(".bed"):
-                    cmd = 'bart profile -i ' + input_file_path + ' -f bed -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '/bart_output > ' + exe_log_path + ' 2>&1 && \\ \n'
+                    cmd = 'python3 /nv/vol190/zanglab/wm9tr/software/BART-v1.0.1-py3-full/bin/bart profile -i ' + input_file_path + ' -f bed -s ' + user_data["assembly"] + ' -p ' + str(BART_CORE) + ' --outdir ' + bart_output_path + '/bart_output > ' + exe_log_path + ' 2>&1 && \\ \n'
                     logger.info("Write slurm: " + cmd)
                     fopen.write(cmd)
         os.chmod(slurm_file,0o777)
