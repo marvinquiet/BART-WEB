@@ -3,9 +3,6 @@ language: bash
 services:
   - docker
 
-python:
-  - "3.6"
-
 before_install:
   - sudo pip install --upgrade pip
   - pip install --user awscli
