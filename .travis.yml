@@ -3,11 +3,9 @@ language: bash
 services:
   - docker
 
-
 before_install:
-  - sudo apt install python3-pip
-  - sudo pip3 install --upgrade pip3
-  - pip3 install --user awscli
+  - sudo pip install --upgrade pip
+  - pip install --user awscli
   - export PATH=$PATH:$HOME/.local/bin
   - echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin 
 
