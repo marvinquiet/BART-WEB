@@ -53,8 +53,11 @@ def send_sqs_message(directory):
 
 # send user key to user e-mail
 def send_user_key(user_mail, user_key, email_type):
-    MY_ADDRESS = "zanglab.service@gmail.com"
-    PASSWORD = "UYJzH9NjgN25f2i"
+    email_info = os.path.join(PROJECT_DIR, 'usercase/email.txt')
+    with open(email_info) as f1:
+        email = f1.read().splitlines()
+    MY_ADDRESS = email[0]
+    PASSWORD = email[1]
 
     msg = MIMEMultipart()
     msg['From'] = MY_ADDRESS
